@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import banner from '../../images/image1_0.jpg';
+import banner from '../../images/construction banner.jpg';
 import { ArrowRight, Building, TruckIcon, ClipboardCheck, Users } from 'lucide-react';
 
 function Body() {
@@ -35,17 +35,17 @@ function Body() {
     // Testimonials data
     const testimonials = [
         {
-            name: "Sarah Johnson",
+            name: "Fuad Jemal",
             company: "Johnson Construction",
             text: "This platform has cut our ordering time in half. Materials arrive on schedule every time."
         },
         {
-            name: "Michael Rodriguez",
+            name: "Abdu Read",
             company: "Rodriguez Builders",
             text: "The supplier network is excellent, and the order tracking feature has saved us countless hours."
         },
         {
-            name: "Amy Chen",
+            name: "A/rehman Moha",
             company: "Chen Properties",
             text: "Easy to use, great customer service, and helps us stay organized across multiple projects."
         }
@@ -67,7 +67,7 @@ function Body() {
 
                         <div className="pt-6 md:pt-10 flex gap-3">
                             <button className="border rounded-full px-4 py-2 text-sm font-medium bg-fuchsia-500 text-white hover:bg-fuchsia-600 transition duration-300">
-                                Get Started
+                                Explore
                             </button>
                             <button className="border rounded-full px-4 py-2 text-sm font-medium hover:bg-gray-100 transition duration-300">
                                 Learn More
@@ -75,7 +75,7 @@ function Body() {
                         </div>
                     </div>
 
-                    <div className="w-full md:w-1/2 flex justify-center md:justify-end">
+                    <div className="w-full md:w-2/3 flex justify-center md:justify-end">
                         <img
                             className="w-full max-w-md h-auto rounded-2xl shadow-lg object-cover"
                             src={banner}
@@ -86,7 +86,7 @@ function Body() {
             </section>
 
             {/* Services Section */}
-            <section className="mt-20 md:mt-32 px-4 md:px-10 lg:px-20 bg-gray-50 py-16">
+            <section className="mt-20 md:mt-32 px-4 md:px-10 lg:px-20 bg-gray-50 py-16" id='service'>
                 <div className="text-center mb-12">
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Our Services</h2>
                     <p className="text-gray-600 mt-2">Everything you need to manage your construction materials</p>
@@ -112,8 +112,8 @@ function Body() {
                             <button
                                 key={service.id}
                                 className={`px-4 py-2 text-sm font-medium mr-2 ${activeTab === service.id
-                                        ? 'border-b-2 border-fuchsia-500 text-fuchsia-500'
-                                        : 'text-gray-500 hover:text-gray-800'
+                                    ? 'border-b-2 border-fuchsia-500 text-fuchsia-500'
+                                    : 'text-gray-500 hover:text-gray-800'
                                     }`}
                                 onClick={() => setActiveTab(service.id)}
                             >
@@ -128,7 +128,7 @@ function Body() {
             </section>
 
             {/* How It Works Section */}
-            <section className="mt-20 px-4 md:px-10 lg:px-20">
+            <section className="mt-20 px-4 md:px-10 lg:px-20" id='learn-more'>
                 <div className="text-center mb-12">
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-800">How It Works</h2>
                     <p className="text-gray-600 mt-2">Simple steps to optimize your material management</p>
@@ -166,7 +166,7 @@ function Body() {
             </section>
 
             {/* Testimonials Section */}
-            <section className="mt-20 md:mt-32 px-4 md:px-10 lg:px-20 bg-gray-50 py-16">
+            <section className="mt-20 md:mt-32 px-4 md:px-10 lg:px-20 bg-gray-50 py-16" id='about-us'>
                 <div className="text-center mb-12">
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-800">What Our Clients Say</h2>
                     <p className="text-gray-600 mt-2">Trusted by construction professionals nationwide</p>

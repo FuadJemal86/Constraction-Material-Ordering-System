@@ -30,7 +30,7 @@ function Header() {
 
         window.addEventListener('resize', handleResize);
         window.addEventListener('scroll', handleScroll);
-        
+
         return () => {
             window.removeEventListener('resize', handleResize);
             window.removeEventListener('scroll', handleScroll);
@@ -41,16 +41,23 @@ function Header() {
         setIsMenuOpen(!isMenuOpen);
     };
 
+    const handelSection = (id) => {
+        const section = document.getElementById(id)
+
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth' })
+        }
+    }
+
     return (
-        <header className={`w-full fixed top-0 z-50 transition-all duration-300 ${
-            scrolled ? 'bg-white shadow-md' : 'bg-white/90 backdrop-blur-md'
-        }`}>
+        <header className={`w-full fixed top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md' : 'bg-white/90 backdrop-blur-md'
+            }`}>
             <div className="container mx-auto px-4 sm:px-6">
-                <nav className="flex items-center justify-between h-16 sm:h-18 md:h-20" style={{fontFamily:'Roboto, sans-serif'}}>
+                <nav className="flex items-center justify-between h-16 sm:h-18 md:h-20" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     {/* Logo */}
                     <div className="flex items-center">
                         <Link to="/" className="flex items-center">
-                            <img className='w-12 h-12' src= {logo} alt="" srcset="" />
+                            <img className='w-12 h-12' src={logo} alt="" srcset="" />
                             <span className="font-bold text-lg sm:text-xl">ConstructEase</span>
                         </Link>
                     </div>
@@ -63,7 +70,7 @@ function Header() {
                             </Link>
                         </li>
                         <li>
-                            <Link to="/about" className="text-gray-700 hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
+                            <Link onClick={() => handelSection('about-us')} className="text-gray-700 hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
                                 About Us
                             </Link>
                         </li>
@@ -73,31 +80,31 @@ function Header() {
                             </Link>
                         </li>
                         <li className="relative">
-                            <button 
+                            <button
                                 className="flex items-center text-gray-700 hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base"
                                 onClick={() => setDropdownOpen(!dropdownOpen)}
                             >
                                 Services <ChevronDown className="ml-1 h-4 w-4" />
                             </button>
-                            
+
                             {dropdownOpen && (
                                 <div className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-20">
-                                    <Link 
-                                        to="/services/materials" 
+                                    <Link
+                                        to="/services/materials"
                                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                         onClick={() => setDropdownOpen(false)}
                                     >
                                         Materials
                                     </Link>
-                                    <Link 
-                                        to="/services/ordering" 
+                                    <Link
+                                        to="/services/ordering"
                                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                         onClick={() => setDropdownOpen(false)}
                                     >
                                         Ordering
                                     </Link>
-                                    <Link 
-                                        to="/services/tracking" 
+                                    <Link
+                                        to="/services/tracking"
                                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                         onClick={() => setDropdownOpen(false)}
                                     >
@@ -114,12 +121,12 @@ function Header() {
                             Join Now
                         </Link>
                         <Link to="/learn" className="border border-fuchsia-500 bg-fuchsia-500 rounded-full px-3 py-1.5 lg:px-5 lg:py-2 text-white font-medium hover:bg-fuchsia-600 hover:border-fuchsia-600 transition-colors text-sm lg:text-base">
-                            Learn More
+                            Post Now
                         </Link>
                     </div>
 
                     {/* Mobile Menu Button */}
-                    <button 
+                    <button
                         className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
                         onClick={toggleMenu}
                         aria-label="Toggle menu"
@@ -130,12 +137,11 @@ function Header() {
             </div>
 
             {/* Mobile Menu - Animated Slide Down */}
-            <div 
-                className={`md:hidden bg-white border-t overflow-hidden transition-all duration-300 ease-in-out ${
-                    isMenuOpen 
-                        ? 'max-h-screen opacity-100' 
+            <div
+                className={`md:hidden bg-white border-t overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen
+                        ? 'max-h-screen opacity-100'
                         : 'max-h-0 opacity-0'
-                }`}
+                    }`}
             >
                 <ul className="flex flex-col py-4 px-6 space-y-4">
                     <li>
@@ -165,7 +171,7 @@ function Header() {
                             Contact Us
                         </Link>
                     </li>
-                    
+
                     {/* Mobile Services Dropdown */}
                     <li className="space-y-2">
                         <div className="font-medium text-gray-700">Services</div>
@@ -199,7 +205,7 @@ function Header() {
                             </li>
                         </ul>
                     </li>
-                    
+
                     <li className="pt-4 flex flex-col space-y-3">
                         <Link
                             to="/signup"
@@ -218,11 +224,11 @@ function Header() {
                     </li>
                 </ul>
             </div>
-            
+
             {/* Backdrop for dropdowns on desktop */}
             {dropdownOpen && (
-                <div 
-                    className="hidden md:block fixed inset-0 z-10" 
+                <div
+                    className="hidden md:block fixed inset-0 z-10"
                     onClick={() => setDropdownOpen(false)}
                 ></div>
             )}
