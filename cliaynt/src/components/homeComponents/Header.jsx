@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, Wrench, ChevronDown } from 'lucide-react';
+import logo from '../../images/logo constraction.jpeg';
+import '@fontsource/roboto';
 
 function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -44,11 +46,11 @@ function Header() {
             scrolled ? 'bg-white shadow-md' : 'bg-white/90 backdrop-blur-md'
         }`}>
             <div className="container mx-auto px-4 sm:px-6">
-                <nav className="flex items-center justify-between h-16 sm:h-18 md:h-20">
+                <nav className="flex items-center justify-between h-16 sm:h-18 md:h-20" style={{fontFamily:'Roboto, sans-serif'}}>
                     {/* Logo */}
                     <div className="flex items-center">
                         <Link to="/" className="flex items-center">
-                            <Wrench className="h-5 w-5 sm:h-6 sm:w-6 text-fuchsia-500 mr-1 sm:mr-2" />
+                            <img className='w-12 h-12' src= {logo} alt="" srcset="" />
                             <span className="font-bold text-lg sm:text-xl">ConstructEase</span>
                         </Link>
                     </div>
