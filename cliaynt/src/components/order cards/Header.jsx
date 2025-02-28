@@ -10,10 +10,11 @@ import { Link } from 'react-router-dom';
 
 
 function Header() {
+
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(
         localStorage.getItem("theme") === "dark"
     );
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         if (darkMode) {

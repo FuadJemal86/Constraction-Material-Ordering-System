@@ -17,9 +17,9 @@ function Body() {
                 </div>
             </div>
 
-            <div className="flex">
+            <div className="flex ">
                 {/* Sidebar */}
-                <div className="border dark:border-gray-900 w-1/4 h-screen overflow-y-auto max-h-80 m-4 rounded-lg p-1">
+                <div className="border dark:border-gray-900 w-1/4 h-screen overflow-y-auto max-h-80 m-4 rounded-lg p-1 custom-scrollbar">
                     <div>
                         <div className='p-2'>
                             <p className='font-semibold text-xl'>Category</p>
@@ -44,7 +44,7 @@ function Body() {
                         </div>
                     </div>
                 </div>
-                <div className="flex-1 p-4">
+                <div className="flex-1 p-4 custom-scrollbar">
                     <Outlet />
                 </div>
             </div>

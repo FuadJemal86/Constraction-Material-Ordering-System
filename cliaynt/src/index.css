@@ -5,3 +5,33 @@
 body {
     @apply bg-white text-black dark:bg-gray-900 dark:text-white;
 }
+
+@layer utilities {
+
+    /* Custom scrollbar for WebKit browsers (Chrome, Edge, Safari) */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+        /* Thin scrollbar */
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgb(225, 225, 228);
+        border-radius: 10px;
+        /* Dark background */
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgb(100, 100, 200);
+        /* Light blue thumb */
+        border-radius: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgb(120, 120, 220);
+        /* Slightly lighter on hover */
+    }
+}
+
+html {
+    @apply custom-scrollbar;
+}
