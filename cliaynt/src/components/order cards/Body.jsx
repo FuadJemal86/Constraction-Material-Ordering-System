@@ -17,9 +17,8 @@ function Body() {
                 </div>
             </div>
 
-            <div className="flex ">
-                {/* Sidebar */}
-                <div className="border dark:border-gray-900 w-1/4 h-screen overflow-y-auto max-h-80 m-4 rounded-lg p-1 custom-scrollbar">
+            <div className="grid md:flex">
+                <div className="border dark:border-gray-900 md:w-1/4 h-screen overflow-y-auto max-h-80 m-4 rounded-lg p-1 custom-scrollbar">
                     <div>
                         <div className='p-2'>
                             <p className='font-semibold text-xl'>Category</p>

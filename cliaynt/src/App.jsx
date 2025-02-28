@@ -12,7 +12,8 @@ function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<OrderParent />}>
+                <Route path='/' element = {<HomeParent/>} />
+                <Route path="/products" element={<OrderParent />}>
                     <Route path='' element={<Cards />} />
                 </Route>
             </Routes>

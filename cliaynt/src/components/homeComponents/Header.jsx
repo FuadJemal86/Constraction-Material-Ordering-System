@@ -90,7 +90,7 @@ function Header() {
                             {dropdownOpen && (
                                 <div className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-20">
                                     <Link
-                                        to="/services/materials"
+                                        to="/products"
                                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                         onClick={() => setDropdownOpen(false)}
                                     >
@@ -117,8 +117,8 @@ function Header() {
 
                     {/* CTA Buttons - Desktop */}
                     <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
-                        <Link to="/signup" className="border border-gray-300 rounded-full px-3 py-1.5 lg:px-5 lg:py-2 text-gray-700 font-medium hover:bg-gray-100 transition-colors text-sm lg:text-base">
-                            Join Now
+                        <Link to="/products" className="border border-gray-300 rounded-full px-3 py-1.5 lg:px-5 lg:py-2 text-gray-700 font-medium hover:bg-gray-100 transition-colors text-sm lg:text-base">
+                            Materials
                         </Link>
                         <Link to="/learn" className="border border-fuchsia-500 bg-fuchsia-500 rounded-full px-3 py-1.5 lg:px-5 lg:py-2 text-white font-medium hover:bg-fuchsia-600 hover:border-fuchsia-600 transition-colors text-sm lg:text-base">
                             Post Now

@@ -42,7 +42,7 @@ function Header() {
                         <div className='hidden md:flex justify-center w-full'>
                             <nav>
                                 <ul className='flex gap-6 font-semibold'>
-                                    <li><Link className="hover:text-yellow-500 transition-colors">Explore</Link></li>
+                                    <li><Link className="hover:text-yellow-500 transition-colors">Home</Link></li>
                                     <li><Link className="hover:text-yellow-500 transition-colors">Catagory</Link></li>
                                     <li><Link className="hover:text-yellow-500 transition-colors">About Us</Link></li>
                                     <li><Link className="hover:text-yellow-500 transition-colors">Contact</Link></li>
@@ -90,15 +90,15 @@ function Header() {
                     </div>
 
                     {mobileMenuOpen && (
-                        <div className="fixed inset-0 bg-white dark:bg-gray-900 z-10 pt-16">
+                        <div className="fixed inset-0  bg-white dark:bg-gray-900 z-10 pt-16">
                             <div className="flex flex-col p-5">
-                                <div className="mb-6">
+                                <div className="mb-6 mt-7">
                                     <input
                                         type="text"
                                         placeholder="Search"
-                                        className="w-full outline-none border border-gray-200 dark:border-gray-800 p-3 pl-10 rounded-3xl dark:bg-gray-900"
+                                        className="w-full mt-2 outline-none border border-gray-200 dark:border-gray-800 p-3 pl-10 rounded-3xl dark:bg-gray-900"
                                     />
-                                    <FaSearch className="absolute left-8 top-[5.7rem] transform -translate-y-1/2 text-gray-500" />
+                                    <FaSearch className="absolute left-8 top-[9.1rem] transform -translate-y-1/2 text-gray-500" />
                                 </div>
 
                                 <nav>
