@@ -50,62 +50,62 @@ function Header() {
     }
 
     return (
-        <header className={`w-full fixed top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md' : 'bg-white/90 backdrop-blur-md'
+        <header className={`w-full fixed top-0 z-50 transition-all duration-300 dark:bg-gray-900 ${scrolled ? 'bg-white shadow-md' : 'bg-white/90 backdrop-blur-md'
             }`}>
             <div className="container mx-auto px-4 sm:px-6">
                 <nav className="flex items-center justify-between h-16 sm:h-18 md:h-20" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     {/* Logo */}
                     <div className="flex items-center">
                         <Link to="/" className="flex items-center">
-                            <img className='w-12 h-12' src={logo} alt="" srcset="" />
+                            <img className='w-12 h-12 dark:bg-white rounded-full m-1' src={logo} alt="" srcset="" />
                             <span className="font-bold text-lg sm:text-xl">ConstructEase</span>
                         </Link>
                     </div>
 
                     {/* Desktop Navigation */}
-                    <ul className="hidden md:flex items-center space-x-4 lg:space-x-8">
+                    <ul className="hidden md:flex items-center space-x-4 lg:space-x-8 ">
                         <li>
-                            <Link to="/" className="text-gray-700 hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
+                            <Link to="/" className="text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
                                 Home
                             </Link>
                         </li>
                         <li>
-                            <Link onClick={() => handelSection('about-us')} className="text-gray-700 hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
+                            <Link onClick={() => handelSection('about-us')} className="text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
                                 About Us
                             </Link>
                         </li>
                         <li>
-                            <Link to="/contact" className="text-gray-700 hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
+                            <Link to="/contact" className="text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
                                 Contact Us
                             </Link>
                         </li>
                         <li className="relative">
                             <button
-                                className="flex items-center text-gray-700 hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base"
+                                className="flex items-center text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base"
                                 onClick={() => setDropdownOpen(!dropdownOpen)}
                             >
                                 Services <ChevronDown className="ml-1 h-4 w-4" />
                             </button>
 
                             {dropdownOpen && (
-                                <div className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-20">
+                                <div className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-20 dark:bg-gray-900">
                                     <Link
                                         to="/products"
-                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        className="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg"
                                         onClick={() => setDropdownOpen(false)}
                                     >
                                         Materials
                                     </Link>
                                     <Link
                                         to="/services/ordering"
-                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        className="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg"
                                         onClick={() => setDropdownOpen(false)}
                                     >
                                         Ordering
                                     </Link>
                                     <Link
                                         to="/services/tracking"
-                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        className="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg"
                                         onClick={() => setDropdownOpen(false)}
                                     >
                                         Tracking
@@ -117,7 +117,7 @@ function Header() {
 
                     {/* CTA Buttons - Desktop */}
                     <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
-                        <Link to="/products" className="border border-gray-300 rounded-full px-3 py-1.5 lg:px-5 lg:py-2 text-gray-700 font-medium hover:bg-gray-100 transition-colors text-sm lg:text-base">
+                        <Link to="/products" className="border border-gray-300 rounded-full px-3 py-1.5 lg:px-5 lg:py-2 text-gray-700 font-medium hover:bg-gray-100 transition-colors text-sm lg:text-base dark:text-white dark:hover:bg-gray-500">
                             Materials
                         </Link>
                         <Link to="/learn" className="border border-fuchsia-500 bg-fuchsia-500 rounded-full px-3 py-1.5 lg:px-5 lg:py-2 text-white font-medium hover:bg-fuchsia-600 hover:border-fuchsia-600 transition-colors text-sm lg:text-base">
@@ -179,7 +179,7 @@ function Header() {
                             <li>
                                 <Link
                                     to="/services/materials"
-                                    className="block text-gray-600 hover:text-fuchsia-500 transition-colors"
+                                    className="block text-gray-600 hover:text-fuchsia-500  transition-colors"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     Materials

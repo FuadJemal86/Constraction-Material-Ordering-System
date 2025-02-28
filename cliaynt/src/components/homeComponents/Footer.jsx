@@ -7,19 +7,21 @@ import '@fontsource/roboto';
 
 function Footer() {
     return (
-        <div className='bg-slate-100'>
+        <div className='bg-slate-100 dark:bg-gray-950'>
             <div>
                 <div className=' w-full sm:flex grid sm:p-12 p-5 '>
                     <div className=' w-28 h-28 text-left'>
-                        <img className='' src= {logo} alt="" srcset="" />
+                        <img className='dark:bg-white rounded-full' src={logo} alt="" srcset="" />
                     </div>
 
                     <div className='w-full '>
-                        <nav className='grid sm:flex gap-4 sm:justify-center text-left font-medium' style={{fontFamily: 'Roboto, sans-serif'}}>
-                            <ul>Contact Us</ul>
-                            <ul>About Us</ul>
-                            <ul>Help Center</ul>
-                            <ul>Blong Posts</ul>
+                        <nav className='grid sm:flex gap-4 sm:justify-center text-left font-medium' >
+                            <ul className='flex gap-4' style={{ fontFamily: 'Roboto, sans-serif' }}>
+                                <li>Contact Us</li>
+                                <li>About Us</li>
+                                <li>Help Center</li>
+                                <li>Blong Posts</li>
+                            </ul>
                         </nav>
                     </div>
 
