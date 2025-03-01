@@ -127,7 +127,7 @@ function Header() {
 
                     {/* Mobile Menu Button */}
                     <button
-                        className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         onClick={toggleMenu}
                         aria-label="Toggle menu"
                     >
@@ -138,7 +138,7 @@ function Header() {
 
             {/* Mobile Menu - Animated Slide Down */}
             <div
-                className={`md:hidden bg-white border-t overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen
+                className={`md:hidden bg-white border-t dark:bg-gray-900 overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen
                         ? 'max-h-screen opacity-100'
                         : 'max-h-0 opacity-0'
                     }`}
@@ -147,7 +147,7 @@ function Header() {
                     <li>
                         <Link
                             to="/"
-                            className="block text-gray-700 hover:text-fuchsia-500 font-medium transition-colors"
+                            className="block text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Home
@@ -156,7 +156,7 @@ function Header() {
                     <li>
                         <Link
                             to="/about"
-                            className="block text-gray-700 hover:text-fuchsia-500 font-medium transition-colors"
+                            className="block text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             About Us
@@ -165,7 +165,7 @@ function Header() {
                     <li>
                         <Link
                             to="/contact"
-                            className="block text-gray-700 hover:text-fuchsia-500 font-medium transition-colors"
+                            className="block text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Contact Us
@@ -174,12 +174,12 @@ function Header() {
 
                     {/* Mobile Services Dropdown */}
                     <li className="space-y-2">
-                        <div className="font-medium text-gray-700">Services</div>
+                        <div className="font-medium text-gray-700 dark:text-white">Services</div>
                         <ul className="pl-4 space-y-2 border-l-2 border-gray-200">
                             <li>
                                 <Link
-                                    to="/services/materials"
-                                    className="block text-gray-600 hover:text-fuchsia-500  transition-colors"
+                                    to="/products"
+                                    className="block text-gray-600 dark:text-white hover:text-fuchsia-500  transition-colors"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     Materials
@@ -188,7 +188,7 @@ function Header() {
                             <li>
                                 <Link
                                     to="/services/ordering"
-                                    className="block text-gray-600 hover:text-fuchsia-500 transition-colors"
+                                    className="block text-gray-600 dark:text-white hover:text-fuchsia-500 transition-colors"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     Ordering
@@ -197,7 +197,7 @@ function Header() {
                             <li>
                                 <Link
                                     to="/services/tracking"
-                                    className="block text-gray-600 hover:text-fuchsia-500 transition-colors"
+                                    className="block text-gray-600 dark:text-white hover:text-fuchsia-500 transition-colors"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     Tracking
@@ -209,7 +209,7 @@ function Header() {
                     <li className="pt-4 flex flex-col space-y-3">
                         <Link
                             to="/signup"
-                            className="border border-gray-300 rounded-full px-5 py-2 text-center text-gray-700 font-medium hover:bg-gray-100 transition-colors"
+                            className="border border-gray-300 dark:text-white rounded-full px-5 py-2 text-center text-gray-700 font-medium hover:bg-gray-100 transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Join Now

@@ -10,13 +10,13 @@ function Footer() {
         <div className='bg-slate-100 dark:bg-gray-950'>
             <div>
                 <div className=' w-full sm:flex grid sm:p-12 p-5 '>
-                    <div className=' w-28 h-28 text-left'>
+                    <div className=' w-14 h-14 p-1 text-left'>
                         <img className='dark:bg-white rounded-full' src={logo} alt="" srcset="" />
                     </div>
 
-                    <div className='w-full '>
-                        <nav className='grid sm:flex gap-4 sm:justify-center text-left font-medium' >
-                            <ul className='flex gap-4' style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className='w-full p-2'>
+                        <nav className='' >
+                            <ul className='grid sm:flex gap-4 sm:justify-center text-left font-medium' style={{ fontFamily: 'Roboto, sans-serif' }}>
                                 <li>Contact Us</li>
                                 <li>About Us</li>
                                 <li>Help Center</li>
@@ -38,7 +38,7 @@ function Footer() {
             </div>
             <div>
                 <div>
-                    <p className='text-center py-4 text-slate-400'>2025 Constraction Material Ordering System. All rights reserved.</p>
+                    <p className='text-center py-4 text-slate-400 text-sm md:text-base'>2025 Constraction Material Ordering System. All rights reserved.</p>
                 </div>
             </div>
         </div>
