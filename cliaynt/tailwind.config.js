@@ -3,7 +3,14 @@ export default {
   darkMode: 'class',
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        poppins: ["Poppins", "sans-serif"],
+      },
+      backgroundImage: {
+        'custom-radial': 'radial-gradient(circle, #472916,#AA9774)',
+      },
+    },
   },
   plugins: [],
 }
