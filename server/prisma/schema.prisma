@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model admin {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique(map: "Admin_email_key")
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model complaint {
+  id         Int              @id @default(autoincrement())
+  customerId Int?
+  supplierId Int?
+  message    String
+  status     complaint_status @default(PENDING)
+  createdAt  DateTime         @default(now())
+  customer   customer?        @relation(fields: [customerId], references: [id], map: "Complaint_customerId_fkey")
+  supplier   supplier?        @relation(fields: [supplierId], references: [id], map: "Complaint_supplierId_fkey")
+
+  @@index([customerId], map: "Complaint_customerId_fkey")
+  @@index([supplierId], map: "Complaint_supplierId_fkey")
+}
+
+model customer {
+  id        Int         @id @default(autoincrement())
+  name      String
+  email     String      @unique(map: "Customer_email_key")
+  password  String
+  phone     String?
+  createdAt DateTime    @default(now())
+  complaint complaint[]
+  order     order[]
+}
+
+model message {
+  id           Int                  @id @default(autoincrement())
+  senderId     Int
+  senderType   message_senderType
+  receiverId   Int
+  receiverType message_receiverType
+  content      String
+  createdAt    DateTime             @default(now())
+}
+
+model order {
+  id         Int          @id @default(autoincrement())
+  customerId Int
+  supplierId Int
+  totalPrice Float
+  paymentId  String?
+  status     order_status @default(PENDING)
+  createdAt  DateTime     @default(now())
+  customer   customer     @relation(fields: [customerId], references: [id], map: "Order_customerId_fkey")
+  supplier   supplier     @relation(fields: [supplierId], references: [id], map: "Order_supplierId_fkey")
+  orderitem  orderitem[]
+  payment    payment?
+
+  @@index([customerId], map: "Order_customerId_fkey")
+  @@index([supplierId], map: "Order_supplierId_fkey")
+}
+
+model orderitem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price     Float
+  order     order   @relation(fields: [orderId], references: [id], map: "OrderItem_orderId_fkey")
+  product   product @relation(fields: [productId], references: [id], map: "OrderItem_productId_fkey")
+
+  @@index([orderId], map: "OrderItem_orderId_fkey")
+  @@index([productId], map: "OrderItem_productId_fkey")
+}
+
+model payment {
+  id        Int            @id @default(autoincrement())
+  orderId   Int            @unique(map: "Payment_orderId_key")
+  amount    Float
+  method    String
+  status    payment_status @default(PENDING)
+  createdAt DateTime       @default(now())
+  order     order          @relation(fields: [orderId], references: [id], map: "Payment_orderId_fkey")
+}
+
+model product {
+  id         Int         @id @default(autoincrement())
+  name       String
+  category   String
+  price      Float
+  stock      Int         @default(0)
+  supplierId Int
+  createdAt  DateTime    @default(now())
+  orderitem  orderitem[]
+  supplier   supplier    @relation(fields: [supplierId], references: [id], map: "Product_supplierId_fkey")
+
+  @@index([supplierId], map: "Product_supplierId_fkey")
+}
+
+model supplier {
+  id         Int         @id @default(autoincrement())
+  name       String
+  email      String      @unique(map: "Supplier_email_key")
+  password   String
+  phone      String?
+  tinNumber  String      @unique(map: "Supplier_tinNumber_key")
+  isApproved Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  complaint  complaint[]
+  order      order[]
+  product    product[]
+}
+
+enum message_senderType {
+  CUSTOMER
+  SUPPLIER
+}
+
+enum complaint_status {
+  PENDING
+  RESOLVED
+  REJECTED
+}
+
+enum message_receiverType {
+  CUSTOMER
+  SUPPLIER
+}
+
+enum payment_status {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum order_status {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}

@@ -1,0 +1,46 @@
+const express = require('express')
+const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcrypt')
+
+
+
+const prisma = new PrismaClient();
+
+const router = express.Router()
+
+
+
+
+// sign up 
+
+router.post('/sign-up', async (req, res) => {
+    try {
+
+        const { name, email, phone, tinNumber, password, licenseNum } = req.body
+
+        const isExist = await prisma.supplier.findUnique({ where: { email } })
+
+        if (isExist) {
+            return res.status(401).json({ status: false, message: 'Account Already Exist' })
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        await prisma.supplier.create({
+            data: { name, email, phone, tinNumber, password: hashedPassword, licenseNum }
+        })
+
+        return res.status(200).json({ status: true, message: 'supplier registed' })
+
+
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ status: false, message: 'server error' })
+    }
+})
+
+
+
+
+
+module.exports = { supplier: router }

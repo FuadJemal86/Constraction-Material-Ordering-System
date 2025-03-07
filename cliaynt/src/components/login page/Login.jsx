@@ -7,13 +7,13 @@ function Login() {
         <div className="flex justify-center items-center min-h-screen gap-32">
             <div className="grid gap-5 text-center ml-52">
                 <div className="grid items-center">
-                    <img className="w-24 h-24 mx-auto " src={logo} alt="Logo" />
-                    <span className="text-xl font-bold font-poppins">ConstructEasy</span>
+                    <img className="w-24 h-24 mx-auto dark:bg-white rounded-full" src={logo} alt="Logo" />
+                    <span className="text-xl font-bold font-poppins dark:text-gray-400">ConstructEasy</span>
                 </div>
 
                 <div className="grid gap-1">
-                    <span className="text-3xl font-bold font-poppins">Create your account.</span>
-                    <span className="text-sm font-light font-poppins">
+                    <span className="text-3xl font-bold font-poppins dark:text-gray-400">Create your account.</span>
+                    <span className="text-sm font-light font-poppins dark:text-gray-400">
                         Already have an account? <span className="text-blue-500 cursor-pointer font-semibold">Sign in</span>
                     </span>
                 </div>
@@ -22,8 +22,8 @@ function Login() {
                     <div className='grid text-left'>
                         <label className='text-xs mb-1 font-light font-poppins text-gray-500'>Full name / Company name</label>
                         <input
-                            className='w-[336px] h-8 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition'
-                            placeholder='fuad jemal'
+                            className='w-[336px] h-8 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition dark:bg-slate-200 placeholder:text-gray-500'
+                            placeholder='your name'
                         />
                     </div>
 
@@ -31,16 +31,16 @@ function Login() {
                         <div className='grid text-left'>
                             <lable className='text-xs mb-1 font-light font-poppins text-gray-500'>Email address</lable>
                             <input
-                                className='w-[162px] h-8 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition'
-                                placeholder='fuad jemal'
+                                className='w-[162px] h-8 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition dark:bg-slate-200 placeholder:text-gray-500'
+                                placeholder='example@gmail.com'
                             />
                         </div>
 
                         <div className='grid text-left'>
                             <lable className='text-xs mb-1 font-light font-poppins text-gray-500'>Phone number</lable>
                             <input
-                                className='w-[162px] h-8 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition'
-                                placeholder='fuad jemal'
+                                className='w-[162px] h-8 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition dark:bg-slate-200 placeholder:text-gray-500'
+                                placeholder='+251 902 920301'
                             />
                         </div>
                     </div>
@@ -49,16 +49,16 @@ function Login() {
                         <div className='grid text-left'>
                             <lable className='text-xs mb-1 font-light font-poppins text-gray-500'>TIN number</lable>
                             <input
-                                className='w-[162px] h-8 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition'
-                                placeholder='fuad jemal'
+                                className='w-[162px] h-8 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition dark:bg-slate-200 placeholder:text-gray-500'
+                                placeholder=''
                             />
                         </div>
 
                         <div className='grid text-left'>
                             <lable className='text-xs mb-1 font-light font-poppins text-gray-500'>Password</lable>
                             <input
-                                className='w-[162px] h-8 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition'
-                                placeholder='fuad jemal'
+                                className='w-[162px] h-8 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition dark:bg-slate-200 placeholder:text-gray-500'
+                                placeholder='*****'
                             />
                         </div>
                     </div>
@@ -67,7 +67,7 @@ function Login() {
                         <lable className='text-xs mb-1 font-light font-poppins text-gray-500'>Company Address</lable>
                         <input
                             placeholder='-------'
-                            className='w-[336px] h-8 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition'
+                            className='w-[336px] h-8 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition dark:bg-slate-200 placeholder:text-gray-500'
                         />
                     </div>
 
@@ -75,7 +75,7 @@ function Login() {
                         <lable className='text-xs mb-1 font-thin font-poppins text-gray-500'>Bussines license number</lable>
                         <input
                             placeholder='*****'
-                            className='w-[px] h-8 border p-1 rounded-lg text-base border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition'
+                            className='w-[px] h-8 border p-1 rounded-lg text-base border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition dark:bg-slate-200 placeholder:text-gray-500'
                         />
                     </div>
 
@@ -83,7 +83,6 @@ function Login() {
                         <input
                             type='checkbox'
                             className='w-3 h-3'
-
                         />
                         <span className='text-xs mb-1 font-thin font-poppins text-gray-500'> i agree to the term and condition</span>
                     </div>
