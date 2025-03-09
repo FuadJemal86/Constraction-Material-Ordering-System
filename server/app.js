@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const {supplier} = require('./Route/supplier')
+const {customer} = require('./Route/customer')
 
 
 
@@ -18,7 +19,9 @@ app.use(cors({
 
 app.use(express.json())
 
+app.use(express.static('public'));
 app.use('/supplier' , supplier)
+app.use('/customer' , customer)
 
 
 

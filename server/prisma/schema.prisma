@@ -93,13 +93,15 @@ model payment {
 model product {
   id         Int         @id @default(autoincrement())
   name       String
-  category   String
+  categoryId  Int
   price      Float
   stock      Int         @default(0)
   supplierId Int
+  image      String  
   createdAt  DateTime    @default(now())
-  orderitem  orderitem[]
-  supplier   supplier    @relation(fields: [supplierId], references: [id], map: "Product_supplierId_fkey")
+  orderItems orderitem[]
+  category   category   @relation(fields: [categoryId], references: [id])
+  supplier   supplier   @relation(fields: [supplierId], references: [id])
 
   @@index([supplierId], map: "Product_supplierId_fkey")
 }
@@ -115,6 +117,12 @@ model supplier {
   createdAt  DateTime    @default(now())
   complaint  complaint[]
   order      order[]
+  product    product[]
+}
+
+model category {
+  id        Int           @id @default(autoincrement())
+  category  String        @unique(map: "category_key")
   product    product[]
 }
 
