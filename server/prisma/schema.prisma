@@ -50,14 +50,32 @@ model message {
   createdAt    DateTime             @default(now())
 }
 
+model address {
+  id           Int    @id @default(autoincrement())
+  address      String
+  order  order[]
+}
+
+model bank {
+  id           Int    @id @default(autoincrement())
+  supplierId   Int
+  bankName     String
+  account      String
+  payment payment[]
+
+  supplier   supplier     @relation(fields: [supplierId], references: [id], map: "bank_supplierId")
+}
+
 model order {
   id         Int          @id @default(autoincrement())
   customerId Int
   supplierId Int
+  addressId  Int
   totalPrice Float
   status     order_status @default(PENDING)
   createdAt  DateTime     @default(now())
   customer   customer     @relation(fields: [customerId], references: [id], map: "Order_customerId_fkey")
+  address    address     @relation(fields: [addressId], references: [id], map: "order_address")
   supplier   supplier     @relation(fields: [supplierId], references: [id], map: "Order_supplierId_fkey")
   orderitem  orderitem[]
   payment    payment?
@@ -83,24 +101,25 @@ model payment {
   id        Int            @id @default(autoincrement())
   orderId   Int            @unique(map: "Payment_orderId_key")
   amount    Float
-  method    String
+  bankId    Int
   status    payment_status @default(PENDING)
   createdAt DateTime       @default(now())
   order     order          @relation(fields: [orderId], references: [id], map: "Payment_orderId_fkey")
+  bank   bank @relation(fields: [bankId], references: [id], map: "Payment_bankId_fkey")
 }
 
 model product {
   id         Int         @id @default(autoincrement())
   name       String
-  categoryId  Int
+  categoryId Int
   price      Float
   stock      Int         @default(0)
   supplierId Int
-  image      String  
+  image      String
   createdAt  DateTime    @default(now())
   orderItems orderitem[]
-  category   category   @relation(fields: [categoryId], references: [id])
-  supplier   supplier   @relation(fields: [supplierId], references: [id])
+  category   category    @relation(fields: [categoryId], references: [id])
+  supplier   supplier    @relation(fields: [supplierId], references: [id])
 
   @@index([supplierId], map: "Product_supplierId_fkey")
 }
@@ -117,12 +136,13 @@ model supplier {
   complaint  complaint[]
   order      order[]
   product    product[]
+  bank       bank[]
 }
 
 model category {
-  id        Int           @id @default(autoincrement())
-  category  String        @unique(map: "category_key")
-  product    product[]
+  id       Int       @id @default(autoincrement())
+  category String    @unique(map: "category_key")
+  product  product[]
 }
 
 enum message_senderType {
