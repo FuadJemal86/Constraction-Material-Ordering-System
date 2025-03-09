@@ -35,29 +35,38 @@ const upload = multer({
 
 router.post('/sign-up', async (req, res) => {
     try {
+        const { companyName, email, phone, address, tinNumber, licenseNumber, password } = req.body;
 
-        const { name, email, phone, tinNumber, password, licenseNum } = req.body
+        const tinRegex = /^\d{10}$/;
+        if (!tinRegex.test(tinNumber)) {
+            return res.status(400).json({ status: false, message: 'Invalid TIN Number. It must be 10 digits.' });
+        }
 
-        const isExist = await prisma.supplier.findUnique({ where: { email } })
+        const licenseRegex = /^[A-Z]{2,3}\/\d{3,6}\/\d{4}$/;
+        if (!licenseRegex.test(licenseNumber)) {
+            return res.status(400).json({ status: false, message: 'Invalid License Number format. Use format like MT/1234/2015' });
+        }
+
+        const isExist = await prisma.supplier.findUnique({ where: { email } });
 
         if (isExist) {
-            return res.status(401).json({ status: false, message: 'Account Already Exist' })
+            return res.status(401).json({ status: false, message: 'Account Already Exists' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
         await prisma.supplier.create({
-            data: { name, email, phone, tinNumber, password: hashedPassword, licenseNum }
-        })
+            data: { companyName, email, phone, address, tinNumber, licenseNumber, password: hashedPassword }
+        });
 
-        return res.status(200).json({ status: true, message: 'supplier registed' })
-
+        return res.status(200).json({ status: true, message: 'Supplier registered successfully' });
 
     } catch (err) {
-        console.log(err)
-        return res.status(500).json({ status: false, error: 'server error' })
+        console.log(err);
+        return res.status(500).json({ status: false, error: 'Server error' });
     }
-})
+});
+
 
 
 // login 
@@ -196,7 +205,6 @@ router.put('/update-product/:id', upload.single('image'), async (req, res) => {
 
 router.get('/get-order', async (req, res) => {
     try {
-
         const order = await prisma.order.findMany()
 
         return res.status(200).json({ status: true, result: order })
