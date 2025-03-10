@@ -7,6 +7,7 @@ import Cards from './components/order cards/Cards';
 import OrderParent from './components/order cards/OrderParent';
 import Login from './components/login page/Login';
 import Nav from './components/SupplyNav/Nav';
+import SupplierOrders from './components/SupplyNav/SupplierOrders';
 
 
 
@@ -19,6 +20,10 @@ function App() {
                 <Route path='/sign-up' element = {<Login/>} />
                 <Route path="/products" element={<OrderParent />}>
                     <Route path='' element={<Cards />} />
+                </Route>
+
+                <Route path="/supplier-page" element={<Nav />}>
+                    <Route path='order' element={<SupplierOrders />} />
                 </Route>
             </Routes>
         </Router>

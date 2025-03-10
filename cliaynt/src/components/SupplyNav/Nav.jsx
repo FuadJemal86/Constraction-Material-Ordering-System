@@ -1,12 +1,12 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Outlet } from 'react-router-dom'
 import logo from '../../images/logo constraction.jpeg'
 import { AlignLeft, MoreVertical, Eye, Package, ShoppingCart, Box, CreditCard, MessageCircle, AlertCircle, Bell } from "lucide-react";
 
 
 function Nav() {
     return (
-        <div>
+        <div className='flex'>
             <div className="bg-slate-200/50 backdrop-blur-md shadow-sm fixed right-0 left-64 h-11 flex items-center">
                 <header className='w-full'>
                     <div className='flex'>
@@ -45,7 +45,7 @@ function Nav() {
                         <nav className='pl-8 pt-7'>
                             <ul className='text-gray-300 grid gap-4 text-left'>
                                 <li className='hover:bg-slate-700 hover:text-white w-full p-1 transition cursor-pointer rounded-md flex gap-2'><Eye /><Link className='w-full pl-1'>Overview</Link></li>
-                                <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'><Package /><Link className='w-full pl-1'>Orders</Link></li>
+                                <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'><Package /><Link to={'order'} className='w-full pl-1'>Orders</Link></li>
                                 <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'><ShoppingCart /><Link className='w-full pl-1'>Suppliers</Link></li>
                                 <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'><Box /><Link className='w-full pl-1'>Products</Link></li>
                                 <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'><CreditCard /><Link className='w-full pl-1'>Payments</Link></li>
@@ -54,6 +54,9 @@ function Nav() {
                         </nav>
                     </div>
                 </div>
+            </div>
+            <div className="flex-1 p-4 custom-scrollbar">
+                <Outlet />
             </div>
         </div>
     )

@@ -44,7 +44,7 @@ router.post('/sign-up', async (req, res) => {
 
         const licenseRegex = /^[A-Z]{2,3}\/\d{3,6}\/\d{4}$/;
         if (!licenseRegex.test(licenseNumber)) {
-            return res.status(400).json({ status: false, message: 'Invalid License Number format. Use format like MT/1234/2015' });
+            return res.status(400).json({ status: false, message: 'Invalid License Number format' });
         }
 
         const isExist = await prisma.supplier.findUnique({ where: { email } });
