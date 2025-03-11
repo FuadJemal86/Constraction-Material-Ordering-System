@@ -47,15 +47,15 @@ function Nav() {
                                 <li className='hover:bg-slate-700 hover:text-white w-full p-1 transition cursor-pointer rounded-md flex gap-2'><Eye /><Link className='w-full pl-1'>Overview</Link></li>
                                 <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'><Package /><Link to={'order'} className='w-full pl-1'>Orders</Link></li>
                                 <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'><ShoppingCart /><Link className='w-full pl-1'>Suppliers</Link></li>
-                                <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'><Box /><Link className='w-full pl-1'>Products</Link></li>
-                                <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'><CreditCard /><Link className='w-full pl-1'>Payments</Link></li>
+                                <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'><Box /><Link to={'product'} className='w-full pl-1'>Products</Link></li>
+                                <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'><CreditCard /><Link to={'payment'} className='w-full pl-1'>Payments</Link></li>
                                 <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'><MessageCircle /><Link className='w-full pl-1'>Messages</Link></li>
                             </ul>
                         </nav>
                     </div>
                 </div>
             </div>
-            <div className="flex-1 p-4 custom-scrollbar">
+            <div className="flex-1 p-4 custom-scrollbar bg-gray-50">
                 <Outlet />
             </div>
         </div>

@@ -1,5 +1,6 @@
 const express = require('express')
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcrypt')
 
 
 
@@ -20,12 +21,13 @@ router.post('/sign-up', async (req, res) => {
             return res.status(401).json({ status: false, message: 'Account Already Exist' })
         }
 
-        await prisma.supplier.create({
-            data: { name, email, password, phone }
+        const hashPassword = await bcrypt.hash(password , 10)
+
+        await prisma.customer.create({
+            data: { name, email, password : hashPassword, phone }
         })
 
-        return res.status(200).json({ status: true, message: 'supplier registed' })
-
+        return res.status(200).json({ status: true, message: 'customer registed' })
 
     } catch (err) {
         console.log(err)
@@ -38,10 +40,10 @@ router.post('/sign-up', async (req, res) => {
 
 router.post('/place-order', async (req, res) => { 
     try {
-        const { customerId, supplierId, totalPrice, addressId, orderItems } = req.body;
+        const { customerId, supplierId, addressId, totalPrice } = req.body;
 
         const newOrder = await prisma.order.create({
-            data: { customerId, supplierId, totalPrice, addressId }
+            data: { customerId, supplierId, addressId, totalPrice }
         });
 
         if (orderItems && orderItems.length > 0) {

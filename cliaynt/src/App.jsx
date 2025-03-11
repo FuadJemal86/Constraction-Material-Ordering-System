@@ -8,6 +8,10 @@ import OrderParent from './components/order cards/OrderParent';
 import Login from './components/login page/Login';
 import Nav from './components/SupplyNav/Nav';
 import SupplierOrders from './components/SupplyNav/SupplierOrders';
+import Product from './components/SupplyNav/Product';
+import AddProduct from './components/SupplyNav/AddProduct';
+import Payment from './components/SupplyNav/Payment';
+import SignIn from './components/login page/SignIn';
 
 
 
@@ -18,12 +22,17 @@ function App() {
             <Routes>
                 <Route path='/' element = {<HomeParent/>} />
                 <Route path='/sign-up' element = {<Login/>} />
+                <Route path='/sign-in' element = {<SignIn/>} />
                 <Route path="/products" element={<OrderParent />}>
                     <Route path='' element={<Cards />} />
                 </Route>
+                
 
                 <Route path="/supplier-page" element={<Nav />}>
                     <Route path='order' element={<SupplierOrders />} />
+                    <Route path='product' element={<Product />} />
+                    <Route path='add-product' element={<AddProduct />} />
+                    <Route path='payment' element={<Payment />} />
                 </Route>
             </Routes>
         </Router>

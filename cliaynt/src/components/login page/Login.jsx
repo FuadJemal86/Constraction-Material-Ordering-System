@@ -4,7 +4,7 @@ import banner from '../../images/login banner.jpg';
 import api from '../../api';
 import { Toaster, toast } from 'react-hot-toast';
 import { Notyf } from 'notyf';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import 'notyf/notyf.min.css';
 
 function Login() {
@@ -51,20 +51,21 @@ function Login() {
             if (result.data.status) {
                 notyf.success('Your data will be processed');
 
-                navigate('/suplier-page')
-                
+                navigate('/supplier-page')
+
             } else {
                 toast.error(result.data.message || 'Signup failed!');
             }
         } catch (err) {
-            toast.error('An error occurred. Please try again.');
+            const errorMessage = err.response.data.message || 'An error occurred. Please try again.';
+            toast.error(errorMessage);
             console.error(err);
         }
     };
 
     return (
         <div className="flex justify-center items-center min-h-screen gap-32">
-            <Toaster position="top-left" reverseOrder={false} />
+            <Toaster position="top-center" reverseOrder={false} />
 
             <div className="grid gap-5 text-center ml-52">
                 <div className="grid items-center">
@@ -75,7 +76,7 @@ function Login() {
                 <div className="grid gap-1">
                     <span className="text-3xl font-bold font-poppins dark:text-gray-400">Create your account.</span>
                     <span className="text-sm font-light font-poppins dark:text-gray-400">
-                        Already have an account? <span className="text-blue-500 cursor-pointer font-semibold">Sign in</span>
+                        Already have an account? <span className="text-blue-500 cursor-pointer font-semibold"><Link to={'/sign-in'}>Sign in</Link></span>
                     </span>
                 </div>
 
