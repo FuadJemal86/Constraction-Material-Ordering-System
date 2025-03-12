@@ -20,13 +20,12 @@ function App() {
     return (
         <Router>
             <Routes>
-                <Route path='/' element = {<HomeParent/>} />
-                <Route path='/sign-up' element = {<Login/>} />
-                <Route path='/sign-in' element = {<SignIn/>} />
+                <Route path='/' element={<HomeParent />} />
+                <Route path='/sign-up' element={<Login />} />
+                <Route path='/sign-in' element={<SignIn />} />
                 <Route path="/products" element={<OrderParent />}>
                     <Route path='' element={<Cards />} />
                 </Route>
-                
 
                 <Route path="/supplier-page" element={<Nav />}>
                     <Route path='order' element={<SupplierOrders />} />
