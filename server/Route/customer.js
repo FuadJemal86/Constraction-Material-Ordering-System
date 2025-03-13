@@ -1,6 +1,7 @@
 const express = require('express')
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt')
+require('dotenv').config()
 
 
 
@@ -32,6 +33,44 @@ router.post('/sign-up', async (req, res) => {
     } catch (err) {
         console.log(err)
         return res.status(500).json({ status: false, error: 'server error' })
+    }
+})
+
+
+// login
+
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body
+
+        const customer = await prisma.customer.findUnique({ where: { email } })
+
+        if (!customer) {
+            return res.status(401).json({ loginStatus: false, message: 'Wrong email or password!' })
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(password, customer.password)
+
+        if (!isPasswordCorrect) {
+            return res.status(401).json({ loginStatus: false, message: 'Wrong Password or Email' })
+        }
+
+        const token = jwt.sign({
+            customer: true, email: customer.email, id: customer.id
+        }, process.env.CUSTOMER_KEY, { expiresIn: "30d" })
+
+        res.cookie("token", token, {
+            httpOnly: true,   
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
+
+
+        res.status(200).json({ loginStatus: true, message: "Login successful" });
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ status: false, error: 'server error!' })
     }
 })
 

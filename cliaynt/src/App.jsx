@@ -12,6 +12,8 @@ import Product from './components/SupplyNav/Product';
 import AddProduct from './components/SupplyNav/AddProduct';
 import Payment from './components/SupplyNav/Payment';
 import SignIn from './components/login page/SignIn';
+import CustomerSignIn from './components/customer/CustomerSignIn';
+import SignUp from './components/customer/SignUp';
 
 
 
@@ -23,6 +25,8 @@ function App() {
                 <Route path='/' element={<HomeParent />} />
                 <Route path='/sign-up' element={<Login />} />
                 <Route path='/sign-in' element={<SignIn />} />
+                <Route path='/customer-sign-in' element={<CustomerSignIn />} />
+                <Route path='/customer-sign-up' element={<SignUp />} />
                 <Route path="/products" element={<OrderParent />}>
                     <Route path='' element={<Cards />} />
                 </Route>

@@ -1,7 +1,9 @@
-import React from 'react'
-import image1 from '../../images/image1_0.jpg'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import image1 from '../../images/image1_0.jpg';
 
 function Cards() {
+    const navigate = useNavigate();
 
     const products = [
         { id: 1, name: "Product 1", price: "$19.99", image: image1 },
@@ -21,31 +23,45 @@ function Cards() {
         { id: 15, name: "Product 15", price: "$159.99", image: image1 },
         { id: 16, name: "Product 16", price: "$169.99", image: image1 }
     ];
+
+    const handleOrderClick = (product) => {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            navigate("/customer-sign-in"); // Redirect to login if no token
+            return;
+        }
+
+        // Get cart from localStorage or initialize an empty array
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        // Check if the product is already in the cart
+        const existingProduct = cart.find(item => item.id === product.id);
+        if (existingProduct) {
+            existingProduct.quantity += 1; // Increase quantity if already in cart
+        } else {
+            cart.push({ ...product, quantity: 1 }); // Add new product with quantity 1
+        }
+
+        // Save updated cart to localStorage
+        localStorage.setItem("cart", JSON.stringify(cart));
+
+        console.log("Cart updated:", cart);
+    };
+
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {products.map(product => (
                     <div key={product.id} className="border rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 dark:border-gray-800">
-                        <div className="relative">
-                            <div className="aspect-w-1 aspect-h-1">
-                                <img
-                                    src={product.image}
-                                    alt={product.name}
-                                    className="w-full h-48 object-cover"
-                                />
-                                <div className="absolute top-2 right-2">
-                                    <button className="bg-white rounded-full p-2 shadow hover:bg-gray-100">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
                         <div className="p-4">
                             <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
                             <p className="text-gray-800 font-bold dark:text-white">{product.price}</p>
-                            <button className="mt-3 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
+                            <button
+                                className="mt-3 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
+                                onClick={() => handleOrderClick(product)}
+                            >
                                 Add to Cart
                             </button>
                         </div>
@@ -53,7 +69,7 @@ function Cards() {
                 ))}
             </div>
         </div>
-    )
+    );
 }
 
-export default Cards
+export default Cards;

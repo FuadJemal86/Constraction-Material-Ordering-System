@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const multer = require('multer')
 const path = require('path');
+const cookieParser = require('cookie-parser')
 require('dotenv').config()
 
 
@@ -11,6 +12,8 @@ require('dotenv').config()
 const prisma = new PrismaClient();
 
 const router = express.Router()
+
+router.use(cookieParser());
 
 
 
@@ -91,8 +94,15 @@ router.post('/login', async (req, res) => {
             supplier: true, email: supplier.email, id: supplier.id
         }, process.env.SUPPLIER_KEY, { expiresIn: "30d" })
 
+        res.cookie("token", token, {
+            httpOnly: true,   
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
 
-        res.status(200).json({ loginStatus: true, token })
+
+        res.status(200).json({ loginStatus: true, message: "Login successful" });
     } catch (err) {
         console.log(err)
         return res.status(500).json({ status: false, error: 'server error!' })
