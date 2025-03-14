@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import image1 from '../../images/image1_0.jpg';
+import api from '../../api';
+import toast from 'react-hot-toast';
 
 function Cards() {
     const navigate = useNavigate();
@@ -24,29 +26,31 @@ function Cards() {
         { id: 16, name: "Product 16", price: "$169.99", image: image1 }
     ];
 
-    const handleOrderClick = (product) => {
-        const token = localStorage.getItem("token");
+    const handleOrderClick = async (product) => {
+        try {
+            const result = await api.get("/customer/verify-token", {
+                withCredentials: true,
+            });
 
-        if (!token) {
-            navigate("/customer-sign-in"); // Redirect to login if no token
-            return;
+            if (result.data.valid) {
+                let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+                const existingProduct = cart.find(item => item.id === product.id);
+                if (existingProduct) {
+                    existingProduct.quantity += 1;
+                } else {
+                    cart.push({ ...product, quantity: 1 });
+                }
+
+                localStorage.setItem("cart", JSON.stringify(cart));
+                console.log("Item added to cart:", cart);
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (err) {
+            console.error("Token verification failed!", err);
+            navigate("/customer-sign-in");
         }
-
-        // Get cart from localStorage or initialize an empty array
-        let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-        // Check if the product is already in the cart
-        const existingProduct = cart.find(item => item.id === product.id);
-        if (existingProduct) {
-            existingProduct.quantity += 1; // Increase quantity if already in cart
-        } else {
-            cart.push({ ...product, quantity: 1 }); // Add new product with quantity 1
-        }
-
-        // Save updated cart to localStorage
-        localStorage.setItem("cart", JSON.stringify(cart));
-
-        console.log("Cart updated:", cart);
     };
 
     return (

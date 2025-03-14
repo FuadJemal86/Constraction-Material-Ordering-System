@@ -26,7 +26,7 @@ function CustomerSignIn() {
         try {
             const result = await api.post('/customer/login',customer)
 
-            if(result.data.status) {
+            if(result.data.loginStatus) {
                 toast.success(result.data.message)
             } else {
                 toast.error(result.data.message)

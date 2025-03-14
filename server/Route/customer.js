@@ -1,12 +1,15 @@
 const express = require('express')
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+const cookieParser = require('cookie-parser')
 require('dotenv').config()
 
 
 
-const prisma =new  PrismaClient()
+const prisma = new PrismaClient()
 const router = express.Router()
+router.use(cookieParser());
 
 
 // sign up
@@ -22,10 +25,10 @@ router.post('/sign-up', async (req, res) => {
             return res.status(401).json({ status: false, message: 'Account Already Exist' })
         }
 
-        const hashPassword = await bcrypt.hash(password , 10)
+        const hashPassword = await bcrypt.hash(password, 10)
 
         await prisma.customer.create({
-            data: { name, email, password : hashPassword, phone }
+            data: { name, email, password: hashPassword, phone }
         })
 
         return res.status(200).json({ status: true, message: 'customer registed' })
@@ -59,11 +62,11 @@ router.post('/login', async (req, res) => {
             customer: true, email: customer.email, id: customer.id
         }, process.env.CUSTOMER_KEY, { expiresIn: "30d" })
 
-        res.cookie("token", token, {
-            httpOnly: true,   
+        res.cookie("x-auth-token", token, {
+            httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "Strict",
-            maxAge: 30 * 24 * 60 * 60 * 1000
+            maxAge: 24 * 60 * 60 * 1000,
+            sameSite: "lax",
         });
 
 
@@ -74,10 +77,46 @@ router.post('/login', async (req, res) => {
     }
 })
 
+// validate the token
+
+const verifyToken = (req, res, next) => {
+    const token = req.cookies.token; 
+
+    if (!token) {
+        return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.CUSTOMER_KEY);
+        req.customer = decoded; 
+        next();
+    } catch (error) {
+        return res.status(401).json({ valid: false, message: "Invalid or expired token!" });
+    }
+};
+
+router.get("/verify-token", verifyToken, async (req, res) => {
+    try {
+        const user = await prisma.customer.findUnique({
+            where: { id: req.customer.id }
+        });
+
+        if (!user) {
+            return res.status(401).json({ valid: false, message: "User not found" });
+        }
+
+        res.status(200).json({ valid: true, user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ valid: false, message: "Server error" });
+    }
+});
+
+
 
 // place order
 
-router.post('/place-order', async (req, res) => { 
+router.post('/place-order', async (req, res) => {
     try {
         const { customerId, supplierId, addressId, totalPrice } = req.body;
 
@@ -139,4 +178,4 @@ router.post('/make-payment', async (req, res) => {
 
 
 
-module.exports = {customer: router}
+module.exports = { customer: router }
