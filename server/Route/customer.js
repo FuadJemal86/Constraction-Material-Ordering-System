@@ -80,7 +80,8 @@ router.post('/login', async (req, res) => {
 // validate the token
 
 const verifyToken = (req, res, next) => {
-    const token = req.cookies.token; 
+    // console.log("Cookies:", req.cookies["x-auth-token"]);
+    const token = req.cookies["x-auth-token"];
 
     if (!token) {
         return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });

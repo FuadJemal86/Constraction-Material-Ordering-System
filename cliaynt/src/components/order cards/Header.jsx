@@ -3,18 +3,17 @@ import { FaSearch } from "react-icons/fa";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import logo from '../../images/logo constraction.jpeg';
-import bannerImage from '../../images/banner2 page2.jpg'; // Add your banner image path here
-import { LightMode, DarkMode } from "@mui/icons-material";
+import bannerImage from '../../images/banner2 page2.jpg';
+import { LightMode, DarkMode, Close } from "@mui/icons-material";
 import { Menu, X, Wrench, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-
 function Header() {
-
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(
         localStorage.getItem("theme") === "dark"
     );
+    const [cartOpen, setCartOpen] = useState(false);
 
     useEffect(() => {
         if (darkMode) {
@@ -25,6 +24,21 @@ function Header() {
             localStorage.setItem("theme", "light");
         }
     }, [darkMode]);
+
+    useEffect(() => {
+        if (cartOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, [cartOpen]);
+
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+    const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 
     return (
         <div>
@@ -60,8 +74,18 @@ function Header() {
                         </div>
 
                         <div className='flex gap-2 md:gap-5 items-center'>
-                            <button className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center">
-                                <ShoppingCartOutlinedIcon className="text-xl md:text-2xl text-gray-700 dark:text-white" />
+                            <button 
+                                className="relative hidden md:block"
+                                onClick={() => setCartOpen(true)}
+                            >
+                                <div className="w-10 h-10 flex items-center justify-center">
+                                    <ShoppingCartOutlinedIcon className="text-2xl" />
+                                </div>
+                                {cartItemCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[12px] font-bold p-1 rounded-full">
+                                        {cartItemCount}
+                                    </span>
+                                )}
                             </button>
 
                             <div className="relative hidden md:block">
@@ -90,7 +114,7 @@ function Header() {
                     </div>
 
                     {mobileMenuOpen && (
-                        <div className="fixed inset-0  bg-white dark:bg-gray-900 z-10 pt-16">
+                        <div className="fixed inset-0 bg-white dark:bg-gray-900 z-10 pt-16">
                             <div className="flex flex-col p-5">
                                 <div className="mb-6 mt-7">
                                     <input
@@ -124,6 +148,97 @@ function Header() {
                                         <span>Notifications</span>
                                         <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">3</span>
                                     </div>
+                                    
+                                    <div 
+                                        className="flex items-center space-x-2 p-2 border-b border-gray-100 dark:border-gray-800 cursor-pointer"
+                                        onClick={() => setCartOpen(true)}
+                                    >
+                                        <ShoppingCartOutlinedIcon className="text-2xl" />
+                                        <span>Cart</span>
+                                        {cartItemCount > 0 && (
+                                            <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                                {cartItemCount}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Simple Shopping Cart Modal */}
+                    {cartOpen && (
+                        <div className="fixed inset-0 bg-black/60 z-30 flex items-center justify-center md:justify-end">
+                            <div className="bg-white dark:bg-gray-900 w-full max-w-md h-full md:h-auto max-h-full overflow-y-auto shadow-xl md:mr-4 md:my-4 md:rounded-lg">
+                                <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-900">
+                                    <h2 className="text-xl font-bold flex items-center">
+                                        <ShoppingCartOutlinedIcon className="mr-2" /> 
+                                        Your Cart ({cartItemCount})
+                                    </h2>
+                                    <button 
+                                        onClick={() => setCartOpen(false)}
+                                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
+                                
+                                <div className="p-4">
+                                    {cart.length === 0 ? (
+                                        <div className="text-center py-12">
+                                            <ShoppingCartOutlinedIcon style={{ fontSize: '3rem' }} className="text-gray-400 mb-3" />
+                                            <h3 className="text-lg font-medium mb-2">Your cart is empty</h3>
+                                            <p className="text-gray-500 dark:text-gray-400 mb-4">Start adding items to your cart</p>
+                                            <button 
+                                                onClick={() => setCartOpen(false)}
+                                                className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-2 px-4 rounded-md transition-all"
+                                            >
+                                                Continue Shopping
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="divide-y divide-gray-100 dark:divide-gray-800 mb-4">
+                                                {cart.map((item, index) => (
+                                                    <div key={index} className="py-3 flex items-center">
+                                                        <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded flex-shrink-0 flex items-center justify-center">
+                                                            <Wrench className="text-gray-400" size={20} />
+                                                        </div>
+                                                        <div className="ml-3 flex-grow">
+                                                            <h3 className="font-medium">{item.name}</h3>
+                                                            <div className="flex justify-between mt-1">
+                                                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                                    ${item.price} × {item.quantity}
+                                                                </p>
+                                                                <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            
+                                            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+                                                <div className="flex justify-between mb-2">
+                                                    <span>Subtotal</span>
+                                                    <span className="font-medium">${cartTotal.toFixed(2)}</span>
+                                                </div>
+                                                <div className="flex justify-between mb-4">
+                                                    <span className="font-bold">Total</span>
+                                                    <span className="font-bold">${cartTotal.toFixed(2)}</span>
+                                                </div>
+                                                
+                                                <button className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-3 px-4 rounded-md mb-2 transition-all">
+                                                    Order Now
+                                                </button>
+                                                <button 
+                                                    onClick={() => setCartOpen(false)}
+                                                    className="w-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 py-2 px-4 rounded-md transition-all"
+                                                >
+                                                    Continue Shopping
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -132,9 +247,7 @@ function Header() {
             </div>
 
             <div className={`pt-16 md:pt-20 ${mobileMenuOpen ? 'hidden' : 'block'}`}>
-
                 <div className="relative w-full h-64 md:h-96">
-
                     <img
                         src={bannerImage}
                         alt="Construction Services"
