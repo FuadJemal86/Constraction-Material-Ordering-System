@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa';
 import FoundationIcon from '@mui/icons-material/Foundation';
@@ -20,10 +20,59 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import FactoryIcon from '@mui/icons-material/Factory';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import HandshakeIcon from '@mui/icons-material/Handshake';
+import api from '../../api';
+import toast from 'react-hot-toast';
 
 function Body() {
     // Example data that would come from backend
-    const categoryData = [
+
+    const [category, setCategory] = useState([])
+    const [supplier , setSupplier] = useState([])
+
+    useEffect(() => {
+
+        const feachData = async () => {
+
+            try {
+                const result = await api.get('/customer/get-category')
+
+                if (result.data.status) {
+                    setCategory(result.data.category)
+                } else {
+                    toast.error(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+                toast.error(err.response.data.message)
+            }
+        }
+
+        feachData()
+
+    },[])
+
+    useEffect(() => {
+
+        const feachData = async () => {
+
+            try {
+                const result = await api.get('/customer/get-supplier')
+
+                if (result.data.status) {
+                    setSupplier(result.data.supplier)
+                } else {
+                    toast.error(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+                toast.error(err.response.data.message)
+            }
+        }
+
+        feachData()
+
+    },[])
+        const CategoryIco = [
         { id: 1, name: 'Cement & Concrete', icon: <FoundationIcon /> },
         { id: 2, name: 'Bricks & Blocks', icon: <ConstructionIcon /> },
         { id: 3, name: 'Steel & Metal', icon: <HardwareIcon /> },
@@ -72,7 +121,7 @@ function Body() {
                 <div className="border dark:border-gray-900 md:w-1/4 h-auto md:h-screen overflow-y-auto max-h-[80vh] m-4 rounded-lg p-1 custom-scrollbar">
                     <div className="sticky top-0 bg-white dark:bg-gray-900 z-10 p-2 border-b dark:border-gray-800">
                         <div className="flex justify-around text-center">
-                            <button 
+                            <button
                                 className={`py-2 px-4 rounded-lg transition duration-300 flex-1 ${activeFilter === 'categories' ? 'bg-blue-500 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-800'}`}
                                 onClick={() => setActiveFilter('categories')}
                             >
@@ -81,7 +130,7 @@ function Body() {
                                     Categories
                                 </span>
                             </button>
-                            <button 
+                            <button
                                 className={`py-2 px-4 rounded-lg transition duration-300 flex-1 ${activeFilter === 'suppliers' ? 'bg-blue-500 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-800'}`}
                                 onClick={() => setActiveFilter('suppliers')}
                             >
@@ -101,10 +150,10 @@ function Body() {
                             </div>
                             <div className="flex text-left p-1">
                                 <ul className="overflow-y-auto w-full">
-                                    {categoryData.map((category) => (
+                                    {category.map((category) => (
                                         <li key={category.id} className='p-1 flex hover:bg-gray-200 hover:text-slate-900 font-semibold transition duration-300 rounded-md dark:hover:bg-slate-600 dark:hover:text-slate-300'>
-                                            <span className='w-9'>{category.icon}</span>
-                                            <Link className='p-1 w-full'>{category.name}</Link>
+                                            <span className='w-9'><BusinessIcon /></span>
+                                            <Link className='p-1 w-full'>{category.category}</Link>
                                         </li>
                                     ))}
                                 </ul>
@@ -120,20 +169,20 @@ function Body() {
                             </div>
                             <div className="flex text-left p-1">
                                 <ul className="overflow-y-auto w-full">
-                                    {supplierData.map((supplier) => (
+                                    {supplier.map((supplier) => (
                                         <li key={supplier.id} className='p-1 flex items-center hover:bg-gray-200 hover:text-slate-900 font-semibold transition duration-300 rounded-md dark:hover:bg-slate-600 dark:hover:text-slate-300'>
-                                            <span className='w-9'>{supplier.icon}</span>
-                                            <div className='p-1 w-full'>
+                                            <span className='w-9'><HardwareIcon /></span>
+                                            <Link className='p-1 w-full'>
                                                 <div className="flex items-center">
-                                                    {supplier.name}
-                                                    {supplier.verified && (
+                                                    {supplier.companyName}
+                                                    {supplier.isApproved && (
                                                         <VerifiedIcon className="ml-2 text-blue-500" style={{ fontSize: '1rem' }} />
                                                     )}
                                                 </div>
                                                 <div className="text-sm text-gray-600 dark:text-gray-400">
                                                     Rating: {supplier.rating}/5
                                                 </div>
-                                            </div>
+                                            </Link>
                                         </li>
                                     ))}
                                 </ul>

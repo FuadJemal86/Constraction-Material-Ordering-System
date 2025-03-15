@@ -1,5 +1,5 @@
 const express = require('express')
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient, message_receiverType } = require('@prisma/client');
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
@@ -70,7 +70,7 @@ router.post('/login', async (req, res) => {
         });
 
 
-        res.status(200).json({ loginStatus: true, message: "Login successful" });
+        return res.status(200).json({ loginStatus: true, message: "Login successful" });
     } catch (err) {
         console.log(err)
         return res.status(500).json({ status: false, error: 'server error!' })
@@ -89,7 +89,7 @@ const verifyToken = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.CUSTOMER_KEY);
-        req.customer = decoded; 
+        req.customer = decoded;
         next();
     } catch (error) {
         return res.status(401).json({ valid: false, message: "Invalid or expired token!" });
@@ -112,6 +112,48 @@ router.get("/verify-token", verifyToken, async (req, res) => {
         res.status(500).json({ valid: false, message: "Server error" });
     }
 });
+
+//get  category
+
+router.get('/get-category', async (req, res) => {
+    try {
+        const category = await prisma.category.findMany()
+
+        if (!category) {
+            return res.status(401).json({ status: false, message: "category not found" })
+        }
+
+        return res.status(200).json({ status: true, category })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ status: false, message: 'server error' })
+    }
+})
+
+// get supplier
+
+router.get('/get-supplier', async (req, res) => {
+    try {
+        const supplier = await prisma.supplier.findMany({
+            select: {
+                companyName: true,
+                isApproved: true
+            }
+        });
+
+        if (!supplier || supplier.length === 0) {
+            return res.status(404).json({ status: false, message: "supplier not found" });
+        }
+
+        return res.status(200).json({ status: true, supplier });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ status: false, message: 'Server error' });
+    }
+});
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import image1 from '../../images/image1_0.jpg';
 import api from '../../api';

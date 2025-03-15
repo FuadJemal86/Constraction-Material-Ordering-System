@@ -25,7 +25,7 @@ router.use(cookieParser());
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'public/image')
+        cb(null, 'public/images')
     },
     filename: (req, file, cb) => {
         cb(null, file.fieldname + '_' + Date.now() + path.extname(file.originalname))
@@ -94,11 +94,11 @@ router.post('/login', async (req, res) => {
             supplier: true, email: supplier.email, id: supplier.id
         }, process.env.SUPPLIER_KEY, { expiresIn: "30d" })
 
-        res.cookie("token", token, {
-            httpOnly: true,   
+        res.cookie("t-auth-token", token, {
+            httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "Strict",
-            maxAge: 30 * 24 * 60 * 60 * 1000
+            maxAge: 24 * 60 * 60 * 1000,
+            sameSite: "lax",
         });
 
 
@@ -127,10 +127,19 @@ router.get('/get-category', async (req, res) => {
 
 // add product
 
-router.post('/add-product', upload.single('image'), async (req, res) => {
 
+router.post('/add-product', upload.single('image'), async (req, res) => {
     try {
-        const { name, price, stock, supplierId, categoryId, } = req.body
+
+        const token = req.cookies["t-auth-token"];
+        if (!token) {
+            return res.status(401).json({ status: false, message: 'Unauthorized, no token found' });
+        }
+
+        const decoded = jwt.verify(token, process.env.SUPPLIER_KEY);
+        const supplierId = decoded.id;
+
+        const { name, price, stock, categoryId } = req.body;
 
         if (!req.file) {
             return res.status(400).json({ status: false, message: 'Image is required' });
@@ -141,19 +150,20 @@ router.post('/add-product', upload.single('image'), async (req, res) => {
                 name,
                 price: parseFloat(price),
                 stock: parseInt(stock),
-                supplierId: parseInt(supplierId),
+                supplierId,
                 categoryId: parseInt(categoryId),
-                image: req.file.filename
+                image: req.file ? req.file.filename : null
             }
-        })
+        });
 
-        return res.status(200).json({ status: true, message: 'product added' })
+        return res.status(200).json({ status: true, message: 'Product added' });
 
     } catch (err) {
-        console.log(err)
-        res.status(500).json({ status: false, error: 'server error' })
+        console.error(err);
+        res.status(500).json({ status: false, error: 'Server error' });
     }
-})
+});
+
 
 // delete product
 

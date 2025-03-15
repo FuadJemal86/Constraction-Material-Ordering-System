@@ -5,7 +5,7 @@ import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import logo from '../../images/logo constraction.jpeg';
 import bannerImage from '../../images/banner2 page2.jpg';
 import { LightMode, DarkMode, Close } from "@mui/icons-material";
-import { Menu, X, Wrench, ChevronDown } from 'lucide-react';
+import { Menu, X, Wrench, ChevronDown, Minus , Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 function Header() {
@@ -36,9 +36,86 @@ function Header() {
         };
     }, [cartOpen]);
 
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
-    const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const [cart, setCart] = useState(JSON.parse(localStorage.getItem("cart")) || []);
+    
+// State for the current product being added/edited
+const [currentItem, setCurrentItem] = useState({
+    name: "",
+    price: 0,
+    quantity: 1,
+    unit: "KG", // Default unit
+    totalPrice: 0
+});
+
+// Unit type options
+const unitTypes = ["KG", "Ton", "Liter", "Piece", "Meter", "Pack"];
+
+// Save cart to localStorage whenever it changes
+useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+}, [cart]);
+
+// Update quantity for an item in the cart
+const updateQuantity = (index, newQuantity) => {
+    if (newQuantity < 1) return;
+    
+    const updatedCart = [...cart];
+    updatedCart[index].quantity = newQuantity;
+    updatedCart[index].totalPrice = updatedCart[index].price * newQuantity;
+    setCart(updatedCart);
+};
+
+// Update unit for an item in the cart
+const updateUnit = (index, newUnit) => {
+    const updatedCart = [...cart];
+    updatedCart[index].unit = newUnit;
+    setCart(updatedCart);
+};
+
+// Remove item from cart
+const removeItem = (index) => {
+    const updatedCart = [...cart];
+    updatedCart.splice(index, 1);
+    setCart(updatedCart);
+};
+
+// Handle input changes for current item
+const handleItemChange = (e) => {
+    const { name, value } = e.target;
+    const updatedItem = { ...currentItem };
+    
+    if (name === "price" || name === "quantity") {
+        updatedItem[name] = parseFloat(value) || 0;
+        // Update total price whenever price or quantity changes
+        updatedItem.totalPrice = updatedItem.price * updatedItem.quantity;
+    } else {
+        updatedItem[name] = value;
+    }
+    
+    setCurrentItem(updatedItem);
+};
+
+// Add current item to cart
+const addToCart = () => {
+    if (!currentItem.name || currentItem.price <= 0 || currentItem.quantity <= 0) {
+        alert("Please enter valid product details");
+        return;
+    }
+    
+    setCart([...cart, { ...currentItem }]);
+    
+    // Reset current item
+    setCurrentItem({
+        name: "",
+        price: 0,
+        quantity: 1,
+        unit: "KG",
+        totalPrice: 0
+    });
+};
+
+const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 
     return (
         <div>
@@ -74,7 +151,7 @@ function Header() {
                         </div>
 
                         <div className='flex gap-2 md:gap-5 items-center'>
-                            <button 
+                            <button
                                 className="relative hidden md:block"
                                 onClick={() => setCartOpen(true)}
                             >
@@ -148,8 +225,8 @@ function Header() {
                                         <span>Notifications</span>
                                         <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">3</span>
                                     </div>
-                                    
-                                    <div 
+
+                                    <div
                                         className="flex items-center space-x-2 p-2 border-b border-gray-100 dark:border-gray-800 cursor-pointer"
                                         onClick={() => setCartOpen(true)}
                                     >
@@ -167,29 +244,93 @@ function Header() {
                     )}
 
                     {/* Simple Shopping Cart Modal */}
+                    {/* Shopping Cart Modal with Quantity and Unit Selection */}
                     {cartOpen && (
                         <div className="fixed inset-0 bg-black/60 z-30 flex items-center justify-center md:justify-end">
                             <div className="bg-white dark:bg-gray-900 w-full max-w-md h-full md:h-auto max-h-full overflow-y-auto shadow-xl md:mr-4 md:my-4 md:rounded-lg">
                                 <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-900">
                                     <h2 className="text-xl font-bold flex items-center">
-                                        <ShoppingCartOutlinedIcon className="mr-2" /> 
+                                        <ShoppingCartOutlinedIcon className="mr-2" />
                                         Your Cart ({cartItemCount})
                                     </h2>
-                                    <button 
+                                    <button
                                         onClick={() => setCartOpen(false)}
                                         className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
                                     >
                                         <X size={20} />
                                     </button>
                                 </div>
-                                
+
                                 <div className="p-4">
+                                    {/* Add Item Form */}
+                                    <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <h3 className="font-semibold mb-3 text-base">Add New Item</h3>
+                                        <div className="grid grid-cols-12 gap-3">
+                                            <div className="col-span-12">
+                                                <input
+                                                    type="text"
+                                                    name="name"
+                                                    placeholder="Product Name"
+                                                    value={currentItem.name}
+                                                    onChange={handleItemChange}
+                                                    className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
+                                                />
+                                            </div>
+                                            <div className="col-span-5">
+                                                <input
+                                                    type="number"
+                                                    name="quantity"
+                                                    placeholder="Quantity"
+                                                    min="1"
+                                                    value={currentItem.quantity}
+                                                    onChange={handleItemChange}
+                                                    className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
+                                                />
+                                            </div>
+                                            <div className="col-span-7">
+                                                <select
+                                                    name="unit"
+                                                    value={currentItem.unit}
+                                                    onChange={handleItemChange}
+                                                    className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
+                                                >
+                                                    {unitTypes.map(unit => (
+                                                        <option key={unit} value={unit}>{unit}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div className="col-span-8">
+                                                <div className="relative">
+                                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
+                                                    <input
+                                                        type="number"
+                                                        name="price"
+                                                        placeholder="Price per unit"
+                                                        step="0.01"
+                                                        min="0"
+                                                        value={currentItem.price}
+                                                        onChange={handleItemChange}
+                                                        className="w-full p-2 pl-7 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-span-4">
+                                                <button
+                                                    onClick={addToCart}
+                                                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold p-2 rounded transition-all"
+                                                >
+                                                    Add
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     {cart.length === 0 ? (
                                         <div className="text-center py-12">
                                             <ShoppingCartOutlinedIcon style={{ fontSize: '3rem' }} className="text-gray-400 mb-3" />
                                             <h3 className="text-lg font-medium mb-2">Your cart is empty</h3>
                                             <p className="text-gray-500 dark:text-gray-400 mb-4">Start adding items to your cart</p>
-                                            <button 
+                                            <button
                                                 onClick={() => setCartOpen(false)}
                                                 className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-2 px-4 rounded-md transition-all"
                                             >
@@ -200,23 +341,66 @@ function Header() {
                                         <>
                                             <div className="divide-y divide-gray-100 dark:divide-gray-800 mb-4">
                                                 {cart.map((item, index) => (
-                                                    <div key={index} className="py-3 flex items-center">
-                                                        <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded flex-shrink-0 flex items-center justify-center">
-                                                            <Wrench className="text-gray-400" size={20} />
+                                                    <div key={index} className="py-3">
+                                                        <div className="flex items-center mb-2">
+                                                            <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded flex-shrink-0 flex items-center justify-center">
+                                                                <Wrench className="text-gray-400" size={16} />
+                                                            </div>
+                                                            <div className="ml-3 flex-grow">
+                                                                <h3 className="font-medium">{item.name}</h3>
+                                                            </div>
+                                                            <button
+                                                                onClick={() => removeItem(index)}
+                                                                className="p-1 text-gray-500 hover:text-red-500"
+                                                            >
+                                                                <X size={16} />
+                                                            </button>
                                                         </div>
-                                                        <div className="ml-3 flex-grow">
-                                                            <h3 className="font-medium">{item.name}</h3>
-                                                            <div className="flex justify-between mt-1">
-                                                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                                    ${item.price} × {item.quantity}
-                                                                </p>
-                                                                <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                                                        <div className="grid grid-cols-12 gap-2 mt-2">
+                                                            <div className="col-span-4 flex items-center">
+                                                                <button
+                                                                    onClick={() => updateQuantity(index, item.quantity - 1)}
+                                                                    className="p-1 bg-gray-100 dark:bg-gray-800 rounded"
+                                                                    disabled={item.quantity <= 1}
+                                                                >
+                                                                    <Minus size={14} />
+                                                                </button>
+                                                                <input
+                                                                    type="number"
+                                                                    value={item.quantity}
+                                                                    min="1"
+                                                                    onChange={(e) => updateQuantity(index, parseInt(e.target.value) || 1)}
+                                                                    className="w-full mx-1 p-1 text-center border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
+                                                                />
+                                                                <button
+                                                                    onClick={() => updateQuantity(index, item.quantity + 1)}
+                                                                    className="p-1 bg-gray-100 dark:bg-gray-800 rounded"
+                                                                >
+                                                                    <Plus size={14} />
+                                                                </button>
+                                                            </div>
+                                                            <div className="col-span-4">
+                                                                <select
+                                                                    value={item.unit}
+                                                                    onChange={(e) => updateUnit(index, e.target.value)}
+                                                                    className="w-full p-1 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
+                                                                >
+                                                                    {unitTypes.map(unit => (
+                                                                        <option key={unit} value={unit}>{unit}</option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+                                                            <div className="col-span-4 flex justify-between items-center">
+                                                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                                    1
+                                                                </span>
+                                                                <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 ))}
                                             </div>
-                                            
+
                                             <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
                                                 <div className="flex justify-between mb-2">
                                                     <span>Subtotal</span>
@@ -226,11 +410,11 @@ function Header() {
                                                     <span className="font-bold">Total</span>
                                                     <span className="font-bold">${cartTotal.toFixed(2)}</span>
                                                 </div>
-                                                
+
                                                 <button className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-3 px-4 rounded-md mb-2 transition-all">
                                                     Order Now
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={() => setCartOpen(false)}
                                                     className="w-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 py-2 px-4 rounded-md transition-all"
                                                 >
