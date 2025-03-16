@@ -1,30 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import image1 from '../../images/image1_0.jpg';
 import api from '../../api';
 import toast from 'react-hot-toast';
 
 function Cards() {
+    const { id } = useParams();
     const navigate = useNavigate();
+    const [product, setProduct] = useState([]);
 
-    const products = [
-        { id: 1, name: "Product 1", price: "$19.99", image: image1 },
-        { id: 2, name: "Product 2", price: "$29.99", image: image1 },
-        { id: 3, name: "Product 3", price: "$39.99", image: image1 },
-        { id: 4, name: "Product 4", price: "$49.99", image: image1 },
-        { id: 5, name: "Product 5", price: "$59.99", image: image1 },
-        { id: 6, name: "Product 6", price: "$69.99", image: image1 },
-        { id: 7, name: "Product 7", price: "$79.99", image: image1 },
-        { id: 8, name: "Product 8", price: "$89.99", image: image1 },
-        { id: 9, name: "Product 9", price: "$99.99", image: image1 },
-        { id: 10, name: "Product 10", price: "$109.99", image: image1 },
-        { id: 11, name: "Product 11", price: "$119.99", image: image1 },
-        { id: 12, name: "Product 12", price: "$129.99", image: image1 },
-        { id: 13, name: "Product 13", price: "$139.99", image: image1 },
-        { id: 14, name: "Product 14", price: "$149.99", image: image1 },
-        { id: 15, name: "Product 15", price: "$159.99", image: image1 },
-        { id: 16, name: "Product 16", price: "$169.99", image: image1 }
-    ];
+    useEffect(() => {
+        const fetchData = async() => {
+            try {
+                const result = await api.get(`/supplier/get-products/${id}`)
+
+                if(result.data.status) {
+                    console.log(result.data.product)
+                    setProduct(result.data.product)
+                } else {
+                    toast.error(result.data.message)
+                }
+            } catch(err) {
+                console.log(err)
+                toast.error(err.response?.data?.message || "An error occurred")
+            }
+        }
+
+        fetchData()
+    }, [id]);
+
 
     const handleOrderClick = async (product) => {
         try {
@@ -43,9 +47,9 @@ function Cards() {
                 }
 
                 localStorage.setItem("cart", JSON.stringify(cart));
-                console.log("Item added to cart:", cart);
+                toast.success("Item added to cart");
             } else {
-                toast.error(response.data.message);
+                toast.error(result.data.message);
             }
         } catch (err) {
             console.error("Token verification failed!", err);
@@ -56,16 +60,40 @@ function Cards() {
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {products.map(product => (
-                    <div key={product.id} className="border rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 dark:border-gray-800">
-                        <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
-                        <div className="p-4">
-                            <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                            <p className="text-gray-800 font-bold dark:text-white">{product.price}</p>
+                {product.map(product => (
+                    <div key={product.id} className="group relative bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300">
+                        {/* Sale badge - uncomment and customize as needed */}
+                        <div className="absolute top-0 right-0 bg-red-500 text-white px-3 py-1 rounded-bl-lg z-10 font-medium">SALE</div>
+                        
+                        <div className="relative overflow-hidden">
+                            <img 
+                                src={`http://localhost:3032/images/${product.image}`} 
+                                alt={product.name} 
+                                className="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-300" 
+                            />
+                            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                        </div>
+                        
+                        <div className="p-5">
+                            <h3 className="font-bold text-lg mb-2 text-gray-800 dark:text-white">{product.name}</h3>
+                            <div className="flex justify-between items-center mb-4">
+                                <p className="text-blue-600 dark:text-blue-400 font-bold text-xl">{`birr ${product.price}`}</p>
+                                {/* Optional rating component */}
+                                <div className="flex items-center">
+                                    <svg className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                                    </svg>
+                                    <span className="text-xs ml-1 text-gray-600 dark:text-gray-400">4.5</span>
+                                </div>
+                            </div>
+                            
                             <button
-                                className="mt-3 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center group-hover:bg-blue-700"
                                 onClick={() => handleOrderClick(product)}
                             >
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
                                 Add to Cart
                             </button>
                         </div>

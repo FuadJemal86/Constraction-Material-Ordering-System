@@ -169,18 +169,19 @@ function Body() {
                             </div>
                             <div className="flex text-left p-1">
                                 <ul className="overflow-y-auto w-full">
-                                    {supplier.map((supplier) => (
-                                        <li key={supplier.id} className='p-1 flex items-center hover:bg-gray-200 hover:text-slate-900 font-semibold transition duration-300 rounded-md dark:hover:bg-slate-600 dark:hover:text-slate-300'>
+                                    {supplier.map((c) => (
+                                        <li key={c.id} className='p-1 flex items-center hover:bg-gray-200 hover:text-slate-900 font-semibold transition duration-300 rounded-md dark:hover:bg-slate-600 dark:hover:text-slate-300'>
                                             <span className='w-9'><HardwareIcon /></span>
-                                            <Link className='p-1 w-full'>
+                                            <Link to={`/products/supplier-products/${c.id}`} className='p-1 w-full'>
+                                            {console.log(c.id)}
                                                 <div className="flex items-center">
-                                                    {supplier.companyName}
-                                                    {supplier.isApproved && (
+                                                    {c.companyName}
+                                                    {c.isApproved && (
                                                         <VerifiedIcon className="ml-2 text-blue-500" style={{ fontSize: '1rem' }} />
                                                     )}
                                                 </div>
                                                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                                                    Rating: {supplier.rating}/5
+                                                    Rating: {c.rating}/5
                                                 </div>
                                             </Link>
                                         </li>

@@ -136,6 +136,7 @@ router.get('/get-supplier', async (req, res) => {
     try {
         const supplier = await prisma.supplier.findMany({
             select: {
+                id: true,
                 companyName: true,
                 isApproved: true
             }
@@ -153,21 +154,46 @@ router.get('/get-supplier', async (req, res) => {
 });
 
 
-
-
-
-
 // place order
 
-router.post('/place-order', async (req, res) => {
-    try {
-        const { customerId, supplierId, addressId, totalPrice } = req.body;
+router.post("/place-order", async (req, res) => {
+    const token = req.cookies["x-auth-token"];
 
+    if (!token) {
+        return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });
+    }
+
+    let customerId;
+    try {
+        const decoded = jwt.verify(token, process.env.CUSTOMER_KEY);
+        customerId = decoded.id;
+    } catch (err) {
+        return res.status(401).json({ valid: false, message: "Invalid token" });
+    }
+
+    try {
+        const { supplierId, addressId, totalPrice, orderItems } = req.body;
+
+        if (!supplierId || !addressId || !totalPrice) {
+            return res.status(400).json({ status: false, message: "Missing required fields" });
+        }
+
+        // **Check if an order already exists for this customer & supplier**
+        const existingOrder = await prisma.order.findFirst({
+            where: { customerId, supplierId, addressId }
+        });
+
+        if (existingOrder) {
+            return res.status(409).json({ status: false, message: "Order already exists" });
+        }
+
+        // **Create Order**
         const newOrder = await prisma.order.create({
             data: { customerId, supplierId, addressId, totalPrice }
         });
 
-        if (orderItems && orderItems.length > 0) {
+        // **Insert Order Items if present**
+        if (Array.isArray(orderItems) && orderItems.length > 0) {
             const itemsData = orderItems.map(item => ({
                 orderId: newOrder.id,
                 productId: item.productId,
@@ -175,15 +201,17 @@ router.post('/place-order', async (req, res) => {
                 price: item.price
             }));
 
-            await prisma.orderitem.createMany({
-                data: itemsData
-            });
+            await prisma.orderitem.createMany({ data: itemsData });
         }
 
-        return res.status(200).json({ status: true, message: "Order placed successfully", order: newOrder });
+        return res.status(201).json({
+            status: true,
+            message: "Order placed successfully",
+            order: newOrder
+        });
 
     } catch (err) {
-        console.error(err);
+        console.error("Error placing order:", err);
         return res.status(500).json({ status: false, error: "Server error" });
     }
 });
@@ -217,6 +245,23 @@ router.post('/make-payment', async (req, res) => {
     }
 });
 
+
+// get address
+
+router.get('/get-address', async (req, res) => {
+    try {
+        const address = await prisma.address.findMany()
+
+        if (address.length == 0) {
+            return res.status(401).json({ status: false, message: "address not found" })
+        }
+
+        return res.status(200).json({ status: true, address })
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ status: false, error: "Server error" });
+    }
+})
 
 
 

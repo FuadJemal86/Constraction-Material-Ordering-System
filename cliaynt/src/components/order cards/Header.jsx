@@ -5,10 +5,33 @@ import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import logo from '../../images/logo constraction.jpeg';
 import bannerImage from '../../images/banner2 page2.jpg';
 import { LightMode, DarkMode, Close } from "@mui/icons-material";
-import { Menu, X, Wrench, ChevronDown, Minus , Plus } from 'lucide-react';
+import { Menu, X, Wrench, ChevronDown, Minus, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import api from '../../api';
+import toast, { Toaster } from 'react-hot-toast';
 
 function Header() {
+    const [address, setAddress] = useState([])
+    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    const supplierIds = storedCart.map(item => item.supplierId); // Extract supplierId
+
+    const [order, setOrder] = useState({
+        supplierId: "",
+        addressId: "",
+        totalPrice: 0
+    });
+
+    useEffect(() => {
+        if (supplierIds.length > 0) {
+            setOrder(prevOrder => ({
+                ...prevOrder,
+                supplierId: supplierIds[0]
+            }));
+        }
+    }, []);
+
+
+
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(
         localStorage.getItem("theme") === "dark"
@@ -37,89 +60,123 @@ function Header() {
     }, [cartOpen]);
 
     const [cart, setCart] = useState(JSON.parse(localStorage.getItem("cart")) || []);
-    
-// State for the current product being added/edited
-const [currentItem, setCurrentItem] = useState({
-    name: "",
-    price: 0,
-    quantity: 1,
-    unit: "KG", // Default unit
-    totalPrice: 0
-});
 
-// Unit type options
-const unitTypes = ["KG", "Ton", "Liter", "Piece", "Meter", "Pack"];
-
-// Save cart to localStorage whenever it changes
-useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-}, [cart]);
-
-// Update quantity for an item in the cart
-const updateQuantity = (index, newQuantity) => {
-    if (newQuantity < 1) return;
-    
-    const updatedCart = [...cart];
-    updatedCart[index].quantity = newQuantity;
-    updatedCart[index].totalPrice = updatedCart[index].price * newQuantity;
-    setCart(updatedCart);
-};
-
-// Update unit for an item in the cart
-const updateUnit = (index, newUnit) => {
-    const updatedCart = [...cart];
-    updatedCart[index].unit = newUnit;
-    setCart(updatedCart);
-};
-
-// Remove item from cart
-const removeItem = (index) => {
-    const updatedCart = [...cart];
-    updatedCart.splice(index, 1);
-    setCart(updatedCart);
-};
-
-// Handle input changes for current item
-const handleItemChange = (e) => {
-    const { name, value } = e.target;
-    const updatedItem = { ...currentItem };
-    
-    if (name === "price" || name === "quantity") {
-        updatedItem[name] = parseFloat(value) || 0;
-        // Update total price whenever price or quantity changes
-        updatedItem.totalPrice = updatedItem.price * updatedItem.quantity;
-    } else {
-        updatedItem[name] = value;
-    }
-    
-    setCurrentItem(updatedItem);
-};
-
-// Add current item to cart
-const addToCart = () => {
-    if (!currentItem.name || currentItem.price <= 0 || currentItem.quantity <= 0) {
-        alert("Please enter valid product details");
-        return;
-    }
-    
-    setCart([...cart, { ...currentItem }]);
-    
-    // Reset current item
-    setCurrentItem({
+    const [currentItem, setCurrentItem] = useState({
         name: "",
         price: 0,
         quantity: 1,
-        unit: "KG",
+        unit: "KG", // Default unit
         totalPrice: 0
     });
-};
 
-const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
-const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const unitTypes = ["KG", "Ton", "Liter", "Piece", "Meter", "Pack"];
+
+    useEffect(() => {
+        localStorage.setItem("cart", JSON.stringify(cart));
+    }, [cart]);
+
+
+    const updateQuantity = (index, newQuantity) => {
+        if (newQuantity < 1) return;
+
+        const updatedCart = [...cart];
+        updatedCart[index].quantity = newQuantity;
+        updatedCart[index].totalPrice = updatedCart[index].price * newQuantity;
+        setCart(updatedCart);
+    };
+
+
+    const updateUnit = (index, newUnit) => {
+        const updatedCart = [...cart];
+        updatedCart[index].unit = newUnit;
+        setCart(updatedCart);
+    };
+
+
+    const removeItem = (index) => {
+        const updatedCart = [...cart];
+        updatedCart.splice(index, 1);
+        setCart(updatedCart);
+    };
+
+
+    const handleItemChange = (e) => {
+        const { name, value } = e.target;
+        const updatedItem = { ...currentItem };
+
+        if (name === "price" || name === "quantity") {
+            updatedItem[name] = parseFloat(value) || 0;
+
+            updatedItem.totalPrice = updatedItem.price * updatedItem.quantity;
+        } else {
+            updatedItem[name] = value;
+        }
+
+        setCurrentItem(updatedItem);
+    };
+
+    const addToCart = () => {
+        if (!currentItem.name || currentItem.price <= 0 || currentItem.quantity <= 0) {
+            toast.error("Please enter valid product details");
+            return;
+        }
+
+        setCart([...cart, { ...currentItem }]);
+
+        setCurrentItem({
+            name: "",
+            price: 0,
+            quantity: 1,
+            unit: "KG",
+            totalPrice: 0
+        });
+    };
+
+    const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+    const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    useEffect(() => {
+        setOrder((prev) => ({ ...prev, totalPrice: cartTotal }));
+    }, [cartTotal]);
+
+    useEffect(() => {
+        const feachData = async () => {
+            try {
+                const result = await api.get('/customer/get-address')
+
+                if (result.data.status) {
+                    setAddress(result.data.address)
+                } else {
+                    toast.error(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+                toast.error(err.response.data.message)
+            }
+        }
+        feachData()
+    }, [])
+
+    const handelSubmit = async (c) => {
+        c.preventDefault()
+        console.log(order)
+
+        try {
+            const result = await api.post('/customer/place-order', order)
+            if (result.data.status) {
+                toast.success(result.data.message)
+            } else {
+                toast.error(result.data.message)
+            }
+        } catch (err) {
+            console.log(err)
+            toast.error(err.response.data.message)
+        }
+    }
 
     return (
         <div>
             <div>
+                <Toaster position="top-center" reverseOrder={false} />
                 <header className="relative">
                     <div className='flex items-center justify-between md:p-2 p-1 fixed right-0 left-0 bg-white dark:bg-gray-900 z-20 shadow-md'>
                         <div className='flex items-center'>
@@ -301,19 +358,21 @@ const cartTotal = cart.reduce((total, item) => total + (item.price * item.quanti
                                             </div>
                                             <div className="col-span-8">
                                                 <div className="relative">
-                                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
+                                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">birr</span>
                                                     <input
                                                         type="number"
                                                         name="price"
                                                         placeholder="Price per unit"
                                                         step="0.01"
                                                         min="0"
-                                                        value={currentItem.price}
+                                                        value={`birr ${currentItem.price}`}
                                                         onChange={handleItemChange}
-                                                        className="w-full p-2 pl-7 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
+                                                        className="w-full p-2 pl-10 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
                                                     />
                                                 </div>
                                             </div>
+
+
                                             <div className="col-span-4">
                                                 <button
                                                     onClick={addToCart}
@@ -338,90 +397,109 @@ const cartTotal = cart.reduce((total, item) => total + (item.price * item.quanti
                                             </button>
                                         </div>
                                     ) : (
-                                        <>
-                                            <div className="divide-y divide-gray-100 dark:divide-gray-800 mb-4">
-                                                {cart.map((item, index) => (
-                                                    <div key={index} className="py-3">
-                                                        <div className="flex items-center mb-2">
-                                                            <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded flex-shrink-0 flex items-center justify-center">
-                                                                <Wrench className="text-gray-400" size={16} />
-                                                            </div>
-                                                            <div className="ml-3 flex-grow">
-                                                                <h3 className="font-medium">{item.name}</h3>
-                                                            </div>
-                                                            <button
-                                                                onClick={() => removeItem(index)}
-                                                                className="p-1 text-gray-500 hover:text-red-500"
-                                                            >
-                                                                <X size={16} />
-                                                            </button>
-                                                        </div>
-                                                        <div className="grid grid-cols-12 gap-2 mt-2">
-                                                            <div className="col-span-4 flex items-center">
+                                        <form onSubmit={handelSubmit}>
+                                            <>
+
+                                                <div className="divide-y divide-gray-100 dark:divide-gray-800 mb-4">
+                                                    {cart.map((item, index) => (
+                                                        <div key={index} className="py-3">
+                                                            <div className="flex items-center mb-2">
+                                                                <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded flex-shrink-0 flex items-center justify-center">
+                                                                    <Wrench className="text-gray-400" size={16} />
+                                                                </div>
+                                                                <div className="ml-3 flex-grow">
+                                                                    <h3 className="font-medium">{item.name}</h3>
+                                                                </div>
                                                                 <button
-                                                                    onClick={() => updateQuantity(index, item.quantity - 1)}
-                                                                    className="p-1 bg-gray-100 dark:bg-gray-800 rounded"
-                                                                    disabled={item.quantity <= 1}
+                                                                    onClick={() => removeItem(index)}
+                                                                    className="p-1 text-gray-500 hover:text-red-500"
                                                                 >
-                                                                    <Minus size={14} />
-                                                                </button>
-                                                                <input
-                                                                    type="number"
-                                                                    value={item.quantity}
-                                                                    min="1"
-                                                                    onChange={(e) => updateQuantity(index, parseInt(e.target.value) || 1)}
-                                                                    className="w-full mx-1 p-1 text-center border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
-                                                                />
-                                                                <button
-                                                                    onClick={() => updateQuantity(index, item.quantity + 1)}
-                                                                    className="p-1 bg-gray-100 dark:bg-gray-800 rounded"
-                                                                >
-                                                                    <Plus size={14} />
+                                                                    <X size={16} />
                                                                 </button>
                                                             </div>
-                                                            <div className="col-span-4">
+                                                            <div className="grid grid-cols-12 gap-2 mt-2">
+                                                                <div className="col-span-4 flex items-center">
+                                                                    <button
+                                                                        onClick={() => updateQuantity(index, item.quantity - 1)}
+                                                                        className="p-1 bg-gray-100 dark:bg-gray-800 rounded"
+                                                                        disabled={item.quantity <= 1}
+                                                                    >
+                                                                        <Minus size={14} />
+                                                                    </button>
+                                                                    <input
+                                                                        type="number"
+                                                                        value={item.quantity}
+                                                                        min="1"
+                                                                        onChange={(e) => setOrder(index, parseInt(e.target.value) || 1)}
+                                                                        className="w-full mx-1 p-1 text-center border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
+
+                                                                    />
+                                                                    <button
+                                                                        onClick={() => updateQuantity(index, item.quantity + 1)}
+                                                                        className="p-1 bg-gray-100 dark:bg-gray-800 rounded"
+                                                                    >
+                                                                        <Plus size={14} />
+                                                                    </button>
+                                                                </div>
+                                                                <div className="col-span-4">
+                                                                    <select
+                                                                        value={item.unit}
+                                                                        onChange={(e) => updateUnit(index, e.target.value)}
+                                                                        className="w-full p-1 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
+                                                                    >
+                                                                        {unitTypes.map(unit => (
+                                                                            <option key={unit} value={unit}>{unit}</option>
+                                                                        ))}
+                                                                    </select>
+                                                                </div>
+
+                                                                <div className="col-span-4 flex justify-between items-center">
+                                                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                                        1
+                                                                    </span>
+                                                                    <span className="font-medium">birr {(item.price * item.quantity).toFixed(2)}</span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="col-span-4 w-32 pt-3">
                                                                 <select
-                                                                    value={item.unit}
-                                                                    onChange={(e) => updateUnit(index, e.target.value)}
+                                                                    onChange={e => setOrder(prev => ({ ...prev, addressId: parseInt(e.target.value) || "" }))}
                                                                     className="w-full p-1 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
                                                                 >
-                                                                    {unitTypes.map(unit => (
-                                                                        <option key={unit} value={unit}>{unit}</option>
+                                                                    <option value="">Select an Address</option>
+                                                                    {address?.map(c => (
+                                                                        <option key={c.id} value={c.id}>{c.address}</option>
                                                                     ))}
                                                                 </select>
+
                                                             </div>
-                                                            <div className="col-span-4 flex justify-between items-center">
-                                                                <span className="text-sm text-gray-500 dark:text-gray-400">
-                                                                    1
-                                                                </span>
-                                                                <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
-                                                            </div>
+
                                                         </div>
+                                                    ))}
+                                                </div>
+
+
+                                                <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+                                                    <div className="flex justify-between mb-2">
+                                                        <span>Subtotal</span>
+                                                        <span className="font-medium">birr {cartTotal.toFixed(2)}</span>
                                                     </div>
-                                                ))}
-                                            </div>
+                                                    <div className="flex justify-between mb-4">
+                                                        <span className="font-bold">Total</span>
+                                                        <span className="font-bold">birr {cartTotal.toFixed(2)}</span>
+                                                    </div>
 
-                                            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-                                                <div className="flex justify-between mb-2">
-                                                    <span>Subtotal</span>
-                                                    <span className="font-medium">${cartTotal.toFixed(2)}</span>
+                                                    <button className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-3 px-4 rounded-md mb-2 transition-all">
+                                                        Order Now
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setCartOpen(false)}
+                                                        className="w-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 py-2 px-4 rounded-md transition-all"
+                                                    >
+                                                        Continue Shopping
+                                                    </button>
                                                 </div>
-                                                <div className="flex justify-between mb-4">
-                                                    <span className="font-bold">Total</span>
-                                                    <span className="font-bold">${cartTotal.toFixed(2)}</span>
-                                                </div>
-
-                                                <button className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-3 px-4 rounded-md mb-2 transition-all">
-                                                    Order Now
-                                                </button>
-                                                <button
-                                                    onClick={() => setCartOpen(false)}
-                                                    className="w-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 py-2 px-4 rounded-md transition-all"
-                                                >
-                                                    Continue Shopping
-                                                </button>
-                                            </div>
-                                        </>
+                                            </>
+                                        </form>
                                     )}
                                 </div>
                             </div>
