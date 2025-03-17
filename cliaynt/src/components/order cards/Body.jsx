@@ -181,7 +181,7 @@ function Body() {
                                                     )}
                                                 </div>
                                                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                                                    Rating: {c.rating}/5
+                                                    {c.address}
                                                 </div>
                                             </Link>
                                         </li>

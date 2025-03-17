@@ -1,7 +1,10 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
+import api from '../../api';
 
 function Product({ orders = [] }) {
+
+    const [product , setProduct] = useState([])
 
     const getStatusBadgeColor = (status) => {
         const statusColors = {
@@ -13,6 +16,27 @@ function Product({ orders = [] }) {
 
         return statusColors[status] || "bg-gray-100 text-gray-800";
     }
+
+    useEffect(() => {
+
+        const feachData = async() => {
+            try {
+                const result = await api.get('/supplier/get-product')
+
+                if(result.data.status) {
+
+                    setProduct(result.data.result)
+
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch(err) {
+                console.log(err) 
+            }
+
+        }
+        feachData()
+    },[])
     return (
         <div>
             <div className="p-4 mt-16 bg-white rounded-lg shadow ">
@@ -34,20 +58,20 @@ function Product({ orders = [] }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {orders.map((order, index) => (
+                            {product.map((order, index) => (
                                 <tr
                                     key={order.id || index}
                                     className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
                                 >
                                     <td className="p-3 text-sm text-indigo-600 font-medium">{order.id}</td>
-                                    <td className="p-3 text-sm text-gray-800">{order.customer}</td>
-                                    <td className="p-3 text-sm text-gray-800">{order.address}</td>
-                                    <td className="p-3 text-sm text-gray-500">{order.date}</td>
+                                    <td className="p-3 text-sm text-gray-800">{order.name}</td>
+                                    <td className="p-3 text-sm text-gray-800">{order.price}</td>
                                     <td className="p-3 text-sm">
                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(order.status)}`}>
-                                            {order.status}
+                                            {order.price}
                                         </span>
                                     </td>
+                                    <td className="p-3 text-sm text-gray-500">{order.stock}</td>
                                 </tr>
                             ))}
                             {orders.length === 0 && (

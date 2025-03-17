@@ -320,7 +320,7 @@ function Header() {
 
                                 <div className="p-4">
                                     {/* Add Item Form */}
-                                    <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                    {/* <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                                         <h3 className="font-semibold mb-3 text-base">Add New Item</h3>
                                         <div className="grid grid-cols-12 gap-3">
                                             <div className="col-span-12">
@@ -382,7 +382,7 @@ function Header() {
                                                 </button>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
 
                                     {cart.length === 0 ? (
                                         <div className="text-center py-12">

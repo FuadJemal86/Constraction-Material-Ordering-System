@@ -138,7 +138,8 @@ router.get('/get-supplier', async (req, res) => {
             select: {
                 id: true,
                 companyName: true,
-                isApproved: true
+                isApproved: true,
+                address: true
             }
         });
 

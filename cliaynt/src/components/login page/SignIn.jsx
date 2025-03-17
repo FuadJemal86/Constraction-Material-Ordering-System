@@ -25,9 +25,9 @@ function SignIn() {
         try {
             const result = await api.post('/supplier/login', supplier)
 
-            if (result.data.status && result.data.token) {
-                localStorage.setItem('token', result.data.token)
-                navigater('/dashbord')
+            if (result.data.loginStatus) {
+                toast.success(result.data.message)
+                navigater('/supplier-page')
             } else {
                 toast.error(result.data.message)
             }

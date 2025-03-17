@@ -164,6 +164,21 @@ router.post('/add-product', upload.single('image'), async (req, res) => {
     }
 });
 
+// get all product
+
+router.get('/get-product', async (req, res) => {
+    try {
+
+        const product = await prisma.product.findMany()
+
+        return res.status(200).json({ status: true, result: product })
+
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ status: false, error: 'server error' })
+    }
+})
+
 
 // get supplier products
 
