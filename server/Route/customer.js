@@ -179,14 +179,13 @@ router.post("/place-order", async (req, res) => {
             return res.status(400).json({ status: false, message: "Missing required fields" });
         }
 
-        // **Check if an order already exists for this customer & supplier**
-        const existingOrder = await prisma.order.findFirst({
-            where: { customerId, supplierId, addressId }
-        });
+        // const existingOrder = await prisma.order.findFirst({
+        //     where: { customerId, supplierId, addressId }
+        // });
 
-        if (existingOrder) {
-            return res.status(409).json({ status: false, message: "Order already exists" });
-        }
+        // if (existingOrder) {
+        //     return res.status(409).json({ status: false, message: "Order already exists" });
+        // }
 
         // **Create Order**
         const newOrder = await prisma.order.create({

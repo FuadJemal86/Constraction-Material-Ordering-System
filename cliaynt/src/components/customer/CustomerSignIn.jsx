@@ -30,7 +30,7 @@ function CustomerSignIn() {
 
             if(result.data.loginStatus) {
                 toast.success(result.data.message)
-                navigate('/supplier-page')
+                navigate('/supplier-products')
 
             } else {
                 toast.error(result.data.message)

@@ -176,19 +176,14 @@ function Login() {
         );
     };
 
-    // Toggle map visibility
-
 
     // Load Google Maps API script
     const loadGoogleMapsScript = () => {
         return new Promise((resolve, reject) => {
-            // Hard-code the API key temporarily for testing
-            const apiKey = "AIzaSyBThb9ieJOIHzM_616ZKBE31ibU8yIDuIs"; 
-            // Or use environment variable (preferred for production)
+            const apiKey = "AIzaSyBThb9ieJOIHzM_616ZKBE31ibU8yIDuIs";
             // const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-            
-            console.log("API Key being used:", apiKey); // Debug log
-            
+
+
             if (!document.getElementById('google-maps-script')) {
                 const script = document.createElement('script');
                 script.id = 'google-maps-script';
@@ -196,8 +191,6 @@ function Login() {
                 document.body.appendChild(script);
                 script.async = true;
                 script.defer = true;
-                
-                // Rest of function remains the same
             }
         });
     };
@@ -209,10 +202,10 @@ function Login() {
                 if (!window.google || !window.google.maps) {
                     await loadGoogleMapsScript();
                 }
-                
+
                 // Set showMap to true first, to render the map container
                 setShowMap(true);
-                
+
                 // Remove initializeMap call - let the useEffect handle it
                 // The useEffect will run after the component re-renders with showMap=true
             } catch (error) {

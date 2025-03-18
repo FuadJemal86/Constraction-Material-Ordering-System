@@ -4,23 +4,27 @@ import image1 from '../../images/image1_0.jpg';
 import api from '../../api';
 import toast from 'react-hot-toast';
 
+import 'notyf/notyf.min.css';
+import { Notyf } from 'notyf';
+
 function Cards() {
+    const notyf = new Notyf();
     const { id } = useParams();
     const navigate = useNavigate();
     const [product, setProduct] = useState([]);
 
     useEffect(() => {
-        const fetchData = async() => {
+        const fetchData = async () => {
             try {
                 const result = await api.get(`/supplier/get-products/${id}`)
 
-                if(result.data.status) {
+                if (result.data.status) {
                     console.log(result.data.product)
                     setProduct(result.data.product)
                 } else {
                     toast.error(result.data.message)
                 }
-            } catch(err) {
+            } catch (err) {
                 console.log(err)
                 toast.error(err.response?.data?.message || "An error occurred")
             }
@@ -39,10 +43,18 @@ function Cards() {
             if (result.data.valid) {
                 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
+                if (cart.length > 0) {
+                    // Get the supplier ID of the first product in the cart
+                    const existingSupplierId = cart[0].supplierId;
+
+                    if (existingSupplierId !== product.supplierId) {
+                        notyf.error("You cannot add in to cart from different suppliers at the same time.");
+                        return; // Stop execution
+                    }
+                }
+
                 const existingProduct = cart.find(item => item.id === product.id);
-                if (existingProduct) {
-                    // existingProduct.quantity += 1;
-                } else {
+                if (!existingProduct) {
                     cart.push({ ...product, quantity: 1 });
                 }
 
@@ -57,6 +69,7 @@ function Cards() {
         }
     };
 
+
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -64,16 +77,16 @@ function Cards() {
                     <div key={product.id} className="group relative bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300">
                         {/* Sale badge - uncomment and customize as needed */}
                         <div className="absolute top-0 right-0 bg-red-500 text-white px-3 py-1 rounded-bl-lg z-10 font-medium">SALE</div>
-                        
+
                         <div className="relative overflow-hidden">
-                            <img 
-                                src={`http://localhost:3032/images/${product.image}`} 
-                                alt={product.name} 
-                                className="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-300" 
+                            <img
+                                src={`http://localhost:3032/images/${product.image}`}
+                                alt={product.name}
+                                className="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-300"
                             />
                             <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
                         </div>
-                        
+
                         <div className="p-5">
                             <h3 className="font-bold text-lg mb-2 text-gray-800 dark:text-white">{product.name}</h3>
                             <div className="flex justify-between items-center mb-4">
@@ -86,7 +99,7 @@ function Cards() {
                                     <span className="text-xs ml-1 text-gray-600 dark:text-gray-400">4.5</span>
                                 </div>
                             </div>
-                            
+
                             <button
                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center group-hover:bg-blue-700"
                                 onClick={() => handleOrderClick(product)}
