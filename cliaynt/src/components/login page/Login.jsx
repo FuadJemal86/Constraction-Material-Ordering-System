@@ -71,26 +71,25 @@ function Login() {
 
     // Function to place a marker on the map
     const placeMarker = (location, mapInstance) => {
-        if (marker) {
-            marker.setMap(null);
-        }
-
+        if (marker) marker.setMap(null);
+    
         const newMarker = new window.google.maps.Marker({
             position: location,
             map: mapInstance,
             animation: window.google.maps.Animation.DROP
         });
-
+    
         setMarker(newMarker);
-
-        setSupplier({
-            ...supplier,
-            coordinates: {
-                lat: location.lat(),
-                lng: location.lng()
-            }
-        });
+        mapInstance.setCenter(location);
+        mapInstance.setZoom(18);
+    
+        setSupplier((prev) => ({
+            ...prev,
+            coordinates: { lat: location.lat(), lng: location.lng() }
+        }));
     };
+    
+
 
     // Function to get address from coordinates (reverse geocoding)
     const reverseGeocode = async (latLng) => {
@@ -250,35 +249,47 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const { companyName, email, phone, address, tinNumber, licenseNumber, password } = supplier;
-
+    
+        const { companyName, email, phone, address, tinNumber, licenseNumber, password, coordinates } = supplier;
+    
         if (!companyName || !email || !phone || !address || !tinNumber || !licenseNumber || !password) {
             return toast.error('Please fill all fields!');
         }
-
+    
         const tinRegex = /^\d{10}$/;
         if (!tinRegex.test(tinNumber)) {
-            return toast.error('Invalid TIN Number. It must be 10 digits.')
+            return toast.error('Invalid TIN Number. It must be 10 digits.');
         }
-
+    
         const licenseRegex = /^[A-Z]{2,3}\/\d{3,6}\/\d{4}$/;
         if (!licenseRegex.test(licenseNumber)) {
-            return toast.error('Invalid License Number format.')
+            return toast.error('Invalid License Number format.');
         }
-
+    
         if (!agree) {
             return toast.error("You must agree to the terms and conditions.");
         }
-
+    
+        if (!coordinates.lat || !coordinates.lng) {
+            return toast.error("Please select a location on the map.");
+        }
+    
         try {
-            const result = await api.post('/supplier/sign-up', supplier);
-
+            const result = await api.post('/supplier/sign-up', {
+                companyName,
+                email,
+                phone,
+                address,
+                tinNumber,
+                licenseNumber,
+                password,
+                lat: coordinates.lat,  // Sending latitude
+                lng: coordinates.lng    // Sending longitude
+            });
+    
             if (result.data.status) {
                 notyf.success('Your data will be processed');
-
-                navigate('/supplier-page')
-
+                navigate('/supplier-page');
             } else {
                 toast.error(result.data.message || 'Signup failed!');
             }
@@ -288,6 +299,7 @@ function Login() {
             console.error(err);
         }
     };
+    
 
     return (
         <div className="flex flex-col lg:flex-row justify-center items-center min-h-screen gap-8 lg:gap-32 p-4 bg-gradient-to-br from-gray-50 to-gray-100">

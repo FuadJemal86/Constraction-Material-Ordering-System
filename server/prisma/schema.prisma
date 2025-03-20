@@ -125,22 +125,25 @@ model product {
 }
 
 model supplier {
-  id           Int      @id @default(autoincrement())
-  companyName  String
-  email        String   @unique(map: "Supplier_email_key")
-  password     String
-  phone        String
-  address      String
+  id            Int      @id @default(autoincrement())
+  companyName   String
+  email         String   @unique(map: "Supplier_email_key")
+  password      String
+  phone         String
+  address       String
+  lat            Float
+  lng            Float 
   tinNumber     String   @unique(map: "Supplier_tinNumber_key") @db.VarChar(10)
   licenseNumber String   @unique(map: "Supplier_license_key")   @db.VarChar(20)
-  isApproved   Boolean  @default(false)
-  createdAt    DateTime @default(now())
+  isApproved    Boolean  @default(false)
+  createdAt     DateTime @default(now())
 
   complaint  complaint[]
   order      order[]
   product    product[]
   bank       bank[]
 }
+
 
 
 model category {

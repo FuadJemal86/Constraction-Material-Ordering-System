@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useCart } from '../CartContext';
 import image1 from '../../images/image1_0.jpg';
+// import { Notyf } from "notyf";
 import api from '../../api';
 import toast from 'react-hot-toast';
 
@@ -8,10 +10,11 @@ import 'notyf/notyf.min.css';
 import { Notyf } from 'notyf';
 
 function Cards() {
-    const notyf = new Notyf();
+    // const notyf = new Notyf();
     const { id } = useParams();
     const navigate = useNavigate();
     const [product, setProduct] = useState([]);
+    const { addToCart } = useCart()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -34,6 +37,7 @@ function Cards() {
     }, [id]);
 
 
+
     const handleOrderClick = async (product) => {
         try {
             const result = await api.get("/customer/verify-token", {
@@ -41,24 +45,7 @@ function Cards() {
             });
 
             if (result.data.valid) {
-                let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-                if (cart.length > 0) {
-                    // Get the supplier ID of the first product in the cart
-                    const existingSupplierId = cart[0].supplierId;
-
-                    if (existingSupplierId !== product.supplierId) {
-                        notyf.error("You cannot add in to cart from different suppliers at the same time.");
-                        return; // Stop execution
-                    }
-                }
-
-                const existingProduct = cart.find(item => item.id === product.id);
-                if (!existingProduct) {
-                    cart.push({ ...product, quantity: 1 });
-                }
-
-                localStorage.setItem("cart", JSON.stringify(cart));
+                addToCart(product); // ✅ Use context to update cart
                 toast.success("Item added to cart");
             } else {
                 toast.error(result.data.message);
@@ -68,6 +55,7 @@ function Cards() {
             navigate("/customer-sign-in");
         }
     };
+
 
 
     return (

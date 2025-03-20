@@ -7,28 +7,29 @@ import bannerImage from '../../images/banner2 page2.jpg';
 import { LightMode, DarkMode, Close } from "@mui/icons-material";
 import { Menu, X, Wrench, ChevronDown, Minus, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useCart } from "../CartContext";
 import api from '../../api';
 import toast, { Toaster } from 'react-hot-toast';
 
 function Header() {
-    const [address, setAddress] = useState([])
-    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    const supplierIds = storedCart.map(item => item.supplierId); // Extract supplierId
-
+    const { cart, setCart } = useCart();
+    const [address, setAddress] = useState([]);
     const [order, setOrder] = useState({
         supplierId: "",
         addressId: "",
-        totalPrice: 0
+        totalPrice: 0,
     });
+
+    const supplierIds = cart.map(item => item.supplierId);
 
     useEffect(() => {
         if (supplierIds.length > 0) {
             setOrder(prevOrder => ({
                 ...prevOrder,
-                supplierId: supplierIds[0]
+                supplierId: supplierIds[0],
             }));
         }
-    }, []);
+    }, [cart]);
 
 
 
@@ -59,21 +60,9 @@ function Header() {
         };
     }, [cartOpen]);
 
-    const [cart, setCart] = useState(JSON.parse(localStorage.getItem("cart")) || []);
-
-    const [currentItem, setCurrentItem] = useState({
-        name: "",
-        price: 0,
-        quantity: 1,
-        unit: "KG", // Default unit
-        totalPrice: 0
-    });
 
     const unitTypes = ["KG", "Ton", "Liter", "Piece", "Meter", "Pack"];
 
-    useEffect(() => {
-        localStorage.setItem("cart", JSON.stringify(cart));
-    }, [cart]);
 
 
     const updateQuantity = (index, newQuantity) => {
@@ -82,55 +71,23 @@ function Header() {
         const updatedCart = [...cart];
         updatedCart[index].quantity = newQuantity;
         updatedCart[index].totalPrice = updatedCart[index].price * newQuantity;
-        setCart(updatedCart);
+        setOrder(updatedCart);
     };
 
 
     const updateUnit = (index, newUnit) => {
         const updatedCart = [...cart];
         updatedCart[index].unit = newUnit;
-        setCart(updatedCart);
+        setOrder(updatedCart);
     };
 
 
-    const removeItem = (index) => {
-        const updatedCart = [...cart];
-        updatedCart.splice(index, 1);
-        setCart(updatedCart);
+    const removeItem = (itemId) => {
+        setCart(cart.filter((item) => item.id !== itemId)); // Correct way to update cart
     };
 
 
-    const handleItemChange = (e) => {
-        const { name, value } = e.target;
-        const updatedItem = { ...currentItem };
 
-        if (name === "price" || name === "quantity") {
-            updatedItem[name] = parseFloat(value) || 0;
-
-            updatedItem.totalPrice = updatedItem.price * updatedItem.quantity;
-        } else {
-            updatedItem[name] = value;
-        }
-
-        setCurrentItem(updatedItem);
-    };
-
-    const addToCart = () => {
-        if (!currentItem.name || currentItem.price <= 0 || currentItem.quantity <= 0) {
-            toast.error("Please enter valid product details");
-            return;
-        }
-
-        setCart([...cart, { ...currentItem }]);
-
-        setCurrentItem({
-            name: "",
-            price: 0,
-            quantity: 1,
-            unit: "KG",
-            totalPrice: 0
-        });
-    };
 
     const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
     const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -138,23 +95,23 @@ function Header() {
         setOrder((prev) => ({ ...prev, totalPrice: cartTotal }));
     }, [cartTotal]);
 
-    useEffect(() => {
-        const feachData = async () => {
-            try {
-                const result = await api.get('/customer/get-address')
+    // useEffect(() => {
+    //     const feachData = async () => {
+    //         try {
+    //             const result = await api.get('/customer/get-address')
 
-                if (result.data.status) {
-                    setAddress(result.data.address)
-                } else {
-                    toast.error(result.data.message)
-                }
-            } catch (err) {
-                console.log(err)
-                toast.error(err.response.data.message)
-            }
-        }
-        feachData()
-    }, [])
+    //             if (result.data.status) {
+    //                 setAddress(result.data.address)
+    //             } else {
+    //                 toast.error(result.data.message)
+    //             }
+    //         } catch (err) {
+    //             console.log(err)
+    //             toast.error(err.response.data.message)
+    //         }
+    //     }
+    //     feachData()
+    // }, [])
 
     const handelSubmit = async (c) => {
         c.preventDefault()
@@ -215,9 +172,9 @@ function Header() {
                                 <div className="w-10 h-10 flex items-center justify-center">
                                     <ShoppingCartOutlinedIcon className="text-2xl" />
                                 </div>
-                                {cartItemCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[12px] font-bold p-1 rounded-full">
-                                        {cartItemCount}
+                                {cart.length > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                        {cart.length} {/* ✅ Real-time cart count */}
                                     </span>
                                 )}
                             </button>
@@ -319,71 +276,6 @@ function Header() {
                                 </div>
 
                                 <div className="p-4">
-                                    {/* Add Item Form */}
-                                    {/* <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                        <h3 className="font-semibold mb-3 text-base">Add New Item</h3>
-                                        <div className="grid grid-cols-12 gap-3">
-                                            <div className="col-span-12">
-                                                <input
-                                                    type="text"
-                                                    name="name"
-                                                    placeholder="Product Name"
-                                                    value={currentItem.name}
-                                                    onChange={handleItemChange}
-                                                    className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
-                                                />
-                                            </div>
-                                            <div className="col-span-5">
-                                                <input
-                                                    type="number"
-                                                    name="quantity"
-                                                    placeholder="Quantity"
-                                                    min="1"
-                                                    value={currentItem.quantity}
-                                                    onChange={handleItemChange}
-                                                    className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
-                                                />
-                                            </div>
-                                            <div className="col-span-7">
-                                                <select
-                                                    name="unit"
-                                                    value={currentItem.unit}
-                                                    onChange={handleItemChange}
-                                                    className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
-                                                >
-                                                    {unitTypes.map(unit => (
-                                                        <option key={unit} value={unit}>{unit}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                            <div className="col-span-8">
-                                                <div className="relative">
-                                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">birr</span>
-                                                    <input
-                                                        type="number"
-                                                        name="price"
-                                                        placeholder="Price per unit"
-                                                        step="0.01"
-                                                        min="0"
-                                                        value={`birr ${currentItem.price}`}
-                                                        onChange={handleItemChange}
-                                                        className="w-full p-2 pl-10 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
-                                                    />
-                                                </div>
-                                            </div>
-
-
-                                            <div className="col-span-4">
-                                                <button
-                                                    onClick={addToCart}
-                                                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold p-2 rounded transition-all"
-                                                >
-                                                    Add
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div> */}
-
                                     {cart.length === 0 ? (
                                         <div className="text-center py-12">
                                             <ShoppingCartOutlinedIcon style={{ fontSize: '3rem' }} className="text-gray-400 mb-3" />
@@ -403,49 +295,51 @@ function Header() {
                                                 <div className="divide-y divide-gray-100 dark:divide-gray-800 mb-4">
                                                     {cart.map((item, index) => (
                                                         <div key={index} className="py-3">
-                                                            <div className="flex items-center mb-2">
+                                                            <div key={index} className="flex items-center mb-2">
                                                                 <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded flex-shrink-0 flex items-center justify-center">
                                                                     <Wrench className="text-gray-400" size={16} />
                                                                 </div>
                                                                 <div className="ml-3 flex-grow">
                                                                     <h3 className="font-medium">{item.name}</h3>
                                                                 </div>
-                                                                <button
+                                                                <span
                                                                     onClick={() => removeItem(index)}
-                                                                    className="p-1 text-gray-500 hover:text-red-500"
+
+                                                                    className="p-1 text-gray-500 hover:text-red-500 cursor-pointer"
                                                                 >
                                                                     <X size={16} />
-                                                                </button>
+                                                                </span>
+
                                                             </div>
                                                             <div className="grid grid-cols-12 gap-2 mt-2">
                                                                 <div className="col-span-4 flex items-center">
-                                                                    <button
+                                                                    <span
                                                                         onClick={() => updateQuantity(index, item.quantity - 1)}
-                                                                        className="p-1 bg-gray-100 dark:bg-gray-800 rounded"
+                                                                        className="p-1 bg-gray-100 dark:bg-gray-800 rounded cursor-pointer"
                                                                         disabled={item.quantity <= 1}
                                                                     >
                                                                         <Minus size={14} />
-                                                                    </button>
+                                                                    </span>
                                                                     <input
                                                                         type="number"
                                                                         value={item.quantity}
                                                                         min="1"
                                                                         onChange={(e) => setOrder(index, parseInt(e.target.value) || 1)}
-                                                                        className="w-full mx-1 p-1 text-center border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
+                                                                        className="w-full mx-1 p-1 text-center border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900 cursor-pointer"
 
                                                                     />
-                                                                    <button
+                                                                    <span
                                                                         onClick={() => updateQuantity(index, item.quantity + 1)}
-                                                                        className="p-1 bg-gray-100 dark:bg-gray-800 rounded"
+                                                                        className="p-1 bg-gray-100 dark:bg-gray-800 rounded cursor-pointer"
                                                                     >
                                                                         <Plus size={14} />
-                                                                    </button>
+                                                                    </span>
                                                                 </div>
                                                                 <div className="col-span-4">
                                                                     <select
                                                                         value={item.unit}
                                                                         onChange={(e) => updateUnit(index, e.target.value)}
-                                                                        className="w-full p-1 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
+                                                                        className="w-full p-1 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900 cursor-pointer"
                                                                     >
                                                                         {unitTypes.map(unit => (
                                                                             <option key={unit} value={unit}>{unit}</option>
@@ -454,7 +348,7 @@ function Header() {
                                                                 </div>
 
                                                                 <div className="col-span-4 flex justify-between items-center">
-                                                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                                    <span className="text-sm text-gray-500 dark:text-gray-400 cursor-pointer">
                                                                         1
                                                                     </span>
                                                                     <span className="font-medium">birr {(item.price * item.quantity).toFixed(2)}</span>
@@ -506,7 +400,7 @@ function Header() {
                         </div>
                     )}
                 </header>
-            </div>
+            </div >
 
             <div className={`pt-16 md:pt-20 ${mobileMenuOpen ? 'hidden' : 'block'}`}>
                 <div className="relative w-full h-64 md:h-96">
@@ -537,7 +431,7 @@ function Header() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 

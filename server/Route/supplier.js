@@ -38,7 +38,11 @@ const upload = multer({
 
 router.post('/sign-up', async (req, res) => {
     try {
-        const { companyName, email, phone, address, tinNumber, licenseNumber, password } = req.body;
+        const { companyName, email, phone, address, tinNumber, licenseNumber, password, lat, lng } = req.body;
+
+        if (!lat || !lng) {
+            return res.status(400).json({ status: false, message: 'Location (latitude & longitude) is required.' });
+        }
 
         const tinRegex = /^\d{10}$/;
         if (!tinRegex.test(tinNumber)) {
@@ -59,7 +63,17 @@ router.post('/sign-up', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         await prisma.supplier.create({
-            data: { companyName, email, phone, address, tinNumber, licenseNumber, password: hashedPassword }
+            data: { 
+                companyName, 
+                email, 
+                phone, 
+                address, 
+                tinNumber, 
+                licenseNumber, 
+                password: hashedPassword,
+                lat,   // Store latitude
+                lng    // Store longitude
+            }
         });
 
         return res.status(200).json({ status: true, message: 'Supplier registered successfully' });
@@ -69,6 +83,7 @@ router.post('/sign-up', async (req, res) => {
         return res.status(500).json({ status: false, error: 'Server error' });
     }
 });
+
 
 
 
