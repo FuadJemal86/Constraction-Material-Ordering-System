@@ -33,102 +33,12 @@ function Body() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedSupplier, setSelectedSupplier] = useState(null);
     const [activeFilter, setActiveFilter] = useState('suppliers'); // Default to suppliers first
-    const [showNearbyModal, setShowNearbyModal] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [locationStatus, setLocationStatus] = useState('');
+    
 
     // Fetch categories
 
-    const getNearbySuppliers = () => {
-        setLocationStatus('Requesting location permission...');
-
-        if (!navigator.geolocation) {
-            setLocationStatus('Geolocation is not supported by this browser.');
-            setTimeout(() => setLocationStatus(''), 3000);
-            return;
-        }
-
-        // Check for permission before requesting location
-        navigator.permissions.query({ name: 'geolocation' }).then((permissionStatus) => {
-            if (permissionStatus.state === 'granted') {
-                detectLocation();
-            } else if (permissionStatus.state === 'prompt') {
-                // Ask user for permission
-                navigator.geolocation.getCurrentPosition(
-                    (position) => detectLocation(position),
-                    (error) => handleLocationError(error)
-                );
-            } else {
-                setLocationStatus('Location access denied. Please enable location permissions in your browser settings.');
-                toast.error('Location access denied.');
-                setTimeout(() => setLocationStatus(''), 5000);
-            }
-        });
-    };
-
-    const detectLocation = (position = null) => {
-        setLocationStatus('Detecting your location...');
-
-        if (!position) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => detectLocation(position),
-                (error) => handleLocationError(error),
-                {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
-                }
-            );
-            return;
-        }
-
-        const { latitude, longitude } = position.coords;
-
-        setLocationStatus('Finding nearby suppliers...');
-
-        api.get('/customer/nearby-suppliers', {
-            params: { latitude, longitude, radius: 300 }
-        })
-
-            .then((result) => {
-                if (result.data.status && result.data.suppliers.length > 0) {
-                    setSuppliers(result.data.suppliers);
-                    setFilteredSuppliers(result.data.suppliers);
-                    setShowNearbyModal(false);
-                    setActiveFilter('suppliers');
-                    toast.success(`Found ${result.data.suppliers.length} suppliers nearby`);
-                } else {
-                    setLocationStatus('No suppliers found in your area.');
-                    setTimeout(() => setLocationStatus(''), 3000);
-                }
-            })
-            .catch((err) => {
-                console.error(err);
-                setLocationStatus('Error finding nearby suppliers.');
-                toast.error(err.response?.data?.message || 'Error finding nearby suppliers');
-                setTimeout(() => setLocationStatus(''), 3000);
-            });
-    };
-
-    const handleLocationError = (error) => {
-        console.error(error);
-        switch (error.code) {
-            case error.PERMISSION_DENIED:
-                setLocationStatus('Location permission denied. Please enable location access.');
-                toast.error('Location permission denied.');
-                break;
-            case error.POSITION_UNAVAILABLE:
-                setLocationStatus('Location information is unavailable.');
-                break;
-            case error.TIMEOUT:
-                setLocationStatus('Request to get location timed out.');
-                break;
-            default:
-                setLocationStatus('An unknown error occurred.');
-        }
-        setTimeout(() => setLocationStatus(''), 5000);
-    };
-
+   
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -234,13 +144,13 @@ function Body() {
                     />
                     <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
                 </div>
-                <button
+                <Link to={'/products/nearby'}
                     onClick={() => setShowNearbyModal(true)}
                     className="ml-2 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-xl flex items-center"
                 >
                     <NearMeIcon className="mr-1" />
                     <span className="hidden md:inline">Nearby</span>
-                </button>
+                </Link>
             </div>
 
             {/* Selected Supplier Display */}
@@ -391,50 +301,8 @@ function Body() {
                     )}
                 </div>
             </div>
-
-            {/* Nearby Modal */}
-            {showNearbyModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white dark:bg-gray-900 p-6 rounded-xl w-full max-w-md">
-                        <h3 className="font-bold text-xl mb-4">Find Nearby Suppliers</h3>
-                        <p className="mb-4 text-gray-600 dark:text-gray-400">
-                            Allow location access to find suppliers near you.
-                        </p>
-
-                        {locationStatus && (
-                            <div className="my-4 p-3 bg-blue-50 dark:bg-gray-800 rounded text-center">
-                                {locationStatus === 'Detecting your location...' || locationStatus === 'Finding nearby suppliers...' ? (
-                                    <div className="flex items-center justify-center">
-                                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500 mr-2"></div>
-                                        <span>{locationStatus}</span>
-                                    </div>
-                                ) : (
-                                    <span>{locationStatus}</span>
-                                )}
-                            </div>
-                        )}
-
-                        <div className="flex justify-end mt-4">
-                            <button
-                                onClick={() => setShowNearbyModal(false)}
-                                className="px-4 py-2 mr-2 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={getNearbySuppliers}
-                                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
-                                disabled={locationStatus === 'Detecting your location...' || locationStatus === 'Finding nearby suppliers...'}
-                            >
-                                <FaMapMarkerAlt className="mr-2" />
-                                Find Nearby
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
-    );
+    )
 }
 
 export default Body;

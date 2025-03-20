@@ -35,7 +35,6 @@ const upload = multer({
     storage: storage
 })
 
-
 router.post('/sign-up', async (req, res) => {
     try {
         const { companyName, email, phone, address, tinNumber, licenseNumber, password, lat, lng } = req.body;
@@ -63,13 +62,13 @@ router.post('/sign-up', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         await prisma.supplier.create({
-            data: { 
-                companyName, 
-                email, 
-                phone, 
-                address, 
-                tinNumber, 
-                licenseNumber, 
+            data: {
+                companyName,
+                email,
+                phone,
+                address,
+                tinNumber,
+                licenseNumber,
                 password: hashedPassword,
                 lat,   // Store latitude
                 lng    // Store longitude
@@ -182,9 +181,18 @@ router.post('/add-product', upload.single('image'), async (req, res) => {
 // get all product
 
 router.get('/get-product', async (req, res) => {
+
+    const token = req.cookies['x-auth-token'];
+
+    if (!token) {
+        return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });
+    }
     try {
 
-        const product = await prisma.product.findMany()
+        const decoded = jwt.verify(token, process.env.SUPPLIER_KEY)
+        const supplierId = decoded.id
+
+        const product = await prisma.product.findMany({ where: { id: supplierId } })
 
         return res.status(200).json({ status: true, result: product })
 
@@ -204,14 +212,14 @@ router.get('/get-products/:id', async (req, res) => {
 
         const product = await prisma.product.findMany(
             {
-                where: {supplierId:id}
+                where: { supplierId: id }
             })
 
         if (product.length == 0) {
             return res.status(401).json({ status: false, message: "No product found" })
         }
 
-        return res.status(200).json({ status: true,  product })
+        return res.status(200).json({ status: true, product })
 
     } catch (err) {
         console.log(err)
@@ -241,6 +249,7 @@ router.delete('/delete-product/:id', async (req, res) => {
 // update product
 
 router.put('/update-product/:id', upload.single('image'), async (req, res) => {
+
     try {
         const { id } = req.params;
         const { name, price, stock, supplierId, categoryId } = req.body;

@@ -234,7 +234,7 @@ router.post('/make-payment', async (req, res) => {
         }
 
         const newPayment = await prisma.payment.create({
-            data: { orderId, amount, bankId, status: "COMPLETED" }
+            data: { orderId, amount, bankId, status: "PENDING" }
         });
 
         return res.status(201).json({ status: true, message: "Payment successful", payment: newPayment });

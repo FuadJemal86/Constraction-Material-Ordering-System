@@ -14,6 +14,7 @@ import Payment from './components/SupplyNav/Payment';
 import SignIn from './components/login page/SignIn';
 import CustomerSignIn from './components/customer/CustomerSignIn';
 import SignUp from './components/customer/SignUp';
+import Nearby from './components/SupplyNav/Nearby';
 
 
 
@@ -29,6 +30,7 @@ function App() {
                 <Route path='/customer-sign-up' element={<SignUp />} />
                 <Route path="/products" element={<OrderParent />}>
                     <Route path='/products/supplier-products/:id' element={<Cards />} />
+                    <Route path='nearby' element={<Nearby />} />
                 </Route>
 
                 <Route path="/supplier-page" element={<Nav />}>

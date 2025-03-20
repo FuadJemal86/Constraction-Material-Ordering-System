@@ -70,13 +70,16 @@ model order {
   id         Int          @id @default(autoincrement())
   customerId Int
   supplierId Int
+  productId  Int
   addressId  Int
   totalPrice Float
   status     order_status @default(PENDING)
+  transactionId Int
   createdAt  DateTime     @default(now())
   customer   customer     @relation(fields: [customerId], references: [id], map: "Order_customerId_fkey")
   address    address     @relation(fields: [addressId], references: [id], map: "order_address")
   supplier   supplier     @relation(fields: [supplierId], references: [id], map: "Order_supplierId_fkey")
+  product    product     @relation(fields: [customerId], references: [id], map: "order_productId_fkey")
   orderitem  orderitem[]
   payment    payment?
 
@@ -118,6 +121,7 @@ model product {
   image      String
   createdAt  DateTime    @default(now())
   orderItems orderitem[]
+  order      order[]
   category   category    @relation(fields: [categoryId], references: [id])
   supplier   supplier    @relation(fields: [supplierId], references: [id])
 
