@@ -2,14 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FaMapMarkerAlt, FaStore, FaLocationArrow } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
-function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocation }) {
+function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocation, radiusFilter }) {
     const mapRef = useRef(null);
     const [map, setMap] = useState(null);
     const [markers, setMarkers] = useState([]);
     const [userMarker, setUserMarker] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [mapError, setMapError] = useState(null);
-    const [circle, setCircle] = useState(null);
+    const [radiusCircle, setRadiusCircle] = useState(null);
 
     // Load Google Maps API script
     const loadGoogleMapsScript = () => {
@@ -36,12 +36,14 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
 
     // Initialize map
     useEffect(() => {
+        let isMounted = true;
+        
         async function initializeMap() {
             try {
                 setIsLoading(true);
                 await loadGoogleMapsScript();
 
-                if (!mapRef.current) return;
+                if (!mapRef.current || !isMounted) return;
 
                 // Default center (can be set to a default location in your country)
                 const defaultCenter = { lat: 9.145, lng: 40.489 }; // Ethiopia center coordinates
@@ -51,22 +53,49 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
                     zoom: 6,
                     mapTypeControl: false,
                     streetViewControl: false,
-                    fullscreenControl: false
+                    fullscreenControl: false,
+                    zoomControlOptions: {
+                        position: window.google.maps.ControlPosition.RIGHT_CENTER
+                    }
                 });
 
-                setMap(mapInstance);
-
-                setIsLoading(false);
+                // Add custom control for current location
+                const locationButton = document.createElement("button");
+                locationButton.innerHTML = `<div style="background-color: #fff; border: 2px solid #fff; border-radius: 3px; box-shadow: 0 2px 6px rgba(0,0,0,.3); cursor: pointer; text-align: center; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-location-arrow" style="color: #1a73e8; font-size: 18px;"></i>
+                </div>`;
+                locationButton.classList.add("custom-map-control-button");
+                locationButton.setAttribute("title", "Find my location");
+                locationButton.type = "button";
+                
+                mapInstance.controls[window.google.maps.ControlPosition.RIGHT_BOTTOM].push(locationButton);
+                
+                locationButton.addEventListener("click", () => {
+                    getUserLocation();
+                });
+                
+                if (isMounted) {
+                    setMap(mapInstance);
+                    setIsLoading(false);
+                    
+                    // Try to get user location automatically on map init
+                    if (!userLocation) {
+                        getUserLocation(true); // true = silent mode (no toast)
+                    }
+                }
             } catch (error) {
                 console.error("Error initializing map:", error);
-                setMapError("Failed to load map. Please try again later.");
-                setIsLoading(false);
+                if (isMounted) {
+                    setMapError("Failed to load map. Please try again later.");
+                    setIsLoading(false);
+                }
             }
         }
 
         initializeMap();
 
         return () => {
+            isMounted = false;
             // Clean up markers when component unmounts
             if (markers.length > 0) {
                 markers.forEach(marker => marker.setMap(null));
@@ -74,8 +103,8 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
             if (userMarker) {
                 userMarker.setMap(null);
             }
-            if (circle) {
-                circle.setMap(null);
+            if (radiusCircle) {
+                radiusCircle.setMap(null);
             }
         };
     }, []);
@@ -112,8 +141,50 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
                 map.setCenter(userPos);
                 map.setZoom(12);
             }
+            
+            // Draw radius circle
+            updateRadiusCircle(userPos);
         }
     }, [map, userLocation]);
+    
+    // Update radius circle when filter changes
+    useEffect(() => {
+        if (map && userLocation && radiusFilter) {
+            const userPos = new window.google.maps.LatLng(
+                userLocation.latitude,
+                userLocation.longitude
+            );
+            updateRadiusCircle(userPos);
+        }
+    }, [radiusFilter, map, userLocation]);
+    
+    // Function to update the radius circle
+    const updateRadiusCircle = (center) => {
+        // Remove existing circle
+        if (radiusCircle) {
+            radiusCircle.setMap(null);
+        }
+        
+        // Create new circle if we have a radius filter
+        if (radiusFilter) {
+            const newCircle = new window.google.maps.Circle({
+                strokeColor: "#FF6384",
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: "#FF6384",
+                fillOpacity: 0.1,
+                map: map,
+                center: center,
+                radius: radiusFilter * 1000, // Convert km to meters
+                zIndex: 1
+            });
+            
+            setRadiusCircle(newCircle);
+            
+            // Fit map to circle bounds
+            map.fitBounds(newCircle.getBounds());
+        }
+    };
 
     // Add suppliers to map when suppliers array changes
     useEffect(() => {
@@ -187,11 +258,17 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
                 
                 const infoWindow = new window.google.maps.InfoWindow({
                     content: `
-                        <div style="max-width: 200px;">
-                            <h3 style="font-weight: bold; margin-bottom: 5px;">${supplier.companyName}</h3>
+                        <div style="max-width: 250px; padding: 8px;">
+                            <h3 style="font-weight: bold; margin-bottom: 8px; font-size: 16px;">${supplier.companyName}</h3>
                             ${distanceInfo}
-                            <p style="margin-bottom: 5px;">${supplier.address || 'No address provided'}</p>
-                            <p style="margin-bottom: 5px;">${supplier.phone || 'No phone provided'}</p>
+                            <p style="margin-bottom: 5px;"><strong>Address:</strong> ${supplier.address || 'No address provided'}</p>
+                            <p style="margin-bottom: 5px;"><strong>Phone:</strong> ${supplier.phone || 'No phone provided'}</p>
+                            <button 
+                                style="background-color: #3182ce; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-top: 8px; cursor: pointer; width: 100%;"
+                                onclick="document.dispatchEvent(new CustomEvent('selectSupplier', {detail: ${supplier.id}}))"
+                            >
+                                Select This Supplier
+                            </button>
                         </div>
                     `
                 });
@@ -266,62 +343,85 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
         }
     };
 
-    // Get user's current location with the button
-    const getUserLocation = () => {
+    // Listen for custom event from infoWindow button
+    useEffect(() => {
+        const handleSelectSupplier = (event) => {
+            const supplierId = event.detail;
+            const supplier = suppliers.find(s => s.id === supplierId);
+            if (supplier && onSelectSupplier) {
+                onSelectSupplier(supplier);
+            }
+        };
+
+        document.addEventListener('selectSupplier', handleSelectSupplier);
+        
+        return () => {
+            document.removeEventListener('selectSupplier', handleSelectSupplier);
+        };
+    }, [suppliers, onSelectSupplier]);
+
+    // Get user's current location
+    const getUserLocation = (silent = false) => {
         if (!navigator.geolocation) {
-            toast.error('Geolocation is not supported by your browser');
+            if (!silent) toast.error('Geolocation is not supported by your browser');
             return;
         }
 
-        toast.promise(
-            new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const { latitude, longitude } = position.coords;
-                        const userPos = new window.google.maps.LatLng(latitude, longitude);
+        const locationPromise = new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    const userPos = new window.google.maps.LatLng(latitude, longitude);
 
-                        // Clear existing user marker
-                        if (userMarker) {
-                            userMarker.setMap(null);
-                        }
-
-                        // Create new user marker
-                        const newUserMarker = new window.google.maps.Marker({
-                            position: userPos,
-                            map: map,
-                            title: 'Your Location',
-                            icon: {
-                                url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-                                scaledSize: new window.google.maps.Size(40, 40)
-                            },
-                            zIndex: 1000 // Ensure user marker is on top
-                        });
-
-                        setUserMarker(newUserMarker);
-
-                        // Center map on user's location
-                        map.setCenter(userPos);
-                        map.setZoom(13);
-
-                        resolve(position);
-                    },
-                    (error) => {
-                        console.error('Geolocation error:', error);
-                        reject(new Error('Could not get your location'));
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
+                    // Clear existing user marker
+                    if (userMarker) {
+                        userMarker.setMap(null);
                     }
-                );
-            }),
-            {
+
+                    // Create new user marker
+                    const newUserMarker = new window.google.maps.Marker({
+                        position: userPos,
+                        map: map,
+                        title: 'Your Location',
+                        icon: {
+                            url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                            scaledSize: new window.google.maps.Size(40, 40)
+                        },
+                        zIndex: 1000 // Ensure user marker is on top
+                    });
+
+                    setUserMarker(newUserMarker);
+
+                    // Center map on user's location
+                    map.setCenter(userPos);
+                    map.setZoom(13);
+                    
+                    // Draw radius circle around user location
+                    updateRadiusCircle(userPos);
+                    
+                    resolve(position);
+                },
+                (error) => {
+                    console.error('Geolocation error:', error);
+                    reject(new Error('Could not get your location'));
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        });
+        
+        if (!silent) {
+            toast.promise(locationPromise, {
                 loading: 'Getting your location...',
                 success: 'Location found!',
                 error: 'Could not get your location'
-            }
-        );
+            });
+        }
+        
+        return locationPromise;
     };
 
     return (
@@ -331,7 +431,7 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
                 <div className="bg-blue-500 text-white p-3 flex justify-between items-center">
                     <h3 className="font-bold text-lg">Supplier Locations</h3>
                     <button
-                        onClick={getUserLocation}
+                        onClick={() => getUserLocation()}
                         className="bg-white text-blue-500 hover:bg-blue-50 px-3 py-1 rounded-lg flex items-center text-sm font-medium"
                         disabled={!map}
                     >
@@ -344,7 +444,7 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
                 <div
                     ref={mapRef}
                     className="w-full flex-1"
-                    style={{ position: 'relative' }}
+                    style={{ position: 'relative', minHeight: '350px' }}
                 ></div>
 
                 {/* Loading Overlay */}
@@ -376,18 +476,22 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
                 <div className="p-3 border-t border-gray-200 dark:border-gray-800 flex flex-wrap gap-4">
                     <div className="flex items-center">
                         <div className="w-4 h-4 rounded-full bg-red-500 mr-2"></div>
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Supplier Location</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Supplier</span>
                     </div>
                     <div className="flex items-center">
                         <div className="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Selected Supplier</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Selected</span>
                     </div>
                     <div className="flex items-center">
                         <div className="w-4 h-4 rounded-full bg-blue-500 mr-2"></div>
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Your Location</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">You</span>
+                    </div>
+                    <div className="flex items-center">
+                        <div className="w-4 h-4 border-2 border-pink-500 rounded-full bg-pink-100 bg-opacity-30 mr-2"></div>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Filter radius</span>
                     </div>
                     <div className="ml-auto text-sm text-gray-600 dark:text-gray-400">
-                        {markers.length} suppliers shown on map
+                        {markers.length} suppliers shown
                     </div>
                 </div>
             </div>
