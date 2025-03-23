@@ -18,27 +18,24 @@ export const CartProvider = ({ children }) => {
 
     const addToCart = (product) => {
         let updatedCart = [...cart];
-
-        if (updatedCart.length > 0) {
-            const existingSupplierId = updatedCart[0].supplierId;
-            if (existingSupplierId !== product.supplierId) {
-                alert("You cannot add items from different suppliers.");
-                return;
-            }
-        }
-
+    
         const existingProduct = updatedCart.find(item => item.id === product.id);
         if (existingProduct) {
             existingProduct.quantity += 1;
         } else {
             updatedCart.push({ ...product, quantity: 1 });
         }
+    
+        setCart(updatedCart);
+    };
+    
 
-        setCart(updatedCart); // ✅ State updates automatically update localStorage
+    const removeItem = (itemId) => {
+        setCart(cart.filter((item) => item.id !== itemId)); // ✅ Fix remove function
     };
 
     return (
-        <CartContext.Provider value={{ cart, addToCart }}>
+        <CartContext.Provider value={{ cart, setCart, addToCart, removeItem }}>
             {children}
         </CartContext.Provider>
     );

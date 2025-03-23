@@ -153,7 +153,7 @@ router.post('/add-product', upload.single('image'), async (req, res) => {
         const decoded = jwt.verify(token, process.env.SUPPLIER_KEY);
         const supplierId = decoded.id;
 
-        const { name, price, stock, categoryId } = req.body;
+        const { name, price, stock, categoryId , unit , deliveryPricePerKm } = req.body;
 
         if (!req.file) {
             return res.status(400).json({ status: false, message: 'Image is required' });
@@ -166,6 +166,8 @@ router.post('/add-product', upload.single('image'), async (req, res) => {
                 stock: parseInt(stock),
                 supplierId,
                 categoryId: parseInt(categoryId),
+                unit,
+                deliveryPricePerKm: parseFloat(deliveryPricePerKm),
                 image: req.file ? req.file.filename : null
             }
         });
@@ -182,7 +184,7 @@ router.post('/add-product', upload.single('image'), async (req, res) => {
 
 router.get('/get-product', async (req, res) => {
 
-    const token = req.cookies['x-auth-token'];
+    const token = req.cookies['t-auth-token'];
 
     if (!token) {
         return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });
@@ -192,7 +194,11 @@ router.get('/get-product', async (req, res) => {
         const decoded = jwt.verify(token, process.env.SUPPLIER_KEY)
         const supplierId = decoded.id
 
-        const product = await prisma.product.findMany({ where: { id: supplierId } })
+
+        const product = await prisma.product.findMany({ 
+            where: { supplierId: supplierId },
+            include: { category: true } 
+        });
 
         return res.status(200).json({ status: true, result: product })
 

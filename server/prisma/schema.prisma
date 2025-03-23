@@ -112,18 +112,22 @@ model payment {
 }
 
 model product {
-  id         Int         @id @default(autoincrement())
-  name       String
-  categoryId Int
-  price      Float
-  stock      Int         @default(0)
-  supplierId Int
-  image      String
-  createdAt  DateTime    @default(now())
-  orderItems orderitem[]
-  order      order[]
-  category   category    @relation(fields: [categoryId], references: [id])
-  supplier   supplier    @relation(fields: [supplierId], references: [id])
+  id                 Int         @id @default(autoincrement())
+  name               String
+  categoryId         Int
+  price              Float
+  stock              Int         @default(0)
+  supplierId         Int
+  image              String
+  unit               String      @default("piece")
+  createdAt          DateTime    @default(now())
+  offersDelivery     Boolean    @default(false)
+  deliveryPricePerKm Float?    
+  
+  orderItems        orderitem[]
+  order            order[]
+  category         category    @relation(fields: [categoryId], references: [id])
+  supplier         supplier    @relation(fields: [supplierId], references: [id])
 
   @@index([supplierId], map: "Product_supplierId_fkey")
 }

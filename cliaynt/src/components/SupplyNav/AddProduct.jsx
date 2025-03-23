@@ -9,19 +9,36 @@ function AddProduct() {
         name: "",
         categoryId: "",
         price: "",
-        stock: "",
+        unit: "piece", // Default unit
+        stock: 0,
         image: "",
         offersDelivery: false,
         deliveryPricePerKm: ""
     });
 
+    // Common units for products
+    const commonUnits = [
+        { value: "piece", label: "Piece" },
+        { value: "kg", label: "kg" },
+        { value: "g", label: "g" },
+        { value: "lb", label: "lb" },
+        { value: "oz", label: "oz" },
+        { value: "l", label: "L" },
+        { value: "ml", label: "ml" },
+        { value: "pack", label: "Pack" },
+        { value: "box", label: "Box" },
+        { value: "set", label: "Set" },
+        { value: "pair", label: "Pair" },
+        { value: "custom", label: "Custom..." }
+    ];
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const { name, categoryId, price, stock, image, offersDelivery, deliveryPricePerKm } = product;
+        const { name, categoryId, price, unit, stock, image, offersDelivery, deliveryPricePerKm } = product;
 
         // Basic validation
-        if (!name || !categoryId || !price || !stock || !image) {
+        if (!name || !categoryId || !price || !unit || !stock || !image) {
             return toast.error('Please fill all required fields');
         }
 
@@ -35,6 +52,7 @@ function AddProduct() {
         formData.append('name', product.name);
         formData.append('categoryId', product.categoryId);
         formData.append('price', product.price);
+        formData.append('unit', product.unit);
         formData.append('stock', product.stock);
         formData.append('image', product.image);
         formData.append('offersDelivery', product.offersDelivery);
@@ -52,12 +70,15 @@ function AddProduct() {
                     name: "",
                     categoryId: "",
                     price: "",
+                    unit: "piece",
                     stock: "",
                     image: "",
                     offersDelivery: false,
                     deliveryPricePerKm: ""
                 });
                 setHasDelivery(false);
+                setPreviewImage(null);
+                setCustomUnit(false);
             } else {
                 toast.error(result.data.message);
             }
@@ -96,12 +117,14 @@ function AddProduct() {
 
     // Preview image state
     const [previewImage, setPreviewImage] = useState(null);
+    const [customUnit, setCustomUnit] = useState(false);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        setProduct({ ...product, image: file });
         
         if (file) {
+            setProduct({ ...product, image: file });
+            
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPreviewImage(reader.result);
@@ -112,150 +135,202 @@ function AddProduct() {
         }
     };
 
-    return (
-        <div className="flex justify-center items-center p-4 bg-gray-50">
-            <Toaster position="top-center" reverseOrder={false} />
-            <div className="w-80 bg-white rounded-lg shadow-md p-5 border border-gray-100">
-                <h2 className="text-lg font-bold text-center mb-4 text-indigo-700">Add Product</h2>
+    const handleUnitChange = (e) => {
+        const selectedUnit = e.target.value;
+        if (selectedUnit === "custom") {
+            setCustomUnit(true);
+            setProduct({ ...product, unit: "" });
+        } else {
+            setCustomUnit(false);
+            setProduct({ ...product, unit: selectedUnit });
+        }
+    };
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
+    return (
+        <div className="mt-9 flex justify-center items-center p-4">
+            <Toaster position="top-center" reverseOrder={false} />
+            <div className="w-full max-w-md bg-white rounded-lg shadow-md p-5 border border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold text-gray-800">Add Product</h2>
+                    {previewImage && (
+                        <div className="relative">
+                            <img src={previewImage} alt="Preview" className="h-12 w-12 object-cover rounded-md" />
+                            <button 
+                                type="button" 
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setPreviewImage(null);
+                                    setProduct({...product, image: ""});
+                                }}
+                                className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 w-4 h-4 flex items-center justify-center text-xs"
+                            >
+                                ×
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                <form onSubmit={handleSubmit}>
+                    <div className="space-y-3">
+                        {/* Product Name */}
                         <input
                             value={product.name}
                             onChange={e => setProduct({ ...product, name: e.target.value })}
-                            className="w-full px-3 py-2 rounded-md border border-gray-300 focus:border-indigo-400 focus:outline-none"
-                            placeholder="Product Name"
+                            className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
+                            placeholder="Product Name *"
                         />
-                    </div>
 
-                    <div className="relative">
-                        <select
-                            value={product.categoryId}
-                            onChange={(e) => setProduct({ ...product, categoryId: e.target.value })}
-                            className="w-full px-3 py-2 rounded-md border border-gray-300 focus:border-indigo-400 focus:outline-none appearance-none"
-                        >
-                            <option value="" disabled>Select a category</option>
-                            {
-                                category.map((c) => (
-                                    <option key={c.id} value={c.id}>
-                                        {c.category}
-                                    </option>
-                                ))
-                            }
-                        </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
+                        {/* Category */}
+                        <div className="relative">
+                            <select
+                                value={product.categoryId}
+                                onChange={(e) => setProduct({ ...product, categoryId: e.target.value })}
+                                className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none appearance-none"
+                            >
+                                <option value="" disabled>Select Category *</option>
+                                {category.map((c) => (
+                                    <option key={c.id} value={c.id}>{c.category}</option>
+                                ))}
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
                         </div>
-                    </div>
 
-                    <div>
-                        <input
-                            value={product.price}
-                            onChange={e => setProduct({ ...product, price: e.target.value })}
-                            className="w-full px-3 py-2 rounded-md border border-gray-300 focus:border-indigo-400 focus:outline-none"
-                            placeholder="Price"
-                            type="number"
-                            min="0"
-                            step="0.01"
-                        />
-                    </div>
+                        {/* Price and Unit */}
+                        <div className="flex gap-2">
+                            <div className="relative flex-1">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span className="text-gray-500">$</span>
+                                </div>
+                                <input
+                                    value={product.price}
+                                    onChange={e => setProduct({ ...product, price: e.target.value })}
+                                    className="w-full h-10 pl-7 pr-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
+                                    placeholder="Price *"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                />
+                            </div>
+                            
+                            {!customUnit ? (
+                                <div className="relative w-32">
+                                    <select
+                                        value={product.unit}
+                                        onChange={handleUnitChange}
+                                        className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none appearance-none"
+                                    >
+                                        {commonUnits.map(unit => (
+                                            <option key={unit.value} value={unit.value}>{unit.label}</option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            ) : (
+                                <input
+                                    value={product.unit}
+                                    onChange={e => setProduct({ ...product, unit: e.target.value })}
+                                    className="w-32 h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
+                                    placeholder="Unit *"
+                                />
+                            )}
+                        </div>
 
-                    <div>
+                        {/* Stock */}
                         <input
                             value={product.stock}
                             onChange={e => setProduct({ ...product, stock: e.target.value })}
-                            className="w-full px-3 py-2 rounded-md border border-gray-300 focus:border-indigo-400 focus:outline-none"
-                            placeholder="Stock"
+                            className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
+                            placeholder="Stock Quantity *"
                             type="number"
                             min="0"
                         />
-                    </div>
 
-                    <div className="bg-gray-50 p-3 rounded-md">
-                        <div className="text-sm font-medium mb-2">Delivery Options</div>
-                        <div className="flex space-x-4">
-                            <div className="flex items-center">
-                                <input
-                                    id="delivery-yes"
-                                    type="radio"
-                                    name="delivery"
-                                    checked={hasDelivery}
-                                    onChange={() => handleDeliveryToggle(true)}
-                                    className="h-4 w-4 text-indigo-600"
-                                />
-                                <label htmlFor="delivery-yes" className="ml-1 text-sm text-gray-700">
-                                    Delivery
-                                </label>
-                            </div>
-                            <div className="flex items-center">
-                                <input
-                                    id="delivery-no"
-                                    type="radio"
-                                    name="delivery"
-                                    checked={!hasDelivery}
-                                    onChange={() => handleDeliveryToggle(false)}
-                                    className="h-4 w-4 text-indigo-600"
-                                />
-                                <label htmlFor="delivery-no" className="ml-1 text-sm text-gray-700">
-                                    No Delivery
-                                </label>
-                            </div>
-                        </div>
-                        
-                        {hasDelivery && (
-                            <div className="mt-2">
-                                <input
-                                    value={product.deliveryPricePerKm}
-                                    onChange={e => setProduct({ ...product, deliveryPricePerKm: e.target.value })}
-                                    className="w-full px-3 py-2 rounded-md border border-gray-300 focus:border-indigo-400 focus:outline-none"
-                                    placeholder="Price per KM"
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                />
-                            </div>
-                        )}
-                    </div>
-
-                    <div>
-                        {previewImage && (
-                            <div className="mb-2 flex justify-center">
-                                <div className="relative inline-block">
-                                    <img src={previewImage} alt="Preview" className="h-16 w-16 object-cover rounded-md" />
-                                    <button 
-                                        type="button" 
-                                        onClick={() => {
-                                            setPreviewImage(null);
-                                            setProduct({...product, image: ""});
-                                        }}
-                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 w-5 h-5 flex items-center justify-center"
-                                    >
-                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
+                        {/* Delivery Options */}
+                        <div className="flex flex-col space-y-2">
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center">
+                                    <input
+                                        id="delivery-yes"
+                                        type="radio"
+                                        name="delivery"
+                                        checked={hasDelivery}
+                                        onChange={() => handleDeliveryToggle(true)}
+                                        className="h-4 w-4 text-blue-600"
+                                    />
+                                    <label htmlFor="delivery-yes" className="ml-2 text-sm text-gray-700">Offers Delivery</label>
+                                </div>
+                                <div className="flex items-center">
+                                    <input
+                                        id="delivery-no"
+                                        type="radio"
+                                        name="delivery"
+                                        checked={!hasDelivery}
+                                        onChange={() => handleDeliveryToggle(false)}
+                                        className="h-4 w-4 text-blue-600"
+                                    />
+                                    <label htmlFor="delivery-no" className="ml-2 text-sm text-gray-700">No Delivery</label>
                                 </div>
                             </div>
-                        )}
-                        <label className="flex justify-center items-center w-full h-16 transition bg-white border border-gray-300 border-dashed rounded-md cursor-pointer hover:bg-gray-50">
-                            <div className="flex items-center space-x-2">
-                                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <span className="text-sm text-gray-500">Upload image</span>
-                            </div>
-                            <input
-                                onChange={handleImageChange}
-                                type="file" className="hidden" accept="image/*" 
-                            />
-                        </label>
-                    </div>
+                            
+                            {hasDelivery && (
+                                <div className="flex">
+                                    <div className="relative flex-1">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span className="text-gray-500">$</span>
+                                        </div>
+                                        <input
+                                            value={product.deliveryPricePerKm}
+                                            onChange={e => setProduct({ ...product, deliveryPricePerKm: e.target.value })}
+                                            className="w-full h-10 pl-7 pr-12 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
+                                            placeholder="Delivery Price"
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                        />
+                                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                            <span className="text-gray-500">per km</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
 
-                    <button className="w-full py-2 px-3 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 transition-colors">
-                        Post Product
-                    </button>
+                        {/* Product Image */}
+                        {!previewImage && (
+                            <div className="flex h-10">
+                                <label className="flex-1 flex justify-center items-center border border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
+                                    <div className="flex items-center text-gray-500">
+                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <span className="text-sm">Upload Image *</span>
+                                    </div>
+                                    <input
+                                        onChange={handleImageChange}
+                                        type="file" 
+                                        className="hidden" 
+                                        accept="image/*" 
+                                    />
+                                </label>
+                            </div>
+                        )}
+
+                        {/* Submit Button */}
+                        <button 
+                            type="submit" 
+                            className="w-full h-10 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center mt-2"
+                        >
+                            Add Product
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

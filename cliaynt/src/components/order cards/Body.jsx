@@ -34,11 +34,11 @@ function Body() {
     const [selectedSupplier, setSelectedSupplier] = useState(null);
     const [activeFilter, setActiveFilter] = useState('suppliers'); // Default to suppliers first
     const [isLoading, setIsLoading] = useState(true);
-    
+
 
     // Fetch categories
 
-   
+
 
     useEffect(() => {
         const fetchCategories = async () => {

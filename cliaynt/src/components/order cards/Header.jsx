@@ -12,7 +12,7 @@ import api from '../../api';
 import toast, { Toaster } from 'react-hot-toast';
 
 function Header() {
-    const { cart, setCart } = useCart();
+    const { cart, removeItem } = useCart();
     const [address, setAddress] = useState([]);
     const [order, setOrder] = useState({
         supplierId: "",
@@ -61,8 +61,6 @@ function Header() {
     }, [cartOpen]);
 
 
-    const unitTypes = ["KG", "Ton", "Liter", "Piece", "Meter", "Pack"];
-
 
 
     const updateQuantity = (index, newQuantity) => {
@@ -82,36 +80,30 @@ function Header() {
     };
 
 
-    const removeItem = (itemId) => {
-        setCart(cart.filter((item) => item.id !== itemId)); // Correct way to update cart
-    };
-
-
-
-
     const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
     const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
     useEffect(() => {
         setOrder((prev) => ({ ...prev, totalPrice: cartTotal }));
     }, [cartTotal]);
 
-    // useEffect(() => {
-    //     const feachData = async () => {
-    //         try {
-    //             const result = await api.get('/customer/get-address')
 
-    //             if (result.data.status) {
-    //                 setAddress(result.data.address)
-    //             } else {
-    //                 toast.error(result.data.message)
-    //             }
-    //         } catch (err) {
-    //             console.log(err)
-    //             toast.error(err.response.data.message)
-    //         }
-    //     }
-    //     feachData()
-    // }, [])
+    const getSupplierPayments = () => {
+        const supplierPayments = {};
+    
+        cart.forEach(item => {
+            if (!supplierPayments[item.supplierId]) {
+                supplierPayments[item.supplierId] = { supplierId: item.supplierId, total: 0 };
+            }
+            supplierPayments[item.supplierId].total += item.price * item.quantity;
+        });
+    
+        return Object.values(supplierPayments);
+    };
+    
+    // Example Usage:
+    const payments = getSupplierPayments();
+    console.log(payments); 
+    
 
     const handelSubmit = async (c) => {
         c.preventDefault()
@@ -295,21 +287,21 @@ function Header() {
                                                 <div className="divide-y divide-gray-100 dark:divide-gray-800 mb-4">
                                                     {cart.map((item, index) => (
                                                         <div key={index} className="py-3">
-                                                            <div key={index} className="flex items-center mb-2">
-                                                                <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded flex-shrink-0 flex items-center justify-center">
-                                                                    <Wrench className="text-gray-400" size={16} />
+                                                            <div key={index} className="py-3">
+                                                                <div className="flex items-center mb-2">
+                                                                    <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded flex-shrink-0 flex items-center justify-center">
+                                                                        <Wrench className="text-gray-400" size={16} />
+                                                                    </div>
+                                                                    <div className="ml-3 flex-grow">
+                                                                        <h3 className="font-medium">{item.name}</h3>
+                                                                    </div>
+                                                                    <span
+                                                                        onClick={() => removeItem(item.id)} 
+                                                                        className="p-1 text-gray-500 hover:text-red-500 cursor-pointer"
+                                                                    >
+                                                                        <X size={16} />
+                                                                    </span>
                                                                 </div>
-                                                                <div className="ml-3 flex-grow">
-                                                                    <h3 className="font-medium">{item.name}</h3>
-                                                                </div>
-                                                                <span
-                                                                    onClick={() => removeItem(index)}
-
-                                                                    className="p-1 text-gray-500 hover:text-red-500 cursor-pointer"
-                                                                >
-                                                                    <X size={16} />
-                                                                </span>
-
                                                             </div>
                                                             <div className="grid grid-cols-12 gap-2 mt-2">
                                                                 <div className="col-span-4 flex items-center">
@@ -335,7 +327,7 @@ function Header() {
                                                                         <Plus size={14} />
                                                                     </span>
                                                                 </div>
-                                                                <div className="col-span-4">
+                                                                {/* <div className="col-span-4">
                                                                     <select
                                                                         value={item.unit}
                                                                         onChange={(e) => updateUnit(index, e.target.value)}
@@ -345,7 +337,7 @@ function Header() {
                                                                             <option key={unit} value={unit}>{unit}</option>
                                                                         ))}
                                                                     </select>
-                                                                </div>
+                                                                </div> */}
 
                                                                 <div className="col-span-4 flex justify-between items-center">
                                                                     <span className="text-sm text-gray-500 dark:text-gray-400 cursor-pointer">
@@ -354,18 +346,31 @@ function Header() {
                                                                     <span className="font-medium">birr {(item.price * item.quantity).toFixed(2)}</span>
                                                                 </div>
                                                             </div>
-                                                            <div className="col-span-4 w-32 pt-3">
-                                                                <select
-                                                                    onChange={e => setOrder(prev => ({ ...prev, addressId: parseInt(e.target.value) || "" }))}
-                                                                    className="w-full p-1 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
-                                                                >
-                                                                    <option value="">Select an Address</option>
-                                                                    {address?.map(c => (
-                                                                        <option key={c.id} value={c.id}>{c.address}</option>
-                                                                    ))}
-                                                                </select>
-
+                                                            <div className="flex items-center gap-4 p-2">
+                                                                <div className="flex items-center">
+                                                                    <input
+                                                                        id="delivery-yes"
+                                                                        type="radio"
+                                                                        name="delivery"
+                                                                        // checked={hasDelivery}
+                                                                        // onChange={() => handleDeliveryToggle(true)}
+                                                                        className="h-4 w-4 text-blue-600"
+                                                                    />
+                                                                    <label htmlFor="delivery-yes" className="ml-2 text-sm text-gray-700">Offers Delivery</label>
+                                                                </div>
+                                                                <div className="flex items-center">
+                                                                    <input
+                                                                        id="delivery-no"
+                                                                        type="radio"
+                                                                        name="delivery"
+                                                                        // checked={!hasDelivery}
+                                                                        // onChange={() => handleDeliveryToggle(false)}
+                                                                        className="h-4 w-4 text-blue-600"
+                                                                    />
+                                                                    <label htmlFor="delivery-no" className="ml-2 text-sm text-gray-700">No Delivery</label>
+                                                                </div>
                                                             </div>
+
 
                                                         </div>
                                                     ))}
