@@ -41,7 +41,7 @@ function Header() {
         <div>
             {/* Header Navigation */}
             <header className="relative">
-                <div className='flex items-center justify-between md:p-2 p-1 fixed right-0 left-0 bg-white dark:bg-gray-900 z-20 shadow-md'>
+                <div className='flex items-center justify-between md:p-2 p-1 fixed right-0 left-0 top-0 bg-white dark:bg-gray-900 z-20 shadow-md'>
                     {/* Logo */}
                     <div className='flex items-center'>
                         <img className='w-11 h-11 md:w-16 md:h-16 dark:bg-white rounded-full' src={logo} alt="ConstracEase Logo" />

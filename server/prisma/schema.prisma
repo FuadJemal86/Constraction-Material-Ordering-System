@@ -53,7 +53,6 @@ model message {
 model address {
   id           Int    @id @default(autoincrement())
   address      String
-  order  order[]
 }
 
 model bank {
@@ -67,48 +66,56 @@ model bank {
 }
 
 model order {
-  id         Int          @id @default(autoincrement())
-  customerId Int
-  supplierId Int
-  productId  Int
-  addressId  Int
-  totalPrice Float
-  status     order_status @default(PENDING)
-  transactionId Int
-  createdAt  DateTime     @default(now())
-  customer   customer     @relation(fields: [customerId], references: [id], map: "Order_customerId_fkey")
-  address    address     @relation(fields: [addressId], references: [id], map: "order_address")
-  supplier   supplier     @relation(fields: [supplierId], references: [id], map: "Order_supplierId_fkey")
-  product    product     @relation(fields: [customerId], references: [id], map: "order_productId_fkey")
-  orderitem  orderitem[]
-  payment    payment?
+  id            Int          @id @default(autoincrement())
+  customerId    Int
+  supplierId    Int
+  address     String
+  latitude    Float?
+  longitude   Float?
+  totalPrice    Float
+  deliveryOption String
+  transactionId String       @unique  // Unique transaction ID for payment tracking
+  createdAt     DateTime     @default(now())
+  status        order_status @default(PENDING)
+
+  // Relations
+  customer      customer     @relation(fields: [customerId], references: [id], map: "Order_customerId_fkey")
+  supplier      supplier     @relation(fields: [supplierId], references: [id], map: "Order_supplierId_fkey")
+
+  orderitem    orderitem[]  // An order can have multiple order items
+  payment       payment?     // Payment is optional (can be null)
 
   @@index([customerId], map: "Order_customerId_fkey")
   @@index([supplierId], map: "Order_supplierId_fkey")
 }
+
 
 model orderitem {
   id        Int     @id @default(autoincrement())
   orderId   Int
   productId Int
   quantity  Int
-  price     Float
+  unitPrice Float
+  subtotal  Float   // quantity * unitPrice
+
   order     order   @relation(fields: [orderId], references: [id], map: "OrderItem_orderId_fkey")
   product   product @relation(fields: [productId], references: [id], map: "OrderItem_productId_fkey")
 
   @@index([orderId], map: "OrderItem_orderId_fkey")
-  @@index([productId], map: "OrderItem_productId_fkey")
 }
 
+
 model payment {
-  id        Int            @id @default(autoincrement())
-  orderId   Int            @unique(map: "Payment_orderId_key")
-  amount    Float
-  bankId    Int
-  status    payment_status @default(PENDING)
-  createdAt DateTime       @default(now())
-  order     order          @relation(fields: [orderId], references: [id], map: "Payment_orderId_fkey")
-  bank   bank @relation(fields: [bankId], references: [id], map: "Payment_bankId_fkey")
+  id            Int            @id @default(autoincrement())
+  transactionId String         @unique  // Payment links to this transaction ID
+  amount        Float
+  bankId        Int
+  status        payment_status @default(PENDING)
+  createdAt     DateTime       @default(now())
+
+  order         order          @relation(fields: [transactionId], references: [transactionId], map: "Payment_transactionId_fkey")
+  bank          bank           @relation(fields: [bankId], references: [id], map: "Payment_bankId_fkey")
+
 }
 
 model product {
@@ -124,8 +131,7 @@ model product {
   offersDelivery     Boolean    @default(false)
   deliveryPricePerKm Float?    
   
-  orderItems        orderitem[]
-  order            order[]
+  orderItem        orderitem[]
   category         category    @relation(fields: [categoryId], references: [id])
   supplier         supplier    @relation(fields: [supplierId], references: [id])
 

@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
 require('dotenv').config()
+const { v4: uuidv4 } = require('uuid')
 
 
 
@@ -157,64 +158,63 @@ router.get('/get-supplier', async (req, res) => {
 
 // place order
 
-router.post("/place-order", async (req, res) => {
+router.post('/place-order', async (req, res) => {
     const token = req.cookies["x-auth-token"];
 
     if (!token) {
         return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });
     }
 
-    let customerId;
+    let customerId 
     try {
         const decoded = jwt.verify(token, process.env.CUSTOMER_KEY);
-        customerId = decoded.id;
+        customerId = parseInt(decoded.id , 10)
     } catch (err) {
         return res.status(401).json({ valid: false, message: "Invalid token" });
     }
 
     try {
-        const { supplierId, addressId, totalPrice, orderItems } = req.body;
+        const { supplierId, address, latitude, longitude, deliveryOption, products } = req.body;
 
-        if (!supplierId || !addressId || !totalPrice) {
-            return res.status(400).json({ status: false, message: "Missing required fields" });
+        if (!Array.isArray(products) || products.length === 0) {
+            return res.status(400).json({ status: false, message: "Invalid cart data" });
         }
 
-        // const existingOrder = await prisma.order.findFirst({
-        //     where: { customerId, supplierId, addressId }
-        // });
+        let totalPrice = products.reduce((sum, p) => sum + (p.quantity * p.unitPrice), 0);
+        const transactionId = uuidv4();
 
-        // if (existingOrder) {
-        //     return res.status(409).json({ status: false, message: "Order already exists" });
-        // }
-
-        // **Create Order**
         const newOrder = await prisma.order.create({
-            data: { customerId, supplierId, addressId, totalPrice }
+            data: {
+                customerId,
+                supplierId,
+                address,
+                latitude,
+                longitude,
+                deliveryOption,
+                totalPrice,
+                transactionId,
+                orderitem: {
+                    create: products.map(p => ({
+                        productId: parseInt(p.productId, 10),
+                        quantity: parseInt(p.quantity , 10),
+                        unitPrice: parseFloat(p.unitPrice, 10),
+                        subtotal: parseFloat(p.quantity * p.unitPrice, 10)
+                    }))
+                }
+            },
+            include: { orderitem: true }
         });
 
-        // **Insert Order Items if present**
-        if (Array.isArray(orderItems) && orderItems.length > 0) {
-            const itemsData = orderItems.map(item => ({
-                orderId: newOrder.id,
-                productId: item.productId,
-                quantity: item.quantity,
-                price: item.price
-            }));
+        console.log(newOrder)
 
-            await prisma.orderitem.createMany({ data: itemsData });
-        }
+        return res.status(201).json({ status: true, message: "Order placed successfully", order: newOrder });
 
-        return res.status(201).json({
-            status: true,
-            message: "Order placed successfully",
-            order: newOrder
-        });
-
-    } catch (err) {
-        console.error("Error placing order:", err);
+    } catch (error) {
+        console.error(error);
         return res.status(500).json({ status: false, error: "Server error" });
     }
 });
+
 
 
 // make payment

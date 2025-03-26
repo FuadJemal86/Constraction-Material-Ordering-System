@@ -55,6 +55,7 @@ function Product({ orders = [] }) {
                                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
                                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
                                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
+                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -72,6 +73,7 @@ function Product({ orders = [] }) {
                                         </span>
                                     </td>
                                     <td className="p-3 text-sm text-gray-500">{order.stock}</td>
+                                    <td className="p-3 text-sm text-gray-800"></td>
                                 </tr>
                             ))}
                             {product.length === 0 && (

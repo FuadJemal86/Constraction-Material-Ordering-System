@@ -24,11 +24,12 @@ function ShoppingCart({ onClose }) {
         latitude: null,
         longitude: null,
         deliveryOption: "pickup", // Default to pickup
-        deliveryAddress: ""
+        address: ""
     });
 
     // Cart calculations
     const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+
 
     // Effect to set supplierId from first cart item
     useEffect(() => {
@@ -208,13 +209,13 @@ function ShoppingCart({ onClose }) {
                 setLocationAddress(address);
                 setOrder(prev => ({
                     ...prev,
-                    deliveryAddress: address
+                    address: address
                 }));
             } else {
                 setLocationAddress("Address not found");
                 setOrder(prev => ({
                     ...prev,
-                    deliveryAddress: ""
+                    address: ""
                 }));
 
             }
@@ -239,27 +240,32 @@ function ShoppingCart({ onClose }) {
     // Submit order
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Only validate location if delivery is selected
+    
         if (order.deliveryOption === 'delivery' && !userLocation) {
             toast.error('Please select a delivery location on the map');
             return;
         }
-
+    
         try {
-            // If pickup is selected, remove location data
-            const orderData = { ...order };
+            const orderData = {
+                ...order,
+                products: cart.map(item => ({
+                    productId: item.id, 
+                    quantity: item.quantity,
+                    unitPrice: item.price 
+                }))
+            };
+    
             if (order.deliveryOption === 'pickup') {
                 orderData.latitude = null;
                 orderData.longitude = null;
-                orderData.deliveryAddress = '';
+                orderData.address = '';
             }
-
-            // Call your API to place order
+    
             const result = await api.post('/customer/place-order', orderData);
             if (result.data.status) {
                 toast.success(result.data.message);
-                onClose(); // Close the cart after successful order
+                onClose(); // Close cart modal after order
             } else {
                 toast.error(result.data.message);
             }
@@ -268,6 +274,7 @@ function ShoppingCart({ onClose }) {
             toast.error(err.response?.data?.message || 'An error occurred');
         }
     };
+    
 
     return (
         <div className="fixed inset-0 bg-black/60 z-30 flex items-center justify-center md:justify-end">
@@ -357,7 +364,7 @@ function ShoppingCart({ onClose }) {
                                     </label>
                                     <input
                                         placeholder='exact location'
-                                        onChange={e => setOrder({ ...order, deliveryAddress: e.target.value })}
+                                        onChange={e => setOrder({ ...order, address: e.target.value })}
                                         id="delivery-delivery"
                                         className="  w-full mx-1 p-1 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900"
                                     />

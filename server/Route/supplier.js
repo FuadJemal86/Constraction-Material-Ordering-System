@@ -213,7 +213,6 @@ router.get('/get-product', async (req, res) => {
 
 router.get('/get-products/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
-    console.log(id)
     try {
 
         const product = await prisma.product.findMany(
