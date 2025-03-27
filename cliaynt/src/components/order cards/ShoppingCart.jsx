@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef  } from 'react';
 import { X, Minus, Plus, MapPin, Wrench } from 'lucide-react';
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import { useCart } from "../CartContext";
+import { Link } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import api from '../../api';
 
@@ -13,6 +14,7 @@ function ShoppingCart({ onClose }) {
     const mapRef = useRef(null);
     const [map, setMap] = useState(null);
     const [transitionId, setTransitionId] = useState([])
+    const [count, setCount] = useState([])
     const [userMarker, setUserMarker] = useState(null);
     const [userLocation, setUserLocation] = useState(null);
     const [locationAddress, setLocationAddress] = useState("");
@@ -241,28 +243,28 @@ function ShoppingCart({ onClose }) {
     // Submit order
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         if (order.deliveryOption === 'delivery' && !userLocation) {
             toast.error('Please select a delivery location on the map');
             return;
         }
-    
+
         try {
             const orderData = {
                 ...order,
                 products: cart.map(item => ({
-                    productId: item.id, 
+                    productId: item.id,
                     quantity: item.quantity,
-                    unitPrice: item.price 
+                    unitPrice: item.price
                 }))
             };
-    
+
             if (order.deliveryOption === 'pickup') {
                 orderData.latitude = null;
                 orderData.longitude = null;
                 orderData.address = '';
             }
-    
+
             const result = await api.post('/customer/place-order', orderData);
             if (result.data.status) {
                 toast.success(result.data.message);
@@ -277,24 +279,24 @@ function ShoppingCart({ onClose }) {
     };
 
     useEffect(() => {
-            const feachTransitionId = async () => {
-                try {
-                    const result = await api.get('/customer/get-transitionId')
-    
-                    if (result.data.status) {
-                        setTransitionId(result.data.result[0])
-                    } else {
-                        toast.error(result.data.message)
-                    }
-                } catch (err) {
-                    toast.error(err.response.data.message)
+        const feachTransitionId = async () => {
+            try {
+                const result = await api.get('/customer/get-transitionId')
+
+                if (result.data.status) {
+                    setCount(result.data.count)
+                } else {
+                    toast.error(result.data.message)
                 }
+            } catch (err) {
+                toast.error(err.response.data.message)
             }
-    
-            feachTransitionId()
-    
-        }, [])
-    
+        }
+
+        feachTransitionId()
+
+    }, [])
+
 
     return (
         <div className="fixed inset-0 bg-black/60 z-30 flex items-center justify-center md:justify-end">
@@ -309,7 +311,16 @@ function ShoppingCart({ onClose }) {
                     </h2>
 
                     <div>
-                        {transitionId.status}
+                        {
+                            count == 0 ? (
+                                null
+                            ) : (
+
+                                <Link>
+                                    <div className='flex text-cyan-300'>Pending Orders Count:<h2 className='ml-1 bg-violet-500 text-white text-xs font-bold px-2 py-1 rounded-full'> {count}</h2></div></Link>
+                            )
+                        }
+
                     </div>
                     <button
                         onClick={onClose}

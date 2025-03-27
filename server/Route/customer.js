@@ -229,11 +229,13 @@ router.get('/get-transitionId' , async(req , res) => {
     const decoded = jwt.verify(token , process.env.CUSTOMER_KEY)
 
     const customerId = parseInt(decoded.id , 10)
+    
 
     try {
         const transactionId = await prisma.order.findMany({
             where: {
-                customerId:customerId
+                customerId:customerId,
+                status: 'PENDING' 
             },
             select : {
                 status:true,
@@ -241,7 +243,14 @@ router.get('/get-transitionId' , async(req , res) => {
             }
         })
 
-        return res.status(200).json({status:true , result: transactionId})
+        const pendingCount = await prisma.order.count({
+            where: {
+                customerId: customerId,
+                status: 'PENDING'
+            }
+        });
+
+        return res.status(200).json({status:true , result: transactionId , count :pendingCount})
     } catch (error) {
         console.error(error);
         return res.status(500).json({ status: false, error: "Server error" });
