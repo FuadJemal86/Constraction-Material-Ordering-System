@@ -12,6 +12,7 @@ function ShoppingCart({ onClose }) {
     // Map related state
     const mapRef = useRef(null);
     const [map, setMap] = useState(null);
+    const [transitionId, setTransitionId] = useState([])
     const [userMarker, setUserMarker] = useState(null);
     const [userLocation, setUserLocation] = useState(null);
     const [locationAddress, setLocationAddress] = useState("");
@@ -274,6 +275,25 @@ function ShoppingCart({ onClose }) {
             toast.error(err.response?.data?.message || 'An error occurred');
         }
     };
+
+    useEffect(() => {
+            const feachTransitionId = async () => {
+                try {
+                    const result = await api.get('/customer/get-transitionId')
+    
+                    if (result.data.status) {
+                        setTransitionId(result.data.result[0])
+                    } else {
+                        toast.error(result.data.message)
+                    }
+                } catch (err) {
+                    toast.error(err.response.data.message)
+                }
+            }
+    
+            feachTransitionId()
+    
+        }, [])
     
 
     return (
@@ -287,12 +307,17 @@ function ShoppingCart({ onClose }) {
                         <ShoppingCartOutlinedIcon className="mr-2" />
                         Your Cart ({cart.length})
                     </h2>
+
+                    <div>
+                        {transitionId.status}
+                    </div>
                     <button
                         onClick={onClose}
                         className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
                     >
                         <X size={20} />
                     </button>
+
                 </div>
 
                 <div className="p-4">

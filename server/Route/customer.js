@@ -165,10 +165,10 @@ router.post('/place-order', async (req, res) => {
         return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });
     }
 
-    let customerId 
+    let customerId
     try {
         const decoded = jwt.verify(token, process.env.CUSTOMER_KEY);
-        customerId = parseInt(decoded.id , 10)
+        customerId = parseInt(decoded.id, 10)
     } catch (err) {
         return res.status(401).json({ valid: false, message: "Invalid token" });
     }
@@ -196,10 +196,11 @@ router.post('/place-order', async (req, res) => {
                 orderitem: {
                     create: products.map(p => ({
                         productId: parseInt(p.productId, 10),
-                        quantity: parseInt(p.quantity , 10),
+                        quantity: parseInt(p.quantity, 10),
                         unitPrice: parseFloat(p.unitPrice, 10),
                         subtotal: parseFloat(p.quantity * p.unitPrice, 10)
                     }))
+
                 }
             },
             include: { orderitem: true }
@@ -214,6 +215,40 @@ router.post('/place-order', async (req, res) => {
         return res.status(500).json({ status: false, error: "Server error" });
     }
 });
+
+
+// get customer transitionId from cookies
+
+router.get('/get-transitionId' , async(req , res) => {
+    const token = req.cookies['x-auth-token']
+
+    if(!token) {
+        return res.status(400).json({status:false , message : "Unauthorized: No token provided"})
+    }
+
+    const decoded = jwt.verify(token , process.env.CUSTOMER_KEY)
+
+    const customerId = parseInt(decoded.id , 10)
+
+    try {
+        const transactionId = await prisma.order.findMany({
+            where: {
+                customerId:customerId
+            },
+            select : {
+                status:true,
+                transactionId:true
+            }
+        })
+
+        return res.status(200).json({status:true , result: transactionId})
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ status: false, error: "Server error" });
+    }
+})
+
+
 
 
 

@@ -9,6 +9,8 @@ import { useCart } from "../CartContext";
 import logo from '../../images/logo constraction.jpeg';
 import bannerImage from '../../images/banner2 page2.jpg';
 import ShoppingCart from './ShoppingCart';
+import api from '../../api';
+import toast from 'react-hot-toast';
 
 function Header() {
     // Core state management
@@ -16,10 +18,10 @@ function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "dark");
     const [cartOpen, setCartOpen] = useState(false);
-    
+
     // Cart calculations
     const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
-    
+
     // Dark mode toggle effect
     useEffect(() => {
         if (darkMode) {
@@ -30,12 +32,13 @@ function Header() {
             localStorage.setItem("theme", "light");
         }
     }, [darkMode]);
-    
+
     // Body scroll lock when cart is open
     useEffect(() => {
         document.body.style.overflow = cartOpen ? 'hidden' : 'auto';
         return () => { document.body.style.overflow = 'auto'; };
     }, [cartOpen]);
+
 
     return (
         <div>
