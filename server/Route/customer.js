@@ -257,10 +257,6 @@ router.get('/get-transitionId' , async(req , res) => {
     }
 })
 
-
-
-
-
 // make payment
 
 router.post('/make-payment', async (req, res) => {
@@ -289,24 +285,7 @@ router.post('/make-payment', async (req, res) => {
     }
 });
 
-
-// get address
-
-// router.get('/get-address', async (req, res) => {
-//     try {
-//         const address = await prisma.address.findMany()
-
-//         if (address.length == 0) {
-//             return res.status(401).json({ status: false, message: "address not found" })
-//         }
-
-//         return res.status(200).json({ status: true, address })
-//     } catch (err) {
-//         console.error(err);
-//         return res.status(500).json({ status: false, error: "Server error" });
-//     }
-// })
-
+// get nearby supplier
 
 router.get('/nearby-suppliers', async (req, res) => {
     try {
