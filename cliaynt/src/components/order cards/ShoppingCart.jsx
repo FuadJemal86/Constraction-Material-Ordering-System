@@ -1,18 +1,20 @@
-import React, { useState, useEffect, useRef  } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Minus, Plus, MapPin, Wrench } from 'lucide-react';
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import { useCart } from "../CartContext";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import api from '../../api';
 
 function ShoppingCart({ onClose }) {
     // Core state management
     const { cart, removeItem } = useCart();
+    const navigator = useNavigate()
 
     // Map related state
     const mapRef = useRef(null);
     const [map, setMap] = useState(null);
+    const [isPayment , setPayment] = useState(false)
     const [transitionId, setTransitionId] = useState([])
     const [count, setCount] = useState([])
     const [userMarker, setUserMarker] = useState(null);
@@ -268,6 +270,9 @@ function ShoppingCart({ onClose }) {
             const result = await api.post('/customer/place-order', orderData);
             if (result.data.status) {
                 toast.success(result.data.message);
+                setPayment(true)
+                navigator('payment-form')
+
                 onClose(); // Close cart modal after order
             } else {
                 toast.error(result.data.message);
@@ -298,6 +303,7 @@ function ShoppingCart({ onClose }) {
     }, [])
 
 
+
     return (
         <div className="fixed inset-0 bg-black/60 z-30 flex items-center justify-center md:justify-end">
             <Toaster position="top-center" reverseOrder={false} />
@@ -317,7 +323,8 @@ function ShoppingCart({ onClose }) {
                             ) : (
 
                                 <Link>
-                                    <div className='flex text-cyan-300'>Pending Orders Count:<h2 className='ml-1 bg-violet-500 text-white text-xs font-bold px-2 py-1 rounded-full'> {count}</h2></div></Link>
+                                    <div className='flex text-cyan-300'>Pending Orders Count:<h2 className='ml-1 bg-violet-500 text-white text-xs font-bold px-2 py-1 rounded-full'> {count}</h2></div>
+                                </Link>
                             )
                         }
 
@@ -507,6 +514,7 @@ function ShoppingCart({ onClose }) {
                                 </div>
 
                                 <button
+
                                     type="submit"
                                     className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-3 px-4 rounded-md mb-2 transition-all"
                                     disabled={order.deliveryOption === 'delivery' && !userLocation}

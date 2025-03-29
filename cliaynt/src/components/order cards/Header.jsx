@@ -9,8 +9,7 @@ import { useCart } from "../CartContext";
 import logo from '../../images/logo constraction.jpeg';
 import bannerImage from '../../images/banner2 page2.jpg';
 import ShoppingCart from './ShoppingCart';
-import api from '../../api';
-import toast from 'react-hot-toast';
+
 
 function Header() {
     // Core state management
