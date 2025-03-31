@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import api from '../../api';
 import { X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function PaymentForm() {
 
     // State for cart and pricing
+    const navigator = useNavigate()
     const [cartItems, setCartItems] = useState([]);
     const [supplierDetails, setSupplierDetails] = useState(null);
     const [isCloth , setCloth] = useState(true)
@@ -34,6 +36,8 @@ function PaymentForm() {
 
     const handleCloth = () => {
         setCloth(false)
+        navigator('/products')
+
     }
 
     // Calculation of totals
@@ -186,7 +190,7 @@ function PaymentForm() {
                         </div>
                     </div>
                 ) : (
-                    <div></div>
+                    null
                 )
             }
         </div>

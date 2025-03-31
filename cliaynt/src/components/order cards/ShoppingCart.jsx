@@ -8,15 +8,14 @@ import api from '../../api';
 
 function ShoppingCart({ onClose }) {
     // Core state management
-    const { cart, removeItem } = useCart();
+    const { cart, removeItem , updateQuantity } = useCart();
+    
     const navigator = useNavigate()
 
     // Map related state
     const mapRef = useRef(null);
     const [map, setMap] = useState(null);
     const [isPayment , setPayment] = useState(false)
-    const [transitionId, setTransitionId] = useState([])
-    const [count, setCount] = useState([])
     const [userMarker, setUserMarker] = useState(null);
     const [userLocation, setUserLocation] = useState(null);
     const [locationAddress, setLocationAddress] = useState("");
@@ -227,13 +226,6 @@ function ShoppingCart({ onClose }) {
         });
     };
 
-    // Update item quantity in cart
-    const updateQuantity = (index, newQuantity) => {
-        if (newQuantity < 1) return;
-        // This would be handled by your cart context
-        // For example: updateItemQuantity(cart[index].id, newQuantity);
-    };
-
     // Handle delivery option change
     const handleDeliveryOptionChange = (option) => {
         setOrder(prev => ({
@@ -283,24 +275,6 @@ function ShoppingCart({ onClose }) {
         }
     };
 
-    useEffect(() => {
-        const feachTransitionId = async () => {
-            try {
-                const result = await api.get('/customer/get-transitionId')
-
-                if (result.data.status) {
-                    setCount(result.data.count)
-                } else {
-                    toast.error(result.data.message)
-                }
-            } catch (err) {
-                toast.error(err.response.data.message)
-            }
-        }
-
-        feachTransitionId()
-
-    }, [])
 
 
 
@@ -315,20 +289,6 @@ function ShoppingCart({ onClose }) {
                         <ShoppingCartOutlinedIcon className="mr-2" />
                         Your Cart ({cart.length})
                     </h2>
-
-                    <div>
-                        {
-                            count == 0 ? (
-                                null
-                            ) : (
-
-                                <Link>
-                                    <div className='flex text-cyan-300'>Pending Orders Count:<h2 className='ml-1 bg-violet-500 text-white text-xs font-bold px-2 py-1 rounded-full'> {count}</h2></div>
-                                </Link>
-                            )
-                        }
-
-                    </div>
                     <button
                         onClick={onClose}
                         className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"

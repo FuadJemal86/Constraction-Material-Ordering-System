@@ -182,7 +182,7 @@ function Body() {
             <div className="grid md:flex">
                 {/* Sidebar */}
                 <div className="border dark:border-gray-900 md:w-1/4 h-auto md:h-screen overflow-y-auto max-h-[80vh] m-4 rounded-lg p-1 custom-scrollbar">
-                    <div className="sticky top-0 bg-white dark:bg-gray-900 z-10 p-2 border-b dark:border-gray-800">
+                    <div className=" top-0 bg-white dark:bg-gray-900 z-10 p-2 border-b dark:border-gray-800">
                         <div className="flex justify-around text-center">
                             <button
                                 className={`py-2 px-4 rounded-lg transition duration-300 flex-1 ${activeFilter === 'suppliers' ? 'bg-blue-500 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-800'}`}

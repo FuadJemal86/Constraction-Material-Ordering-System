@@ -9,11 +9,14 @@ import { useCart } from "../CartContext";
 import logo from '../../images/logo constraction.jpeg';
 import bannerImage from '../../images/banner2 page2.jpg';
 import ShoppingCart from './ShoppingCart';
+import api from '../../api';
 
 
 function Header() {
     // Core state management
     const { cart } = useCart();
+    const [transitionId, setTransitionId] = useState([])
+    const [count, setCount] = useState([])
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "dark");
     const [cartOpen, setCartOpen] = useState(false);
@@ -39,6 +42,26 @@ function Header() {
     }, [cartOpen]);
 
 
+    useEffect(() => {
+        const feachTransitionId = async () => {
+            try {
+                const result = await api.get('/customer/get-transitionId')
+
+                if (result.data.status) {
+                    setCount(result.data.count)
+                } else {
+                    toast.error(result.data.message)
+                }
+            } catch (err) {
+                toast.error(err.response.data.message)
+            }
+        }
+
+        feachTransitionId()
+
+    }, [])
+
+
     return (
         <div>
             {/* Header Navigation */}
@@ -60,6 +83,16 @@ function Header() {
                                 <li><Link to="/category" className="hover:text-yellow-500 transition-colors">Category</Link></li>
                                 <li><Link to="/about" className="hover:text-yellow-500 transition-colors">About Us</Link></li>
                                 <li><Link to="/contact" className="hover:text-yellow-500 transition-colors">Contact</Link></li>
+                                <div>
+                                    {count > 0 && (
+                                        <Link to="/orders" className="group flex items-center">
+                                            <span className="text-sm md:text-base font-medium mr-1.5 transition-colors group-hover:text-yellow-500">Orders</span>
+                                            <span className="flex items-center justify-center h-6 w-6 md:h-7 md:w-7 bg-yellow-500 text-white text-xs md:text-sm font-bold rounded-full transform transition-transform group-hover:scale-110">
+                                                {count}
+                                            </span>
+                                        </Link>
+                                    )}
+                                </div>
                             </ul>
                         </nav>
                     </div>
@@ -121,17 +154,9 @@ function Header() {
 
                 {/* Mobile Menu */}
                 {mobileMenuOpen && (
-                    <div className="fixed inset-0 bg-white dark:bg-gray-900 z-10 pt-16">
+                    <div className="fixed top-0 inset-0 bg-black dark:bg-gray-900 z-10 pt-16">
                         <div className="flex flex-col p-5">
-                            {/* Mobile Search */}
-                            <div className="mb-6 mt-7 relative">
-                                <input
-                                    type="text"
-                                    placeholder="Search"
-                                    className="w-full mt-2 outline-none border border-gray-200 dark:border-gray-800 p-3 pl-10 rounded-3xl dark:bg-gray-900"
-                                />
-                                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                            </div>
+                            
 
                             {/* Mobile Navigation */}
                             <nav>
@@ -148,11 +173,21 @@ function Header() {
                                     <li className="p-2 border-b border-gray-100 dark:border-gray-800">
                                         <Link to="/contact" className="text-lg font-medium block">Contact</Link>
                                     </li>
+                                    <div>
+                                    {count > 0 && (
+                                        <Link to="/orders" className="group flex items-center">
+                                            <span className="text-sm md:text-base font-medium mr-1.5 transition-colors group-hover:text-yellow-500">Orders</span>
+                                            <span className="flex items-center justify-center h-6 w-6 md:h-7 md:w-7 bg-yellow-500 text-white text-xs md:text-sm font-bold rounded-full transform transition-transform group-hover:scale-110">
+                                                {count}
+                                            </span>
+                                        </Link>
+                                    )}
+                                </div>
                                 </ul>
                             </nav>
 
                             {/* Mobile Bottom Actions */}
-                            <div className="mt-auto pt-6">
+                            <div className="mt-auto relative pt-6">
                                 <div className="flex items-center space-x-2 p-2 border-b border-gray-100 dark:border-gray-800">
                                     <NotificationsNoneIcon className="text-2xl" />
                                     <span>Notifications</span>
