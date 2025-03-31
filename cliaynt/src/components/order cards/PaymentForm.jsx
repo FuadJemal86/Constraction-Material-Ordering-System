@@ -11,7 +11,7 @@ function PaymentForm() {
     const [cartItems, setCartItems] = useState([]);
     const [supplierDetails, setSupplierDetails] = useState(null);
     const [isCloth, setCloth] = useState(true)
-    const [account, setAccount] = useState()
+    const [account, setAccount] = useState([])
 
     useEffect(() => {
         // Retrieve cart items from localStorage
@@ -40,7 +40,8 @@ function PaymentForm() {
 
             try {
                 if (result.data.status) {
-                    setAccount(result.data.account)
+                    setAccount(result.data.result[0])
+                    console.log(result.data.result[0])
                 } else {
                     console.log(result.data.message)
                 }
@@ -50,7 +51,7 @@ function PaymentForm() {
             }
         }
         feachAccount()
-    })
+    },[])
 
 
     const handleCloth = () => {
@@ -92,7 +93,9 @@ function PaymentForm() {
                                             <option>
                                                 Banck Branch
                                             </option>
-                                            <option></option>
+                                            <option>
+                                                {account.bankName}
+                                            </option>
                                         </select>
 
                                         <input
