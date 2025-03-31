@@ -4,7 +4,8 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const multer = require('multer')
 const path = require('path');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
+const { create } = require('domain');
 require('dotenv').config()
 
 
@@ -153,26 +154,42 @@ router.post('/add-product', upload.single('image'), async (req, res) => {
         const decoded = jwt.verify(token, process.env.SUPPLIER_KEY);
         const supplierId = decoded.id;
 
-        const { name, price, stock, categoryId , unit , deliveryPricePerKm } = req.body;
+        const { name, price, stock, categoryId, unit, deliveryPricePerKm, bankName, account } = req.body;
 
         if (!req.file) {
             return res.status(400).json({ status: false, message: 'Image is required' });
         }
 
-        await prisma.product.create({
-            data: {
-                name,
-                price: parseFloat(price),
-                stock: parseInt(stock),
-                supplierId,
-                categoryId: parseInt(categoryId),
-                unit,
-                deliveryPricePerKm: parseFloat(deliveryPricePerKm),
-                image: req.file ? req.file.filename : null
-            }
-        });
 
-        return res.status(200).json({ status: true, message: 'Product added' });
+        prisma.$transaction([
+            prisma.product.create({
+                data: {
+                    name,
+                    price: parseFloat(price),
+                    stock: parseInt(stock),
+                    supplierId,
+                    categoryId: parseInt(categoryId),
+                    unit,
+                    deliveryPricePerKm: parseFloat(deliveryPricePerKm),
+                    image: req.file ? req.file.filename : null,
+                },
+            }),
+            prisma.bank.create({
+                data: {
+                    supplierId,
+                    bankName,
+                    account,
+                },
+            }),
+        ])
+            .then(([product, bank]) => {
+                console.log("Product created:", product);
+                console.log("Bank created:", bank);
+                return res.status(200).json({status:200 , message : 'product add'})
+            })
+            .catch((error) => {
+                console.error("Transaction failed:", error);
+            });
 
     } catch (err) {
         console.error(err);
@@ -195,9 +212,9 @@ router.get('/get-product', async (req, res) => {
         const supplierId = decoded.id
 
 
-        const product = await prisma.product.findMany({ 
+        const product = await prisma.product.findMany({
             where: { supplierId: supplierId },
-            include: { category: true } 
+            include: { category: true }
         });
 
         return res.status(200).json({ status: true, result: product })

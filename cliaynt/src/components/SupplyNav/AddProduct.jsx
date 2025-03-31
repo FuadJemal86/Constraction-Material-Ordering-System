@@ -13,7 +13,9 @@ function AddProduct() {
         stock: 0,
         image: "",
         offersDelivery: false,
-        deliveryPricePerKm: ""
+        deliveryPricePerKm: "",
+        bankName: '',
+        account: ''
     });
 
     // Common units for products
@@ -35,10 +37,12 @@ function AddProduct() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const { name, categoryId, price, unit, stock, image, offersDelivery, deliveryPricePerKm } = product;
+        const { name, categoryId, price, unit, stock, image, offersDelivery, deliveryPricePerKm, bankName, account } = product;
+
+        console.log(product)
 
         // Basic validation
-        if (!name || !categoryId || !price || !unit || !stock || !image) {
+        if (!name || !categoryId || !price || !unit || !stock || !image || !bankName || !account) {
             return toast.error('Please fill all required fields');
         }
 
@@ -56,6 +60,8 @@ function AddProduct() {
         formData.append('stock', product.stock);
         formData.append('image', product.image);
         formData.append('offersDelivery', product.offersDelivery);
+        formData.append('bankName', product.bankName);
+        formData.append('account', product.account);
         if (product.offersDelivery) {
             formData.append('deliveryPricePerKm', product.deliveryPricePerKm);
         }
@@ -74,7 +80,9 @@ function AddProduct() {
                     stock: "",
                     image: "",
                     offersDelivery: false,
-                    deliveryPricePerKm: ""
+                    deliveryPricePerKm: "",
+                    bankName:'',
+                    account:''
                 });
                 setHasDelivery(false);
                 setPreviewImage(null);
@@ -121,10 +129,10 @@ function AddProduct() {
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        
+
         if (file) {
             setProduct({ ...product, image: file });
-            
+
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPreviewImage(reader.result);
@@ -155,12 +163,12 @@ function AddProduct() {
                     {previewImage && (
                         <div className="relative">
                             <img src={previewImage} alt="Preview" className="h-12 w-12 object-cover rounded-md" />
-                            <button 
-                                type="button" 
+                            <button
+                                type="button"
                                 onClick={(e) => {
                                     e.preventDefault();
                                     setPreviewImage(null);
-                                    setProduct({...product, image: ""});
+                                    setProduct({ ...product, image: "" });
                                 }}
                                 className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 w-4 h-4 flex items-center justify-center text-xs"
                             >
@@ -179,6 +187,28 @@ function AddProduct() {
                             className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
                             placeholder="Product Name *"
                         />
+
+                        <div className="flex gap-2">
+                            <select
+                                
+                                onChange={(e) => setProduct({ ...product, bankName: e.target.value })}
+                                className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none appearance-none"
+                            >
+                                <option value="" disabled>Select Bank *</option>
+                                <option value="CBE">CBE</option>
+                                <option value="Abyssinia">Abyssinia</option>
+                                <option value="Dashen">Dashen</option>
+                                <option value="Hibret">Hibret</option>
+                                <option value="Oromia">Oromia</option>
+                            </select>
+
+                            <input
+                                onChange={(e) => setProduct({ ...product, account: e.target.value.trim() })}
+                                className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
+                                placeholder="Account Number *"
+                            />
+                        </div>
+
 
                         {/* Category */}
                         <div className="relative">
@@ -215,7 +245,7 @@ function AddProduct() {
                                     step="0.01"
                                 />
                             </div>
-                            
+
                             {!customUnit ? (
                                 <div className="relative w-32">
                                     <select
@@ -279,7 +309,7 @@ function AddProduct() {
                                     <label htmlFor="delivery-no" className="ml-2 text-sm text-gray-700">No Delivery</label>
                                 </div>
                             </div>
-                            
+
                             {hasDelivery && (
                                 <div className="flex">
                                     <div className="relative flex-1">
@@ -315,17 +345,17 @@ function AddProduct() {
                                     </div>
                                     <input
                                         onChange={handleImageChange}
-                                        type="file" 
-                                        className="hidden" 
-                                        accept="image/*" 
+                                        type="file"
+                                        className="hidden"
+                                        accept="image/*"
                                     />
                                 </label>
                             </div>
                         )}
 
                         {/* Submit Button */}
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             className="w-full h-10 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center mt-2"
                         >
                             Add Product

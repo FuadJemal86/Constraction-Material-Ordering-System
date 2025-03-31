@@ -10,7 +10,8 @@ function PaymentForm() {
     const navigator = useNavigate()
     const [cartItems, setCartItems] = useState([]);
     const [supplierDetails, setSupplierDetails] = useState(null);
-    const [isCloth , setCloth] = useState(true)
+    const [isCloth, setCloth] = useState(true)
+    const [account, setAccount] = useState()
 
     useEffect(() => {
         // Retrieve cart items from localStorage
@@ -33,6 +34,24 @@ function PaymentForm() {
         fetchSupplierDetails();
     }, []);
 
+    useEffect(() => {
+        const feachAccount = async () => {
+            const result = await api.get('/supplier/get-account')
+
+            try {
+                if (result.data.status) {
+                    setAccount(result.data.account)
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+                toast.error(err.response.data.message)
+            }
+        }
+        feachAccount()
+    })
+
 
     const handleCloth = () => {
         setCloth(false)
@@ -51,7 +70,7 @@ function PaymentForm() {
     return (
         <div>
             {
-                isCloth  ? (
+                isCloth ? (
                     <div className="fixed inset-0 bg-black/60 z-30 flex items-center justify-center md:justify-end">
                         {/* Payment Form Section */}
                         <div className="bg-white dark:bg-gray-900 w-full max-w-md h-full md:h-auto max-h-full overflow-y-auto shadow-xl md:mr-4 md:my-4 md:rounded-lg">
@@ -69,13 +88,13 @@ function PaymentForm() {
                                 <form className="space-y-4">
 
                                     <div className="grid grid-cols-1 gap-4">
-                                        <input
-                                            type="text"
-                                            name="address"
-                                            placeholder="Full Address"
-                                            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            required
-                                        />
+                                        <select className='w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'>
+                                            <option>
+                                                Banck Branch
+                                            </option>
+                                            <option></option>
+                                        </select>
+
                                         <input
                                             type="text"
                                             name="zipCode"
