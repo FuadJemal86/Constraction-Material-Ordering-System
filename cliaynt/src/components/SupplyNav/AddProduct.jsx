@@ -5,6 +5,13 @@ import toast, { Toaster } from 'react-hot-toast';
 function AddProduct() {
     const [category, setCategory] = useState([]);
     const [hasDelivery, setHasDelivery] = useState(false);
+    const [accounts, setAccounts] = useState([]);
+    const [showAccountForm, setShowAccountForm] = useState(false);
+    const [newAccount, setNewAccount] = useState({
+        bankName: '',
+        account: ''
+    });
+    
     const [product, setProduct] = useState({
         name: "",
         categoryId: "",
@@ -14,8 +21,6 @@ function AddProduct() {
         image: "",
         offersDelivery: false,
         deliveryPricePerKm: "",
-        bankName: '',
-        account: ''
     });
 
     // Common units for products
@@ -37,17 +42,19 @@ function AddProduct() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const { name, categoryId, price, unit, stock, image, offersDelivery, deliveryPricePerKm, bankName, account } = product;
-
-        console.log(product)
+        const { name, categoryId, price, unit, stock, image, offersDelivery, deliveryPricePerKm } = product;
 
         // Basic validation
-        if (!name || !categoryId || !price || !unit || !stock || !image || !bankName || !account) {
+        if (!name || !categoryId || !price || !unit || !stock || !image) {
             return toast.error('Please fill all required fields');
         }
 
         if (offersDelivery && !deliveryPricePerKm) {
             return toast.error('Please provide delivery price per kilometer');
+        }
+
+        if (accounts.length === 0) {
+            return toast.error('Please add at least one bank account');
         }
 
         const formData = new FormData();
@@ -60,11 +67,13 @@ function AddProduct() {
         formData.append('stock', product.stock);
         formData.append('image', product.image);
         formData.append('offersDelivery', product.offersDelivery);
-        formData.append('bankName', product.bankName);
-        formData.append('account', product.account);
+        
         if (product.offersDelivery) {
             formData.append('deliveryPricePerKm', product.deliveryPricePerKm);
         }
+        
+        // Append accounts data
+        formData.append('accounts', JSON.stringify(accounts));
 
         try {
             const result = await api.post('/supplier/add-product', formData);
@@ -81,12 +90,11 @@ function AddProduct() {
                     image: "",
                     offersDelivery: false,
                     deliveryPricePerKm: "",
-                    bankName:'',
-                    account:''
                 });
                 setHasDelivery(false);
                 setPreviewImage(null);
                 setCustomUnit(false);
+                setAccounts([]);
             } else {
                 toast.error(result.data.message);
             }
@@ -154,6 +162,40 @@ function AddProduct() {
         }
     };
 
+    const handleAddAccount = () => {
+        if (!newAccount.bankName || !newAccount.account) {
+            return toast.error('Bank name and account number are required');
+        }
+        
+        setAccounts([...accounts, { ...newAccount }]);
+        setNewAccount({ bankName: '', account: '' });
+        setShowAccountForm(false);
+    };
+
+    const handleDeleteAccount = (index) => {
+        const updatedAccounts = [...accounts];
+        updatedAccounts.splice(index, 1);
+        setAccounts(updatedAccounts);
+    };
+
+    const handelAccount = async(c) => {
+        c.preventDefault()
+
+        try {
+            const result = await api.post('/supplier/add-account', newAccount)
+
+            if(result.data.status) {
+
+            } else {
+                toast.error(result.data.message)
+            }
+        } catch(err) {
+            console.log(err)
+            toast.error(err.response.data.message)
+        }
+        
+    }
+
     return (
         <div className="mt-9 flex justify-center items-center p-4">
             <Toaster position="top-center" reverseOrder={false} />
@@ -180,7 +222,6 @@ function AddProduct() {
 
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-3">
-                        {/* Product Name */}
                         <input
                             value={product.name}
                             onChange={e => setProduct({ ...product, name: e.target.value })}
@@ -188,29 +229,85 @@ function AddProduct() {
                             placeholder="Product Name *"
                         />
 
-                        <div className="flex gap-2">
-                            <select
-                                
-                                onChange={(e) => setProduct({ ...product, bankName: e.target.value })}
-                                className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none appearance-none"
-                            >
-                                <option value="" disabled>Select Bank *</option>
-                                <option value="CBE">CBE</option>
-                                <option value="Abyssinia">Abyssinia</option>
-                                <option value="Dashen">Dashen</option>
-                                <option value="Hibret">Hibret</option>
-                                <option value="Oromia">Oromia</option>
-                            </select>
+                        <div className="border border-gray-200 rounded-md p-3 mb-3">
+                            <div className="flex justify-between items-center mb-2">
+                                <h3 className="text-sm font-medium text-gray-700">Bank Accounts</h3>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAccountForm(true)}
+                                    className="bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center hover:bg-blue-600"
+                                >
+                                    +
+                                </button>
+                            </div>
 
-                            <input
-                                onChange={(e) => setProduct({ ...product, account: e.target.value.trim() })}
-                                className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
-                                placeholder="Account Number *"
-                            />
+                            {accounts.length > 0 ? (
+                                <form className="space-y-2 mb-2" onSubmit={handelAccount}>
+                                    {accounts.map((acc, index) => (
+                                        <div key={index} className="flex justify-between items-center bg-gray-50 p-2 rounded-md">
+                                            <div>
+                                                <span className="text-sm font-medium">{acc.bankName}: </span>
+                                                <span className="text-sm">{acc.account}</span>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDeleteAccount(index)}
+                                                className="text-red-500 hover:text-red-700"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    ))}
+                                </form>
+                            ) : (
+                                <p className="text-sm text-gray-500 mb-2">No accounts added yet</p>
+                            )}
+
+                            {showAccountForm && (
+                                <div className="space-y-2">
+                                    <div className="flex gap-2">
+                                        <select
+                                            value={newAccount.bankName}
+                                            onChange={(e) => setNewAccount({ ...newAccount, bankName: e.target.value })}
+                                            className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none appearance-none"
+                                        >
+                                            <option value="" disabled>Select Bank *</option>
+                                            <option value="CBE">CBE</option>
+                                            <option value="Abyssinia">Abyssinia</option>
+                                            <option value="Dashen">Dashen</option>
+                                            <option value="Hibret">Hibret</option>
+                                            <option value="Oromia">Oromia</option>
+                                        </select>
+
+                                        <input
+                                            value={newAccount.account}
+                                            onChange={(e) => setNewAccount({ ...newAccount, account: e.target.value.trim() })}
+                                            className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
+                                            placeholder="Account Number *"
+                                        />
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={handleAddAccount}
+                                            className="flex-1 h-8 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+                                        >
+                                            Add
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowAccountForm(false)}
+                                            className="flex-1 h-8 bg-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-400 transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-
-                        {/* Category */}
                         <div className="relative">
                             <select
                                 value={product.categoryId}
@@ -229,7 +326,6 @@ function AddProduct() {
                             </div>
                         </div>
 
-                        {/* Price and Unit */}
                         <div className="flex gap-2">
                             <div className="relative flex-1">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -273,7 +369,6 @@ function AddProduct() {
                             )}
                         </div>
 
-                        {/* Stock */}
                         <input
                             value={product.stock}
                             onChange={e => setProduct({ ...product, stock: e.target.value })}
@@ -283,7 +378,6 @@ function AddProduct() {
                             min="0"
                         />
 
-                        {/* Delivery Options */}
                         <div className="flex flex-col space-y-2">
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center">

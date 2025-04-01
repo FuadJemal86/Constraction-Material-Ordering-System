@@ -185,7 +185,7 @@ router.post('/add-product', upload.single('image'), async (req, res) => {
             .then(([product, bank]) => {
                 console.log("Product created:", product);
                 console.log("Bank created:", bank);
-                return res.status(200).json({status:200 , message : 'product add'})
+                return res.status(200).json({ status: 200, message: 'product add' })
             })
             .catch((error) => {
                 console.error("Transaction failed:", error);
@@ -331,6 +331,32 @@ router.get('/get-account', async (req, res) => {
         console.log(err)
         return res.status(500).json({ status: false, error: 'server error' })
     }
+})
+
+// add account
+
+router.post('/add-account', async (req, res) => {
+
+    const { bankName, account } = req.body
+
+    if (!bankName || !account) {
+        return res.status(400).json({ status: false, message: 'pleas fill the feild' })
+    }
+
+    try {
+        await prisma.bank.create({
+            data: {
+                bankName,
+                account
+            }
+        })
+
+        return res.status(200).json({ status: true, message: 'account added' })
+    } catch(err) {
+        console.log(err)
+        return res.status(500).json('server error')
+    }
+
 })
 
 
