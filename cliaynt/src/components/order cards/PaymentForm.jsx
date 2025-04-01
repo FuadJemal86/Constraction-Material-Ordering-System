@@ -40,8 +40,7 @@ function PaymentForm() {
 
             try {
                 if (result.data.status) {
-                    setAccount(result.data.result[0])
-                    console.log(result.data.result[0])
+                    setAccount(result.data.result)
                 } else {
                     console.log(result.data.message)
                 }
@@ -51,7 +50,7 @@ function PaymentForm() {
             }
         }
         feachAccount()
-    },[])
+    }, [])
 
 
     const handleCloth = () => {
@@ -93,9 +92,14 @@ function PaymentForm() {
                                             <option>
                                                 Banck Branch
                                             </option>
-                                            <option>
-                                                {account.bankName}
-                                            </option>
+                                            {
+                                                account.map(c => (
+                                                    <option key={c.id} value={c.id}>
+                                                        {c.bankName}: {c.account}
+                                                    </option>
+                                                ))
+                                            }
+
                                         </select>
 
                                         <input
