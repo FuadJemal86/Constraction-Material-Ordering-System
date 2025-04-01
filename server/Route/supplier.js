@@ -337,6 +337,16 @@ router.get('/get-account', async (req, res) => {
 
 router.post('/add-account', async (req, res) => {
 
+    const token = req.cookies['t-auth-token']
+
+    if (!token) {
+        return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });
+    }
+
+    const decoded = jwt.verify(token, process.env.SUPPLIER_KEY)
+
+    const supplierId = decoded.id
+
     const { bankName, account } = req.body
 
     if (!bankName || !account) {
@@ -346,17 +356,44 @@ router.post('/add-account', async (req, res) => {
     try {
         await prisma.bank.create({
             data: {
+                supplierId,
                 bankName,
                 account
             }
         })
 
         return res.status(200).json({ status: true, message: 'account added' })
-    } catch(err) {
+    } catch (err) {
         console.log(err)
         return res.status(500).json('server error')
     }
 
+})
+
+// delete account
+
+router.delete('/delete-account/:id', async (req, res) => {
+
+    const { id } = req.params
+
+
+    try {
+        const bankRecord = await prisma.bank.findMany({
+            where: { id: Number(id) }
+        });
+
+        if (!bankRecord) {
+            return res.status(404).json({ message: "Bank record not found." });
+        }
+
+        await prisma.bank.delete({ where: { id: Number(id) } });
+        res.status(200).json({status:true, message: "Bank record deleted successfully." });
+
+
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ status: false, error: 'server error' })
+    }
 })
 
 

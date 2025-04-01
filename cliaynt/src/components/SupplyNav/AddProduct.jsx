@@ -6,12 +6,13 @@ function AddProduct() {
     const [category, setCategory] = useState([]);
     const [hasDelivery, setHasDelivery] = useState(false);
     const [accounts, setAccounts] = useState([]);
+    const [supplierAccount, setSupplierAccount] = useState([])
     const [showAccountForm, setShowAccountForm] = useState(false);
     const [newAccount, setNewAccount] = useState({
         bankName: '',
         account: ''
     });
-    
+
     const [product, setProduct] = useState({
         name: "",
         categoryId: "",
@@ -67,11 +68,11 @@ function AddProduct() {
         formData.append('stock', product.stock);
         formData.append('image', product.image);
         formData.append('offersDelivery', product.offersDelivery);
-        
+
         if (product.offersDelivery) {
             formData.append('deliveryPricePerKm', product.deliveryPricePerKm);
         }
-        
+
         // Append accounts data
         formData.append('accounts', JSON.stringify(accounts));
 
@@ -162,30 +163,38 @@ function AddProduct() {
         }
     };
 
-    const handleAddAccount = () => {
+    const handleAddAccount = async () => {
         if (!newAccount.bankName || !newAccount.account) {
             return toast.error('Bank name and account number are required');
         }
-        
-        setAccounts([...accounts, { ...newAccount }]);
-        setNewAccount({ bankName: '', account: '' });
-        setShowAccountForm(false);
-    };
-
-    const handleDeleteAccount = (index) => {
-        const updatedAccounts = [...accounts];
-        updatedAccounts.splice(index, 1);
-        setAccounts(updatedAccounts);
-    };
-
-    const handelAccount = async(c) => {
-        c.preventDefault()
 
         try {
             const result = await api.post('/supplier/add-account', newAccount)
 
-            if(result.data.status) {
+            if (result.data.status) {
 
+                feachData()
+
+                setAccounts([...accounts, { ...newAccount }]);
+                setNewAccount({ bankName: '', account: '' });
+                setShowAccountForm(false);
+
+            } else {
+                toast.error(result.data.message)
+            }
+        } catch (err) {
+            console.log(err)
+            toast.error(err.response.data.message)
+        }
+
+    };
+
+    const handleDeleteAccount = async(id) => {
+
+        try {
+            const result = await api.delete(`/supplier/delete-account/${id}`)
+            if(result.data.status) {
+                feachData()
             } else {
                 toast.error(result.data.message)
             }
@@ -194,7 +203,25 @@ function AddProduct() {
             toast.error(err.response.data.message)
         }
         
+    };
+
+    const feachData = async () => {
+        try {
+            const result = await api.get('/supplier/get-account')
+            if (result.data.status) {
+                setSupplierAccount(result.data.result)
+            } else {
+                console.log(result.data.message)
+            }
+        } catch (err) {
+            console.log(err)
+            toast.error(err.response.data.message)
+        }
     }
+
+    useEffect(() => {
+        feachData()
+    },[])
 
     return (
         <div className="mt-9 flex justify-center items-center p-4">
@@ -241,9 +268,9 @@ function AddProduct() {
                                 </button>
                             </div>
 
-                            {accounts.length > 0 ? (
-                                <form className="space-y-2 mb-2" onSubmit={handelAccount}>
-                                    {accounts.map((acc, index) => (
+                            {supplierAccount.length > 0 ? (
+                                <div className="space-y-2 mb-2">
+                                    {supplierAccount.map((acc, index) => (
                                         <div key={index} className="flex justify-between items-center bg-gray-50 p-2 rounded-md">
                                             <div>
                                                 <span className="text-sm font-medium">{acc.bankName}: </span>
@@ -251,7 +278,7 @@ function AddProduct() {
                                             </div>
                                             <button
                                                 type="button"
-                                                onClick={() => handleDeleteAccount(index)}
+                                                onClick={() => handleDeleteAccount(acc.id)}
                                                 className="text-red-500 hover:text-red-700"
                                             >
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -260,7 +287,7 @@ function AddProduct() {
                                             </button>
                                         </div>
                                     ))}
-                                </form>
+                                </div>
                             ) : (
                                 <p className="text-sm text-gray-500 mb-2">No accounts added yet</p>
                             )}
