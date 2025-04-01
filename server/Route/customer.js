@@ -208,7 +208,7 @@ router.post('/place-order', async (req, res) => {
 
         console.log(newOrder)
 
-        return res.status(201).json({ status: true, message: "Order placed successfully", order: newOrder });
+        return res.status(201).json({ status: true, message: "Order placed successfully", orderId: newOrder.id });
 
     } catch (error) {
         console.error(error);
@@ -261,21 +261,21 @@ router.get('/get-transitionId' , async(req , res) => {
 
 router.post('/make-payment', async (req, res) => {
     try {
-        const { orderId, amount, bankId } = req.body;
+        const { transactionId, amount, bankId } = req.body;
 
-        const order = await prisma.order.findUnique({ where: { id: orderId } });
+        const order = await prisma.order.findUnique({ where: { id: transactionId } });
         if (!order) {
             return res.status(404).json({ status: false, message: "Order not found" });
         }
 
-        const existingPayment = await prisma.payment.findUnique({ where: { orderId } });
+        const existingPayment = await prisma.payment.findUnique({ where: { transactionId } });
         if (existingPayment) {
             return res.status(400).json({ status: false, message: "Payment already made for this order" });
         }
 
         const newPayment = await prisma.payment.create({
-            data: { orderId, amount, bankId, status: "PENDING" }
-        });
+            data: { transactionId, amount, bankId, status: "PENDING" }
+        });transactionId
 
         return res.status(201).json({ status: true, message: "Payment successful", payment: newPayment });
 

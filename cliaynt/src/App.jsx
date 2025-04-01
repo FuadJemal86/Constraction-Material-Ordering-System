@@ -31,7 +31,7 @@ function App() {
                 <Route path="/products" element={<OrderParent />}>
                     <Route path='/products/supplier-products/:id' element={<Cards />} />
                     <Route path='nearby' element={<Nearby />} />
-                    <Route path='payment-form' element={<PaymentForm />} />
+                    <Route path='payment-form/:id' element={<PaymentForm />} />
                 </Route>
 
                 <Route path="/supplier-page" element={<Nav />}>

@@ -12,6 +12,11 @@ function PaymentForm() {
     const [supplierDetails, setSupplierDetails] = useState(null);
     const [isCloth, setCloth] = useState(true)
     const [account, setAccount] = useState([])
+    const [payment , setPayment] = useState({
+        bankId:'',
+        BankTransactionId:'',
+        image:''
+    })
 
     useEffect(() => {
         // Retrieve cart items from localStorage
@@ -59,6 +64,22 @@ function PaymentForm() {
 
     }
 
+
+    const handleSubmit = async(c) => {
+        c.preventDefalt()
+        try {
+            const result = await api.post('/customer/make-payment' , payment)
+            if(result.data.status) {
+                toast.success(result.data.message)
+            } else {
+                toast.error(result.data.message)
+            }
+        } catch(err) {
+            console.log(err)
+            toast.error(err.response.data.message)
+        }
+    }
+
     // Calculation of totals
     const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     const taxRate = 0.08; // 8% tax
@@ -85,10 +106,12 @@ function PaymentForm() {
                                     </button>
                                 </div>
 
-                                <form className="space-y-4">
+                                <form className="space-y-4" onSubmit={handleSubmit}>
 
                                     <div className="grid grid-cols-1 gap-4">
-                                        <select className='w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'>
+                                        <select className='w-full p-3 border rounded-lg focus:outline-none    focus:ring-2 focus:ring-blue-500'
+                                        onChange={e => setPayment({...payment , bankBranch:e.target.value})}
+                                        >
                                             <option>
                                                 Banck Branch
                                             </option>
@@ -103,52 +126,33 @@ function PaymentForm() {
                                         </select>
 
                                         <input
+                                        onChange={e => setPayment({...payment , BankTransactionId:e.target.value})}
                                             type="text"
                                             name="zipCode"
-                                            placeholder="Zip Code"
+                                            placeholder="Bank Transaction Id"
                                             className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             required
                                         />
                                     </div>
 
                                     {/* Payment Method */}
-                                    <div>
-                                        <select
-                                            name="paymentMethod"
-                                            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        >
-                                            <option value="credit">Credit Card</option>
-                                            <option value="debit">Debit Card</option>
-                                            <option value="paypal">PayPal</option>
-                                        </select>
+                                    <div className="flex h-10">
+                                        <label className="flex-1 flex justify-center items-center border border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
+                                            <div className="flex items-center text-gray-500">
+                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                </svg>
+                                                <span className="text-sm">screen shoot</span>
+                                            </div>
+                                            <input
+
+                                                type="file"
+                                                className="hidden"
+                                                accept="image/*"
+                                            />
+                                        </label>
                                     </div>
 
-                                    {/* Payment Information */}
-                                    <div className="grid md:grid-cols-3 gap-4">
-                                        <input
-                                            type="text"
-                                            name="cardNumber"
-                                            placeholder="Card Number"
-                                            className="w-full p-3 border rounded-lg col-span-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            required
-                                        />
-                                        <input
-                                            type="text"
-                                            name="expiryDate"
-                                            placeholder="MM/YY"
-                                            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="grid md:grid-cols-2 gap-4">
-                                        <input
-                                            type="text"
-                                            name="cvv"
-                                            placeholder="CVV"
-                                            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            required
-                                        />
-                                    </div>
 
                                     <button
                                         type="submit"
@@ -178,7 +182,7 @@ function PaymentForm() {
                                                     <p className="text-gray-600 text-sm">Qty: {item.quantity}</p>
                                                 </div>
                                             </div>
-                                            <p className="font-bold">${(item.price * item.quantity).toFixed(2)}</p>
+                                            <p className="font-bold">birr {(item.price * item.quantity).toFixed(2)}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -187,19 +191,19 @@ function PaymentForm() {
                                 <div className="space-y-2 mb-6">
                                     <div className="flex justify-between">
                                         <p>Subtotal</p>
-                                        <p>${subtotal.toFixed(2)}</p>
+                                        <p>birr {subtotal.toFixed(2)}</p>
                                     </div>
                                     <div className="flex justify-between">
                                         <p>Tax (8%)</p>
-                                        <p>${tax.toFixed(2)}</p>
+                                        <p>birr {tax.toFixed(2)}</p>
                                     </div>
                                     <div className="flex justify-between">
                                         <p>Shipping</p>
-                                        <p>${shippingCost.toFixed(2)}</p>
+                                        <p>birr {shippingCost.toFixed(2)}</p>
                                     </div>
                                     <div className="flex justify-between font-bold text-lg border-t pt-2">
                                         <p>Total</p>
-                                        <p>${total.toFixed(2)}</p>
+                                        <p>birr {total.toFixed(2)}</p>
                                     </div>
                                 </div>
 

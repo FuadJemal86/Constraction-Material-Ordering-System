@@ -15,6 +15,7 @@ function ShoppingCart({ onClose }) {
     // Map related state
     const mapRef = useRef(null);
     const [map, setMap] = useState(null);
+    const [orderId , setOrderId] = useState([])
     const [isPayment , setPayment] = useState(false)
     const [userMarker, setUserMarker] = useState(null);
     const [userLocation, setUserLocation] = useState(null);
@@ -261,9 +262,10 @@ function ShoppingCart({ onClose }) {
 
             const result = await api.post('/customer/place-order', orderData);
             if (result.data.status) {
+                setOrderId(result.data.orderId)
                 toast.success(result.data.message);
                 setPayment(true)
-                navigator('payment-form')
+                navigator(`/products/payment-form/${result.data.orderId}`)
 
                 onClose(); // Close cart modal after order
             } else {

@@ -112,6 +112,7 @@ model payment {
   bankId        Int
   status        payment_status @default(PENDING)
   createdAt     DateTime       @default(now())
+  image              String
 
   order         order          @relation(fields: [transactionId], references: [transactionId], map: "Payment_transactionId_fkey")
   bank          bank           @relation(fields: [bankId], references: [id], map: "Payment_bankId_fkey")
