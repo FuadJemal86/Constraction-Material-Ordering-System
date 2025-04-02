@@ -26,8 +26,8 @@ function PaymentForm() {
 
     useEffect(() => {
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    setCartItems(cart);
-    } , [])
+        setCartItems(cart);
+    }, [])
 
 
     useEffect(() => {
@@ -99,7 +99,6 @@ function PaymentForm() {
     // panding payment
 
     useEffect(() => {
-
         feachPayment()
     }, [])
 
@@ -112,6 +111,7 @@ function PaymentForm() {
                 setPaymentPayed(result.data.paymentStatus)
             } else {
                 console.log(result.data.message)
+                return
             }
         } catch (err) {
             console.log(err)

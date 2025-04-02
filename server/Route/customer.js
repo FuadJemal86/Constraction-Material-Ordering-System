@@ -275,7 +275,7 @@ router.get('/get-transitionId', async (req, res) => {
 // make payment
 
 router.post('/make-payment/:id', upload.single('image'), async (req, res) => {
-    const { id } = req.params; 
+    const { id } = req.params;
     const { bankTransactionId, bankId } = req.body;
 
     try {
@@ -293,8 +293,8 @@ router.post('/make-payment/:id', upload.single('image'), async (req, res) => {
 
         const { transactionId, totalPrice: amount } = order;
 
-        const existingPayment = await prisma.payment.findFirst({ 
-            where: { transactionId } 
+        const existingPayment = await prisma.payment.findFirst({
+            where: { transactionId }
         });
 
         if (existingPayment) {
@@ -304,7 +304,7 @@ router.post('/make-payment/:id', upload.single('image'), async (req, res) => {
         const newPayment = await prisma.payment.create({
             data: {
                 amount,
-                bankId:parseInt(bankId),
+                bankId: parseInt(bankId),
                 status: "PENDING",
                 transactionId,
                 image: req.file ? req.file.filename : null,
@@ -322,38 +322,95 @@ router.post('/make-payment/:id', upload.single('image'), async (req, res) => {
 
 // get pending payment
 
-router.get('/get-pending-payment/:id' , async(req , res) => {
+router.get('/get-pending-payment/:id', async (req, res) => {
 
-    const {id}  = req.params;
+    const { id } = req.params;
 
     try {
         const order = await prisma.order.findUnique({
-            where:{id : parseInt(id)},
-            select:{
-                transactionId:true
+            where: { id: parseInt(id) },
+            select: {
+                transactionId: true
             }
         })
 
-        if(!order) {
-            return res.status(400).json({status:false , message:'order not found'})
+        if (!order) {
+            return res.status(400).json({ status: false, message: 'order not found' })
         }
 
-        const {transactionId} = order
+        const { transactionId } = order
 
         const pendingSatus = await prisma.payment.findUnique({
-            where:{transactionId:transactionId , status: 'PENDING'},
-            select : {
-                status:true
+            where: { transactionId: transactionId, status: 'PENDING' },
+            select: {
+                status: true
             }
         })
 
-        return res.status(200).json({status:true , paymentStatus:pendingSatus })
+        return res.status(200).json({ status: true, paymentStatus: pendingSatus })
     } catch (err) {
         console.error(err);
         return res.status(500).json({ status: false, error: "Server error" });
     }
 
 })
+
+// get payment status
+
+router.get('/get-payment-status', async (req, res) => {
+    const token = req.cookies['x-auth-token'];
+
+    if (!token) {
+        return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });
+    }
+
+    let customerId;
+    try {
+        const decoded = jwt.verify(token, process.env.CUSTOMER_KEY);
+        customerId = parseInt(decoded.id, 10);
+    } catch (err) {
+        return res.status(401).json({ valid: false, message: "Invalid token" });
+    }
+
+    try {
+
+        const [orders, payments] = await prisma.$transaction([
+            prisma.order.findMany({
+                where: { customerId },
+                select: { transactionId: true, status: true , totalPrice:true }
+            }),
+            prisma.payment.findMany({
+                where: { 
+                    transactionId: {
+                        in: (await prisma.order.findMany({
+                            where: { customerId },
+                            select: { transactionId: true , status: true  , totalPrice:true }
+                        })).map(order => order.transactionId)
+                    }
+                },
+                select: {
+                    transactionId: true,
+                    status: true
+                }
+            })
+        ]);
+
+        if (orders.length === 0) {
+            return res.status(400).json({ status: false, message: 'No orders found' });
+        }
+
+        return res.status(200).json({
+            status: true,
+            orders: orders.map(order => order.status),
+            paymentStatuses: payments
+        });
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ status: false, message: 'Server error' });
+    }
+});
+
 // get nearby supplier
 
 router.get('/nearby-suppliers', async (req, res) => {

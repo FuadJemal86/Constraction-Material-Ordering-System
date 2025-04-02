@@ -16,16 +16,18 @@ function Header() {
     // Core state management
     const { cart } = useCart();
     const [mobilePaymentsOpen, setMobilePaymentsOpen] = useState(false)
-    const [mobileOrdersOpen , setMobileOrdersOpen] = useState(false)
+    const [mobileOrdersOpen, setMobileOrdersOpen] = useState(false)
+    const [paymentStatus, setPaymentStatus] = useState([])
+    console.log(paymentStatus.status)
     const [count, setCount] = useState([])
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "dark");
     const [cartOpen, setCartOpen] = useState(false);
 
-    // Cart calculations
+
     const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
 
-    // Dark mode toggle effect
+
     useEffect(() => {
         if (darkMode) {
             document.documentElement.classList.add("dark");
@@ -36,7 +38,8 @@ function Header() {
         }
     }, [darkMode]);
 
-    // Body scroll lock when cart is open
+
+
     useEffect(() => {
         document.body.style.overflow = cartOpen ? 'hidden' : 'auto';
         return () => { document.body.style.overflow = 'auto'; };
@@ -62,13 +65,32 @@ function Header() {
 
     }, [])
 
+    useEffect(() => {
+        const feachStatus = async () => {
+            try {
+                const result = await api.get('/customer/get-payment-status')
+
+                if (result.data.status) {
+                    console.log(result.data.paymentStatuses)
+                    console.log(result.data.orders)
+                    setPaymentStatus(result.data.paymentStatuses)
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                toast.error(err.response.data.message)
+            }
+        }
+
+        feachStatus()
+    }, [])
+
 
     return (
         <div>
-            {/* Header Navigation */}
             <header className="relative">
                 <div className='flex items-center justify-between md:p-2 p-1 fixed right-0 left-0 top-0 bg-white dark:bg-gray-900 z-20 shadow-md'>
-                    {/* Logo */}
+
                     <div className='flex items-center'>
                         <img className='w-11 h-11 md:w-16 md:h-16 dark:bg-white rounded-full' src={logo} alt="ConstracEase Logo" />
                         <div className='font-bold text-lg md:text-2xl md:px-2'>
@@ -76,7 +98,6 @@ function Header() {
                         </div>
                     </div>
 
-                    {/* Desktop Navigation */}
                     <div className='hidden md:flex justify-center w-full'>
                         <nav>
                             <ul className='flex gap-6 font-semibold'>
@@ -97,24 +118,36 @@ function Header() {
                                             <div className="mb-4">
                                                 <div className="flex items-center justify-between mb-2">
                                                     <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">PENDING PAYMENTS</h3>
-                                                    <Link to="/payments/pending" className="text-xs text-yellow-500 hover:underline">View All</Link>
+                                                    {
+                                                        paymentStatus.status === 'PENDING' ? (
+                                                            <Link to="/payments/pending" className="text-xs text-yellow-500 hover:underline">View All</Link>
+                                                        ) : (
+                                                            <Link to="/payments/pending" className="text-xs text-yellow-500 hover:underline"></Link>
+                                                        )
+                                                    }
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                                                        <div className="flex justify-between">
-                                                            <span className="font-medium text-sm">Invoice #1082</span>
-                                                            <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">$1,240</span>
+                                                {
+                                                    paymentStatus.status === 'PENDING' ? (
+                                                        <div className="space-y-2">
+                                                            <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                                                <div className="flex justify-between">
+                                                                    <span className="font-medium text-sm">{paymentStatus.status}</span>
+                                                                    <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">$1,240</span>
+                                                                </div>
+                                                                <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 3 days</div>
+                                                            </div>
+                                                            <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                                                <div className="flex justify-between">
+                                                                    <span className="font-medium text-sm">Invoice #1094</span>
+                                                                    <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">$840</span>
+                                                                </div>
+                                                                <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 7 days</div>
+                                                            </div>
                                                         </div>
-                                                        <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 3 days</div>
-                                                    </div>
-                                                    <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                                                        <div className="flex justify-between">
-                                                            <span className="font-medium text-sm">Invoice #1094</span>
-                                                            <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">$840</span>
-                                                        </div>
-                                                        <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 7 days</div>
-                                                    </div>
-                                                </div>
+                                                    ) : (
+                                                        null
+                                                    )
+                                                }
                                             </div>
 
                                             {/* Completed Payments */}
@@ -195,7 +228,7 @@ function Header() {
                     <div className='flex gap-2 md:gap-5 items-center'>
                         {/* Payments Quick Access */}
                         <div className="relative hidden md:block">
-                            
+
                             <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-30 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300">
                                 <div className="p-4">
                                     <div className="flex justify-between items-center mb-4">
@@ -344,7 +377,7 @@ function Header() {
 
                 {/* Mobile Menu */}
                 {mobileMenuOpen && (
-                    <div className="fixed top-0 inset-0 bg-black dark:bg-gray-900 z-10 pt-16">
+                    <div className="fixed top-0 inset-0 bg-white dark:bg-gray-900 z-10 pt-16">
                         <div className="flex flex-col p-5">
 
 
