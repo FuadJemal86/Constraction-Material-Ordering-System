@@ -15,7 +15,8 @@ import api from '../../api';
 function Header() {
     // Core state management
     const { cart } = useCart();
-    const [transitionId, setTransitionId] = useState([])
+    const [mobilePaymentsOpen, setMobilePaymentsOpen] = useState(false)
+    const [mobileOrdersOpen , setMobileOrdersOpen] = useState(false)
     const [count, setCount] = useState([])
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "dark");
@@ -83,6 +84,89 @@ function Header() {
                                 <li><Link to="/category" className="hover:text-yellow-500 transition-colors">Category</Link></li>
                                 <li><Link to="/about" className="hover:text-yellow-500 transition-colors">About Us</Link></li>
                                 <li><Link to="/contact" className="hover:text-yellow-500 transition-colors">Contact</Link></li>
+                                <li className="relative group">
+                                    <button className="hover:text-yellow-500 transition-colors flex items-center">
+                                        Payments
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                    <div className="absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-30">
+                                        <div className="p-4">
+                                            {/* Pending Payments */}
+                                            <div className="mb-4">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">PENDING PAYMENTS</h3>
+                                                    <Link to="/payments/pending" className="text-xs text-yellow-500 hover:underline">View All</Link>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                                        <div className="flex justify-between">
+                                                            <span className="font-medium text-sm">Invoice #1082</span>
+                                                            <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">$1,240</span>
+                                                        </div>
+                                                        <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 3 days</div>
+                                                    </div>
+                                                    <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                                        <div className="flex justify-between">
+                                                            <span className="font-medium text-sm">Invoice #1094</span>
+                                                            <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">$840</span>
+                                                        </div>
+                                                        <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 7 days</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Completed Payments */}
+                                            <div className="mb-4">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">COMPLETED PAYMENTS</h3>
+                                                    <Link to="/payments/completed" className="text-xs text-yellow-500 hover:underline">View All</Link>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div className="bg-green-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                                        <div className="flex justify-between">
+                                                            <span className="font-medium text-sm">Invoice #1078</span>
+                                                            <span className="text-green-600 dark:text-green-400 text-sm font-medium">$2,350</span>
+                                                        </div>
+                                                        <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Paid on Apr 1</div>
+                                                    </div>
+                                                    <div className="bg-green-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                                        <div className="flex justify-between">
+                                                            <span className="font-medium text-sm">Invoice #1065</span>
+                                                            <span className="text-green-600 dark:text-green-400 text-sm font-medium">$1,120</span>
+                                                        </div>
+                                                        <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Paid on Mar 28</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Orders Section */}
+                                            <div>
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">RECENT ORDERS</h3>
+                                                    <Link to="/orders" className="text-xs text-yellow-500 hover:underline">View All</Link>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div className="bg-blue-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                                        <div className="flex justify-between">
+                                                            <span className="font-medium text-sm">Order #2045</span>
+                                                            <span className="text-blue-600 dark:text-blue-400 text-sm font-medium">Processing</span>
+                                                        </div>
+                                                        <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Placed on Apr 2</div>
+                                                    </div>
+                                                    <div className="bg-purple-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                                        <div className="flex justify-between">
+                                                            <span className="font-medium text-sm">Order #2036</span>
+                                                            <span className="text-purple-600 dark:text-purple-400 text-sm font-medium">Shipped</span>
+                                                        </div>
+                                                        <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Shipped on Mar 30</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
                                 <div>
                                     {count > 0 && (
                                         <Link to="/orders" className="group flex items-center">
@@ -109,6 +193,112 @@ function Header() {
 
                     {/* Header Icons */}
                     <div className='flex gap-2 md:gap-5 items-center'>
+                        {/* Payments Quick Access */}
+                        <div className="relative hidden md:block">
+                            
+                            <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-30 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300">
+                                <div className="p-4">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="font-bold text-lg">Payment Summary</h3>
+                                        <Link to="/dashboard/payments" className="text-yellow-500 hover:underline text-sm">Full Dashboard</Link>
+                                    </div>
+
+                                    {/* Payment Stats */}
+                                    <div className="grid grid-cols-2 gap-3 mb-4">
+                                        <div className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow">
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">Pending</div>
+                                            <div className="flex items-end justify-between">
+                                                <span className="text-lg font-bold">$2,080</span>
+                                                <span className="text-yellow-500 text-sm">3 invoices</span>
+                                            </div>
+                                        </div>
+                                        <div className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow">
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">Completed</div>
+                                            <div className="flex items-end justify-between">
+                                                <span className="text-lg font-bold">$5,640</span>
+                                                <span className="text-green-500 text-sm">7 invoices</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Recent Payment */}
+                                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg mb-2">
+                                        <div className="flex justify-between items-center">
+                                            <div>
+                                                <div className="font-medium">Latest Payment</div>
+                                                <div className="text-sm text-gray-500 dark:text-gray-400">Today at 10:32 AM</div>
+                                            </div>
+                                            <div className="text-green-500 font-medium">+$2,350</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Orders Quick Access */}
+                        <div className="relative hidden md:block">
+                            <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-30 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300">
+                                <div className="p-4">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="font-bold text-lg">Orders</h3>
+                                        <Link to="/orders" className="text-yellow-500 hover:underline text-sm">View All Orders</Link>
+                                    </div>
+
+                                    {/* Orders Stats */}
+                                    <div className="grid grid-cols-3 gap-2 mb-4">
+                                        <div className="bg-white dark:bg-gray-700 p-2 rounded-lg shadow text-center">
+                                            <div className="text-xs text-gray-500 dark:text-gray-400">Processing</div>
+                                            <div className="text-blue-500 font-bold">3</div>
+                                        </div>
+                                        <div className="bg-white dark:bg-gray-700 p-2 rounded-lg shadow text-center">
+                                            <div className="text-xs text-gray-500 dark:text-gray-400">Shipped</div>
+                                            <div className="text-purple-500 font-bold">2</div>
+                                        </div>
+                                        <div className="bg-white dark:bg-gray-700 p-2 rounded-lg shadow text-center">
+                                            <div className="text-xs text-gray-500 dark:text-gray-400">Delivered</div>
+                                            <div className="text-green-500 font-bold">8</div>
+                                        </div>
+                                    </div>
+
+                                    {/* Recent Orders */}
+                                    <div className="space-y-2">
+                                        <div className="bg-blue-50 dark:bg-gray-700 p-3 rounded-lg">
+                                            <div className="flex justify-between items-center">
+                                                <div>
+                                                    <div className="font-medium">Order #2045</div>
+                                                    <div className="text-sm text-gray-500 dark:text-gray-400">Apr 2, 2025</div>
+                                                </div>
+                                                <div className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2 py-1 rounded">Processing</div>
+                                            </div>
+                                        </div>
+                                        <div className="bg-purple-50 dark:bg-gray-700 p-3 rounded-lg">
+                                            <div className="flex justify-between items-center">
+                                                <div>
+                                                    <div className="font-medium">Order #2036</div>
+                                                    <div className="text-sm text-gray-500 dark:text-gray-400">Mar 30, 2025</div>
+                                                </div>
+                                                <div className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs font-medium px-2 py-1 rounded">Shipped</div>
+                                            </div>
+                                        </div>
+                                        <div className="bg-green-50 dark:bg-gray-700 p-3 rounded-lg">
+                                            <div className="flex justify-between items-center">
+                                                <div>
+                                                    <div className="font-medium">Order #2025</div>
+                                                    <div className="text-sm text-gray-500 dark:text-gray-400">Mar 28, 2025</div>
+                                                </div>
+                                                <div className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs font-medium px-2 py-1 rounded">Delivered</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Track Order Button */}
+                                    <button className="w-full mt-3 bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg font-medium transition-colors">
+                                        Track Current Order
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Cart Icon */}
                         <button
                             className="relative hidden md:block"
@@ -156,7 +346,7 @@ function Header() {
                 {mobileMenuOpen && (
                     <div className="fixed top-0 inset-0 bg-black dark:bg-gray-900 z-10 pt-16">
                         <div className="flex flex-col p-5">
-                            
+
 
                             {/* Mobile Navigation */}
                             <nav>
@@ -173,21 +363,172 @@ function Header() {
                                     <li className="p-2 border-b border-gray-100 dark:border-gray-800">
                                         <Link to="/contact" className="text-lg font-medium block">Contact</Link>
                                     </li>
+
+                                    {/* Payments Section */}
+                                    <li className="p-2 border-b border-gray-100 dark:border-gray-800">
+                                        <div className="flex justify-between items-center" onClick={() => setMobilePaymentsOpen(!mobilePaymentsOpen)}>
+                                            <span className="text-lg font-medium">Payments</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${mobilePaymentsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+
+                                        {/* Mobile Payments Dropdown */}
+                                        {mobilePaymentsOpen && (
+                                            <div className="mt-3 pl-4 space-y-3">
+                                                {/* Pending Payments */}
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">PENDING PAYMENTS</h3>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow">
+                                                            <div className="flex justify-between">
+                                                                <span className="font-medium text-sm">Invoice #1082</span>
+                                                                <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">$1,240</span>
+                                                            </div>
+                                                            <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 3 days</div>
+                                                        </div>
+                                                        <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow">
+                                                            <div className="flex justify-between">
+                                                                <span className="font-medium text-sm">Invoice #1094</span>
+                                                                <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">$840</span>
+                                                            </div>
+                                                            <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 7 days</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="mt-2">
+                                                        <Link to="/payments/pending" className="text-sm text-yellow-500 hover:underline">View All Pending</Link>
+                                                    </div>
+                                                </div>
+
+                                                {/* Divider */}
+                                                <div className="border-t border-gray-100 dark:border-gray-800 my-3"></div>
+
+                                                {/* Completed Payments */}
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">COMPLETED PAYMENTS</h3>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <div className="bg-green-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow">
+                                                            <div className="flex justify-between">
+                                                                <span className="font-medium text-sm">Invoice #1078</span>
+                                                                <span className="text-green-600 dark:text-green-400 text-sm font-medium">$2,350</span>
+                                                            </div>
+                                                            <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Paid on Apr 1</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="mt-2">
+                                                        <Link to="/payments/completed" className="text-sm text-yellow-500 hover:underline">View All Completed</Link>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </li>
+
+                                    {/* Orders Section */}
+                                    <li className="p-2 border-b border-gray-100 dark:border-gray-800">
+                                        <div className="flex justify-between items-center" onClick={() => setMobileOrdersOpen(!mobileOrdersOpen)}>
+                                            <span className="text-lg font-medium">Orders</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${mobileOrdersOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+
+                                        {/* Mobile Orders Dropdown */}
+                                        {mobileOrdersOpen && (
+                                            <div className="mt-3 pl-4 space-y-3">
+                                                {/* Order Stats */}
+                                                <div className="grid grid-cols-3 gap-2 mb-3">
+                                                    <div className="bg-white dark:bg-gray-700 py-2 rounded-lg shadow text-center">
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400">Processing</div>
+                                                        <div className="text-blue-500 font-bold">3</div>
+                                                    </div>
+                                                    <div className="bg-white dark:bg-gray-700 py-2 rounded-lg shadow text-center">
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400">Shipped</div>
+                                                        <div className="text-purple-500 font-bold">2</div>
+                                                    </div>
+                                                    <div className="bg-white dark:bg-gray-700 py-2 rounded-lg shadow text-center">
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400">Delivered</div>
+                                                        <div className="text-green-500 font-bold">8</div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Recent Orders */}
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">RECENT ORDERS</h3>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <div className="bg-blue-50 dark:bg-gray-700 p-2 rounded-lg">
+                                                            <div className="flex justify-between items-center">
+                                                                <div>
+                                                                    <div className="font-medium text-sm">Order #2045</div>
+                                                                    <div className="text-xs text-gray-500 dark:text-gray-400">Apr 2, 2025</div>
+                                                                </div>
+                                                                <div className="text-blue-600 dark:text-blue-400 text-xs font-medium">Processing</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="bg-purple-50 dark:bg-gray-700 p-2 rounded-lg">
+                                                            <div className="flex justify-between items-center">
+                                                                <div>
+                                                                    <div className="font-medium text-sm">Order #2036</div>
+                                                                    <div className="text-xs text-gray-500 dark:text-gray-400">Mar 30, 2025</div>
+                                                                </div>
+                                                                <div className="text-purple-600 dark:text-purple-400 text-xs font-medium">Shipped</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="mt-2">
+                                                        <Link to="/orders" className="text-sm text-yellow-500 hover:underline">View All Orders</Link>
+                                                    </div>
+                                                </div>
+
+                                                {/* Track Order Button */}
+                                                <button className="w-full mt-2 bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg text-sm font-medium transition-colors">
+                                                    Track Current Order
+                                                </button>
+                                            </div>
+                                        )}
+                                    </li>
+
                                     <div>
-                                    {count > 0 && (
-                                        <Link to="/orders" className="group flex items-center">
-                                            <span className="text-sm md:text-base font-medium mr-1.5 transition-colors group-hover:text-yellow-500">Orders</span>
-                                            <span className="flex items-center justify-center h-6 w-6 md:h-7 md:w-7 bg-yellow-500 text-white text-xs md:text-sm font-bold rounded-full transform transition-transform group-hover:scale-110">
-                                                {count}
-                                            </span>
-                                        </Link>
-                                    )}
-                                </div>
+                                        {count > 0 && (
+                                            <Link to="/orders" className="group flex items-center">
+                                                <span className="text-sm md:text-base font-medium mr-1.5 transition-colors group-hover:text-yellow-500">Orders</span>
+                                                <span className="flex items-center justify-center h-6 w-6 md:h-7 md:w-7 bg-yellow-500 text-white text-xs md:text-sm font-bold rounded-full transform transition-transform group-hover:scale-110">
+                                                    {count}
+                                                </span>
+                                            </Link>
+                                        )}
+                                    </div>
                                 </ul>
                             </nav>
 
                             {/* Mobile Bottom Actions */}
                             <div className="mt-auto relative pt-6">
+                                {/* Payment Stats for Mobile */}
+                                <div className="mb-4 border-b border-gray-100 dark:border-gray-800 pb-4">
+                                    <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400 mb-2">PAYMENT SUMMARY</h3>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow">
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">Pending</div>
+                                            <div className="flex items-end justify-between">
+                                                <span className="text-lg font-bold">$2,080</span>
+                                                <span className="text-yellow-500 text-sm">3</span>
+                                            </div>
+                                        </div>
+                                        <div className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow">
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">Completed</div>
+                                            <div className="flex items-end justify-between">
+                                                <span className="text-lg font-bold">$5,640</span>
+                                                <span className="text-green-500 text-sm">7</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className="flex items-center space-x-2 p-2 border-b border-gray-100 dark:border-gray-800">
                                     <NotificationsNoneIcon className="text-2xl" />
                                     <span>Notifications</span>

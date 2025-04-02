@@ -1,43 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import api from '../../api';
-import { X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, X } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+// import { Notyf } from "notyf";
+// import 'notyf/notyf.min.css';
 
 function PaymentForm() {
+
+    const { id } = useParams()
+
 
     // State for cart and pricing
     const navigator = useNavigate()
     const [cartItems, setCartItems] = useState([]);
+    const [paymentPayed, setPaymentPayed] = useState([])
     const [supplierDetails, setSupplierDetails] = useState(null);
     const [isCloth, setCloth] = useState(true)
     const [account, setAccount] = useState([])
-    const [payment , setPayment] = useState({
-        bankId:'',
-        BankTransactionId:'',
-        image:''
+    const [payment, setPayment] = useState({
+        bankId: '',
+        bankTransactionId: '',
+        image: ''
     })
 
     useEffect(() => {
-        // Retrieve cart items from localStorage
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        setCartItems(cart);
+    setCartItems(cart);
+    } , [])
 
-        // Fetch supplier details (you'll need to implement this API endpoint)
-        const fetchSupplierDetails = async () => {
-            try {
-                const response = await api.get('/supplier/bank-details');
-                if (response.data.status) {
-                    setSupplierDetails(response.data.supplier);
-                }
-            } catch (error) {
-                console.error('Failed to fetch supplier details', error);
-                toast.error('Could not retrieve supplier information');
-            }
-        };
-
-        fetchSupplierDetails();
-    }, []);
 
     useEffect(() => {
         const feachAccount = async () => {
@@ -65,18 +56,65 @@ function PaymentForm() {
     }
 
 
-    const handleSubmit = async(c) => {
-        c.preventDefalt()
+    const handleSubmit = async (c) => {
+        c.preventDefault()
+
+        const formData = new FormData()
+
+        formData.append('bankId', payment.bankId)
+        formData.append('bankTransactionId', payment.bankTransactionId)
+        formData.append('image', payment.image)
+
+
         try {
-            const result = await api.post('/customer/make-payment' , payment)
-            if(result.data.status) {
+            const result = await api.post(`/customer/make-payment/${id}`, formData)
+            if (result.data.status) {
+                feachPayment()
                 toast.success(result.data.message)
             } else {
                 toast.error(result.data.message)
             }
-        } catch(err) {
+        } catch (err) {
             console.log(err)
             toast.error(err.response.data.message)
+        }
+    }
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+
+        if (file) {
+            setPayment({ ...payment, image: file });
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewImage(reader.result);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setPreviewImage(null);
+        }
+    };
+
+    // panding payment
+
+    useEffect(() => {
+
+        feachPayment()
+    }, [])
+
+    const feachPayment = async () => {
+        try {
+            const result = await api.get(`/customer/get-pending-payment/${id}`)
+
+            if (result.data.status) {
+                console.log(result.data.paymentStatus)
+                setPaymentPayed(result.data.paymentStatus)
+            } else {
+                console.log(result.data.message)
+            }
+        } catch (err) {
+            console.log(err)
         }
     }
 
@@ -90,6 +128,7 @@ function PaymentForm() {
 
     return (
         <div>
+            <Toaster position="top-center" reverseOrder={false} />
             {
                 isCloth ? (
                     <div className="fixed inset-0 bg-black/60 z-30 flex items-center justify-center md:justify-end">
@@ -110,7 +149,7 @@ function PaymentForm() {
 
                                     <div className="grid grid-cols-1 gap-4">
                                         <select className='w-full p-3 border rounded-lg focus:outline-none    focus:ring-2 focus:ring-blue-500'
-                                        onChange={e => setPayment({...payment , bankBranch:e.target.value})}
+                                            onChange={e => setPayment({ ...payment, bankId: e.target.value })}
                                         >
                                             <option>
                                                 Banck Branch
@@ -126,7 +165,7 @@ function PaymentForm() {
                                         </select>
 
                                         <input
-                                        onChange={e => setPayment({...payment , BankTransactionId:e.target.value})}
+                                            onChange={e => setPayment({ ...payment, bankTransactionId: e.target.value })}
                                             type="text"
                                             name="zipCode"
                                             placeholder="Bank Transaction Id"
@@ -145,7 +184,7 @@ function PaymentForm() {
                                                 <span className="text-sm">screen shoot</span>
                                             </div>
                                             <input
-
+                                                onChange={handleImageChange}
                                                 type="file"
                                                 className="hidden"
                                                 accept="image/*"
@@ -153,13 +192,25 @@ function PaymentForm() {
                                         </label>
                                     </div>
 
+                                    {
+                                        paymentPayed.status === 'PENDING' ? (
+                                            <div
+                                                type="submit"
+                                                className="w-full bg-blue-400 text-white py-3 rounded-lg hover:bg-blue-500 transition duration-300 cursor-not-allowed text-center"
+                                            >
+                                                PENDING
+                                            </div>
+                                        ) : (
+                                            <button
+                                                type="submit"
+                                                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300"
+                                            >
+                                                Complete Payment
+                                            </button>
 
-                                    <button
-                                        type="submit"
-                                        className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300"
-                                    >
-                                        Complete Payment
-                                    </button>
+                                        )
+                                    }
+
                                 </form>
                             </div>
 
@@ -207,15 +258,6 @@ function PaymentForm() {
                                     </div>
                                 </div>
 
-                                {/* Supplier Bank Details */}
-                                {supplierDetails && (
-                                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
-                                        <h3 className="font-bold mb-2 text-gray-800 dark:text-white">Supplier Bank Details</h3>
-                                        <p>Bank Name: {supplierDetails.bankName}</p>
-                                        <p>Account Number: **** **** {supplierDetails.bankAccount.slice(-4)}</p>
-                                        <p>Account Holder: {supplierDetails.accountHolder}</p>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </div>

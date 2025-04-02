@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 const multer = require('multer')
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const { create } = require('domain');
+
 require('dotenv').config()
 
 
@@ -310,7 +310,7 @@ router.put('/update-product/:id', upload.single('image'), async (req, res) => {
 
 router.get('/get-account', async (req, res) => {
 
-    const token = req.cookies['t-auth-token'];
+    const token = req.cookies['x-auth-token'];
 
     if (!token) {
         return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });

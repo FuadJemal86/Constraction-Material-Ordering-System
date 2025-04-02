@@ -3,6 +3,8 @@ const { PrismaClient, message_receiverType } = require('@prisma/client');
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
+const multer = require('multer')
+const path = require('path');
 require('dotenv').config()
 const { v4: uuidv4 } = require('uuid')
 
@@ -14,6 +16,19 @@ router.use(cookieParser());
 
 
 // sign up
+
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/images')
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.fieldname + '_' + Date.now() + path.extname(file.originalname))
+    }
+})
+const upload = multer({
+    storage: storage
+})
 
 router.post('/sign-up', async (req, res) => {
     try {
@@ -219,27 +234,27 @@ router.post('/place-order', async (req, res) => {
 
 // get customer transitionId from cookies
 
-router.get('/get-transitionId' , async(req , res) => {
+router.get('/get-transitionId', async (req, res) => {
     const token = req.cookies['x-auth-token']
 
-    if(!token) {
-        return res.status(400).json({status:false , message : "Unauthorized: No token provided"})
+    if (!token) {
+        return res.status(400).json({ status: false, message: "Unauthorized: No token provided" })
     }
 
-    const decoded = jwt.verify(token , process.env.CUSTOMER_KEY)
+    const decoded = jwt.verify(token, process.env.CUSTOMER_KEY)
 
-    const customerId = parseInt(decoded.id , 10)
-    
+    const customerId = parseInt(decoded.id, 10)
+
 
     try {
         const transactionId = await prisma.order.findMany({
             where: {
-                customerId:customerId,
-                status: 'PENDING' 
+                customerId: customerId,
+                status: 'PENDING'
             },
-            select : {
-                status:true,
-                transactionId:true
+            select: {
+                status: true,
+                transactionId: true
             }
         })
 
@@ -250,7 +265,7 @@ router.get('/get-transitionId' , async(req , res) => {
             }
         });
 
-        return res.status(200).json({status:true , result: transactionId , count :pendingCount})
+        return res.status(200).json({ status: true, result: transactionId, count: pendingCount })
     } catch (error) {
         console.error(error);
         return res.status(500).json({ status: false, error: "Server error" });
@@ -259,23 +274,43 @@ router.get('/get-transitionId' , async(req , res) => {
 
 // make payment
 
-router.post('/make-payment', async (req, res) => {
-    try {
-        const { transactionId, amount, bankId } = req.body;
+router.post('/make-payment/:id', upload.single('image'), async (req, res) => {
+    const { id } = req.params; 
+    const { bankTransactionId, bankId } = req.body;
 
-        const order = await prisma.order.findUnique({ where: { id: transactionId } });
+    try {
+        const order = await prisma.order.findUnique({
+            where: { id: parseInt(id) },
+            select: {
+                transactionId: true,
+                totalPrice: true
+            }
+        });
+
         if (!order) {
             return res.status(404).json({ status: false, message: "Order not found" });
         }
 
-        const existingPayment = await prisma.payment.findUnique({ where: { transactionId } });
+        const { transactionId, totalPrice: amount } = order;
+
+        const existingPayment = await prisma.payment.findFirst({ 
+            where: { transactionId } 
+        });
+
         if (existingPayment) {
             return res.status(400).json({ status: false, message: "Payment already made for this order" });
         }
 
         const newPayment = await prisma.payment.create({
-            data: { transactionId, amount, bankId, status: "PENDING" }
-        });transactionId
+            data: {
+                amount,
+                bankId:parseInt(bankId),
+                status: "PENDING",
+                transactionId,
+                image: req.file ? req.file.filename : null,
+                bankTransactionId
+            }
+        });
 
         return res.status(201).json({ status: true, message: "Payment successful", payment: newPayment });
 
@@ -285,6 +320,40 @@ router.post('/make-payment', async (req, res) => {
     }
 });
 
+// get pending payment
+
+router.get('/get-pending-payment/:id' , async(req , res) => {
+
+    const {id}  = req.params;
+
+    try {
+        const order = await prisma.order.findUnique({
+            where:{id : parseInt(id)},
+            select:{
+                transactionId:true
+            }
+        })
+
+        if(!order) {
+            return res.status(400).json({status:false , message:'order not found'})
+        }
+
+        const {transactionId} = order
+
+        const pendingSatus = await prisma.payment.findUnique({
+            where:{transactionId:transactionId , status: 'PENDING'},
+            select : {
+                status:true
+            }
+        })
+
+        return res.status(200).json({status:true , paymentStatus:pendingSatus })
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ status: false, error: "Server error" });
+    }
+
+})
 // get nearby supplier
 
 router.get('/nearby-suppliers', async (req, res) => {
