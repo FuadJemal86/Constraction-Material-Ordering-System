@@ -10,6 +10,7 @@ import logo from '../../images/logo constraction.jpeg';
 import bannerImage from '../../images/banner2 page2.jpg';
 import ShoppingCart from './ShoppingCart';
 import api from '../../api';
+import toast, { Toaster } from 'react-hot-toast';
 
 
 function Header() {
@@ -18,6 +19,7 @@ function Header() {
     const [mobilePaymentsOpen, setMobilePaymentsOpen] = useState(false)
     const [mobileOrdersOpen, setMobileOrdersOpen] = useState(false)
     const [paymentStatus, setPaymentStatuses] = useState([])
+    const [orderStatus, setOrderStatus] = useState([])
     const [count, setCount] = useState([])
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "dark");
@@ -72,8 +74,9 @@ function Header() {
                 if (result.data.status) {
                     // console.log('Payment statuses:', result.data.paymentStatuses);
                     setPaymentStatuses(result.data.paymentStatuses);
+                    setOrderStatus(result.data.orders)
+                    console.log(result.data.orders)
                 } else {
-                    console.log(result.data.message);
                     toast.error(result.data.message);
                 }
             } catch (err) {
@@ -90,9 +93,9 @@ function Header() {
 
 
 
-
     return (
         <div>
+            <Toaster position="top-center" reverseOrder={false} />
             <header className="relative">
                 <div className='flex items-center justify-between md:p-2 p-1 fixed right-0 left-0 top-0 bg-white dark:bg-gray-900 z-20 shadow-md'>
 
@@ -129,21 +132,23 @@ function Header() {
                                                         )
                                                     }
                                                 </div>
-                                                {
-                                                    paymentStatus
-                                                        .filter(c => c.status === 'PENDING')
-                                                        .map(c => (
-                                                            <div key={c.id} className="space-y-2">
-                                                                <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+
+                                                <div  className="space-y-2">
+                                                    {
+                                                        paymentStatus
+                                                            .filter(c => c.status === 'PENDING')
+                                                            .map(c => (
+                                                                <div key={c.id} className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
                                                                     <div className="flex justify-between mb-1">
                                                                         <span className="font-medium text-sm">{c.status}</span>
                                                                         <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">birr {c.totalPrice}</span>
                                                                     </div>
                                                                     <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 3 days</div>
                                                                 </div>
-                                                            </div>
-                                                        ))
-                                                }
+                                                            ))
+                                                    }
+                                                </div>
+
                                             </div>
 
                                             {/* Completed Payments */}
@@ -156,21 +161,23 @@ function Header() {
                                                         )
                                                     }
                                                 </div>
-                                                {
-                                                    paymentStatus
-                                                        .filter(c => c.status === 'COMPLETED')
-                                                        .map(c => (
-                                                            <div key={c.id} className="space-y-2">
-                                                                <div className="bg-green-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+
+                                                <div  className="space-y-2">
+                                                    {
+                                                        paymentStatus
+                                                            .filter(c => c.status === 'COMPLETED')
+                                                            .map(c => (
+                                                                <div key={c.id} className="bg-green-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
                                                                     <div className="flex justify-between">
                                                                         <span className="font-medium text-sm">{c.status}</span>
                                                                         <span className="text-green-600 dark:text-green-400 text-sm font-medium">birr {c.totalPrice}</span>
                                                                     </div>
                                                                     <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Paid on Apr 1</div>
                                                                 </div>
-                                                            </div>
-                                                        ))
-                                                }
+                                                            ))
+                                                    }
+                                                </div>
+
                                             </div>
 
 
@@ -178,23 +185,25 @@ function Header() {
                                             <div>
                                                 <div className="flex items-center justify-between mb-2">
                                                     <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">RECENT ORDERS</h3>
-                                                    <Link to="/orders" className="text-xs text-yellow-500 hover:underline">View All</Link>
+                                                    {
+                                                        orderStatus.filter(c => c.status).length > 2 && (
+                                                            <Link to="/orders" className="text-xs text-yellow-500 hover:underline">View All</Link>
+                                                        )
+                                                    }
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <div className="bg-blue-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                                                        <div className="flex justify-between">
-                                                            <span className="font-medium text-sm">Order #2045</span>
-                                                            <span className="text-blue-600 dark:text-blue-400 text-sm font-medium">Processing</span>
-                                                        </div>
-                                                        <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Placed on Apr 2</div>
-                                                    </div>
-                                                    <div className="bg-purple-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                                                        <div className="flex justify-between">
-                                                            <span className="font-medium text-sm">Order #2036</span>
-                                                            <span className="text-purple-600 dark:text-purple-400 text-sm font-medium">Shipped</span>
-                                                        </div>
-                                                        <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Shipped on Mar 30</div>
-                                                    </div>
+                                                    {
+                                                        orderStatus.slice(0, 2).map(c => (
+                                                            <div className="bg-blue-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                                                <div className="flex justify-between">
+                                                                    <span className="font-medium text-sm">Order #2045</span>
+                                                                    <span className={`text-blue-600 dark:text-blue-400 text-sm font-medium ${c.status === 'PENDING' ? 'text-yellow-600 ' : null}`}>{c.status}</span>
+                                                                </div>
+                                                                <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Placed on Apr 2</div>
+                                                            </div>
+                                                        ))
+                                                    }
+
                                                 </div>
                                             </div>
                                         </div>

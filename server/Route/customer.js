@@ -377,7 +377,7 @@ router.get('/get-payment-status', async (req, res) => {
         const [orders, payments] = await prisma.$transaction([
             prisma.order.findMany({
                 where: { customerId },
-                select: {id:true, transactionId: true, status: true , totalPrice:true  }
+                select: { id: true, transactionId: true, status: true, totalPrice: true }
             }),
             prisma.payment.findMany({
                 where: { 
@@ -401,7 +401,7 @@ router.get('/get-payment-status', async (req, res) => {
 
         return res.status(200).json({
             status: true,
-            orders: orders.map(order => order.status),
+            orders,
             paymentStatuses: payments
         });
 
