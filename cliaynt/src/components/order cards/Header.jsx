@@ -133,7 +133,7 @@ function Header() {
                                                     }
                                                 </div>
 
-                                                <div  className="space-y-2">
+                                                <div className="space-y-2">
                                                     {
                                                         paymentStatus
                                                             .filter(c => c.status === 'PENDING')
@@ -148,7 +148,6 @@ function Header() {
                                                             ))
                                                     }
                                                 </div>
-
                                             </div>
 
                                             {/* Completed Payments */}
@@ -162,7 +161,7 @@ function Header() {
                                                     }
                                                 </div>
 
-                                                <div  className="space-y-2">
+                                                <div className="space-y-2">
                                                     {
                                                         paymentStatus
                                                             .filter(c => c.status === 'COMPLETED')
@@ -196,7 +195,7 @@ function Header() {
                                                         orderStatus.slice(0, 2).map(c => (
                                                             <div className="bg-blue-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
                                                                 <div className="flex justify-between">
-                                                                    <span className="font-medium text-sm">Order #2045</span>
+                                                                    <span className="font-medium text-sm">Order {c.id}</span>
                                                                     <span className={`text-blue-600 dark:text-blue-400 text-sm font-medium ${c.status === 'PENDING' ? 'text-yellow-600 ' : null}`}>{c.status}</span>
                                                                 </div>
                                                                 <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Placed on Apr 2</div>
@@ -247,32 +246,19 @@ function Header() {
 
                                     {/* Payment Stats */}
                                     <div className="grid grid-cols-2 gap-3 mb-4">
-                                        <div className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow">
-                                            <div className="text-sm text-gray-500 dark:text-gray-400">Pending</div>
-                                            <div className="flex items-end justify-between">
-                                                <span className="text-lg font-bold">$2,080</span>
-                                                <span className="text-yellow-500 text-sm">3 invoices</span>
-                                            </div>
-                                        </div>
-                                        <div className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow">
-                                            <div className="text-sm text-gray-500 dark:text-gray-400">Completed</div>
-                                            <div className="flex items-end justify-between">
-                                                <span className="text-lg font-bold">$5,640</span>
-                                                <span className="text-green-500 text-sm">7 invoices</span>
-                                            </div>
-                                        </div>
+                                        {
+                                            paymentStatus.filter(c => c.status === 'PENDING').map(c => (
+                                                <div className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow">
+                                                    <div className="text-sm text-gray-500 dark:text-gray-400">{c.status}</div>
+                                                    <div className="flex items-end justify-between">
+                                                        <span className="text-lg font-bold">$5,640</span>
+                                                        <span className="text-green-500 text-sm">7 invoices</span>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
                                     </div>
 
-                                    {/* Recent Payment */}
-                                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg mb-2">
-                                        <div className="flex justify-between items-center">
-                                            <div>
-                                                <div className="font-medium">Latest Payment</div>
-                                                <div className="text-sm text-gray-500 dark:text-gray-400">Today at 10:32 AM</div>
-                                            </div>
-                                            <div className="text-green-500 font-medium">+$2,350</div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -288,49 +274,34 @@ function Header() {
 
                                     {/* Orders Stats */}
                                     <div className="grid grid-cols-3 gap-2 mb-4">
-                                        <div className="bg-white dark:bg-gray-700 p-2 rounded-lg shadow text-center">
-                                            <div className="text-xs text-gray-500 dark:text-gray-400">Processing</div>
-                                            <div className="text-blue-500 font-bold">3</div>
-                                        </div>
-                                        <div className="bg-white dark:bg-gray-700 p-2 rounded-lg shadow text-center">
-                                            <div className="text-xs text-gray-500 dark:text-gray-400">Shipped</div>
-                                            <div className="text-purple-500 font-bold">2</div>
-                                        </div>
-                                        <div className="bg-white dark:bg-gray-700 p-2 rounded-lg shadow text-center">
-                                            <div className="text-xs text-gray-500 dark:text-gray-400">Delivered</div>
-                                            <div className="text-green-500 font-bold">8</div>
-                                        </div>
+                                        {
+                                            orderStatus.slice(0, 2).map(c => (
+                                                <div className="bg-white dark:bg-gray-700 p-2 rounded-lg shadow text-center">
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400">{c.status}</div>
+                                                    <div className="text-purple-500 font-bold">{c.length}</div>
+                                                </div>
+
+                                            ))
+                                        }
                                     </div>
 
                                     {/* Recent Orders */}
                                     <div className="space-y-2">
-                                        <div className="bg-blue-50 dark:bg-gray-700 p-3 rounded-lg">
-                                            <div className="flex justify-between items-center">
-                                                <div>
-                                                    <div className="font-medium">Order #2045</div>
-                                                    <div className="text-sm text-gray-500 dark:text-gray-400">Apr 2, 2025</div>
+                                        {
+                                            orderStatus.slice(0, 2).map(c => (
+                                                <div className="bg-blue-50 dark:bg-gray-700 p-3 rounded-lg">
+                                                    <div className="flex justify-between items-center">
+                                                        <div>
+                                                            <div className="font-medium">Order #2045</div>
+                                                            <div className="text-sm text-gray-500 dark:text-gray-400">Apr 2, 2025</div>
+                                                        </div>
+                                                        <div className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2 py-1 rounded">{c.status}</div>
+                                                    </div>
                                                 </div>
-                                                <div className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2 py-1 rounded">Processing</div>
-                                            </div>
-                                        </div>
-                                        <div className="bg-purple-50 dark:bg-gray-700 p-3 rounded-lg">
-                                            <div className="flex justify-between items-center">
-                                                <div>
-                                                    <div className="font-medium">Order #2036</div>
-                                                    <div className="text-sm text-gray-500 dark:text-gray-400">Mar 30, 2025</div>
-                                                </div>
-                                                <div className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs font-medium px-2 py-1 rounded">Shipped</div>
-                                            </div>
-                                        </div>
-                                        <div className="bg-green-50 dark:bg-gray-700 p-3 rounded-lg">
-                                            <div className="flex justify-between items-center">
-                                                <div>
-                                                    <div className="font-medium">Order #2025</div>
-                                                    <div className="text-sm text-gray-500 dark:text-gray-400">Mar 28, 2025</div>
-                                                </div>
-                                                <div className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs font-medium px-2 py-1 rounded">Delivered</div>
-                                            </div>
-                                        </div>
+
+                                            ))
+                                        }
+
                                     </div>
 
                                     {/* Track Order Button */}
@@ -424,20 +395,18 @@ function Header() {
                                                         <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">PENDING PAYMENTS</h3>
                                                     </div>
                                                     <div className="space-y-2">
-                                                        <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow">
-                                                            <div className="flex justify-between">
-                                                                <span className="font-medium text-sm">Invoice #1082</span>
-                                                                <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">$1,240</span>
-                                                            </div>
-                                                            <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 3 days</div>
-                                                        </div>
-                                                        <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow">
-                                                            <div className="flex justify-between">
-                                                                <span className="font-medium text-sm">Invoice #1094</span>
-                                                                <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">$840</span>
-                                                            </div>
-                                                            <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 7 days</div>
-                                                        </div>
+                                                        {
+                                                            paymentStatus.slice(0, 2).filter(c => c.status === 'PENDING').map(c => (
+                                                                <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow">
+                                                                    <div className="flex justify-between">
+                                                                        <span className="font-medium text-sm">payment {c.id}</span>
+                                                                        <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">{c.status}</span>
+                                                                    </div>
+                                                                    <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 3 days</div>
+                                                                </div>
+                                                            ))
+                                                        }
+
                                                     </div>
                                                     <div className="mt-2">
                                                         <Link to="/payments/pending" className="text-sm text-yellow-500 hover:underline">View All Pending</Link>
@@ -452,15 +421,20 @@ function Header() {
                                                     <div className="flex items-center justify-between mb-2">
                                                         <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">COMPLETED PAYMENTS</h3>
                                                     </div>
-                                                    <div className="space-y-2">
-                                                        <div className="bg-green-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow">
-                                                            <div className="flex justify-between">
-                                                                <span className="font-medium text-sm">Invoice #1078</span>
-                                                                <span className="text-green-600 dark:text-green-400 text-sm font-medium">$2,350</span>
+                                                    {
+                                                        paymentStatus.slice(0, 2).filter(c => c.status === 'COMPLETED').map(c => (
+                                                            <div className="space-y-2">
+                                                                <div className="bg-green-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow">
+                                                                    <div className="flex justify-between">
+                                                                        <span className="font-medium text-sm">Invoice #1078</span>
+                                                                        <span className="text-green-600 dark:text-green-400 text-sm font-medium">$2,350</span>
+                                                                    </div>
+                                                                    <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">{c.status}</div>
+                                                                </div>
                                                             </div>
-                                                            <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Paid on Apr 1</div>
-                                                        </div>
-                                                    </div>
+                                                        ))
+                                                    }
+
                                                     <div className="mt-2">
                                                         <Link to="/payments/completed" className="text-sm text-yellow-500 hover:underline">View All Completed</Link>
                                                     </div>
@@ -481,21 +455,17 @@ function Header() {
                                         {/* Mobile Orders Dropdown */}
                                         {mobileOrdersOpen && (
                                             <div className="mt-3 pl-4 space-y-3">
-                                                {/* Order Stats */}
-                                                <div className="grid grid-cols-3 gap-2 mb-3">
-                                                    <div className="bg-white dark:bg-gray-700 py-2 rounded-lg shadow text-center">
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400">Processing</div>
-                                                        <div className="text-blue-500 font-bold">3</div>
-                                                    </div>
-                                                    <div className="bg-white dark:bg-gray-700 py-2 rounded-lg shadow text-center">
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400">Shipped</div>
-                                                        <div className="text-purple-500 font-bold">2</div>
-                                                    </div>
-                                                    <div className="bg-white dark:bg-gray-700 py-2 rounded-lg shadow text-center">
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400">Delivered</div>
-                                                        <div className="text-green-500 font-bold">8</div>
-                                                    </div>
-                                                </div>
+
+                                                {
+                                                    orderStatus.slice(0, 2).map(c => (
+                                                        <div className="grid grid-cols-3 gap-2 mb-3">
+                                                            <div className="bg-white dark:bg-gray-700 py-2 rounded-lg shadow text-center">
+                                                                <div className="text-xs text-gray-500 dark:text-gray-400">{c.status}</div>
+                                                                <div className="text-blue-500 font-bold">{c.length}</div>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                }
 
                                                 {/* Recent Orders */}
                                                 <div>
@@ -503,24 +473,20 @@ function Header() {
                                                         <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">RECENT ORDERS</h3>
                                                     </div>
                                                     <div className="space-y-2">
-                                                        <div className="bg-blue-50 dark:bg-gray-700 p-2 rounded-lg">
-                                                            <div className="flex justify-between items-center">
-                                                                <div>
-                                                                    <div className="font-medium text-sm">Order #2045</div>
-                                                                    <div className="text-xs text-gray-500 dark:text-gray-400">Apr 2, 2025</div>
+                                                        {
+                                                            orderStatus.slice(0, 2).map(c => (
+                                                                <div className="bg-blue-50 dark:bg-gray-700 p-2 rounded-lg">
+                                                                    <div className="flex justify-between items-center">
+                                                                        <div>
+                                                                            <div className="font-medium text-sm">Order {c.id}</div>
+                                                                            <div className="text-xs text-gray-500 dark:text-gray-400">{c.totalPrice}</div>
+                                                                        </div>
+                                                                        <div className="text-blue-600 dark:text-blue-400 text-xs font-medium">{c.status}</div>
+                                                                    </div>
                                                                 </div>
-                                                                <div className="text-blue-600 dark:text-blue-400 text-xs font-medium">Processing</div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="bg-purple-50 dark:bg-gray-700 p-2 rounded-lg">
-                                                            <div className="flex justify-between items-center">
-                                                                <div>
-                                                                    <div className="font-medium text-sm">Order #2036</div>
-                                                                    <div className="text-xs text-gray-500 dark:text-gray-400">Mar 30, 2025</div>
-                                                                </div>
-                                                                <div className="text-purple-600 dark:text-purple-400 text-xs font-medium">Shipped</div>
-                                                            </div>
-                                                        </div>
+
+                                                            ))
+                                                        }
                                                     </div>
                                                     <div className="mt-2">
                                                         <Link to="/orders" className="text-sm text-yellow-500 hover:underline">View All Orders</Link>
@@ -554,20 +520,17 @@ function Header() {
                                 <div className="mb-4 border-b border-gray-100 dark:border-gray-800 pb-4">
                                     <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400 mb-2">PAYMENT SUMMARY</h3>
                                     <div className="grid grid-cols-2 gap-3">
-                                        <div className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow">
-                                            <div className="text-sm text-gray-500 dark:text-gray-400">Pending</div>
-                                            <div className="flex items-end justify-between">
-                                                <span className="text-lg font-bold">$2,080</span>
-                                                <span className="text-yellow-500 text-sm">3</span>
-                                            </div>
-                                        </div>
-                                        <div className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow">
-                                            <div className="text-sm text-gray-500 dark:text-gray-400">Completed</div>
-                                            <div className="flex items-end justify-between">
-                                                <span className="text-lg font-bold">$5,640</span>
-                                                <span className="text-green-500 text-sm">7</span>
-                                            </div>
-                                        </div>
+                                        {
+                                            paymentStatus.slice(0, 2).map(c => (
+                                                <div className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow">
+                                                    <div className="text-sm text-gray-500 dark:text-gray-400">{c.status}</div>
+                                                    <div className="flex items-end justify-between">
+                                                        <span className="text-lg font-bold">{c.totalPrice}</span>
+                                                        <span className="text-yellow-500 text-sm">{c.length}</span>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
                                     </div>
                                 </div>
 
