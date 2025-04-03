@@ -17,8 +17,7 @@ function Header() {
     const { cart } = useCart();
     const [mobilePaymentsOpen, setMobilePaymentsOpen] = useState(false)
     const [mobileOrdersOpen, setMobileOrdersOpen] = useState(false)
-    const [paymentStatus, setPaymentStatus] = useState([])
-    console.log(paymentStatus.status)
+    const [paymentStatus, setPaymentStatuses] = useState([])
     const [count, setCount] = useState([])
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "dark");
@@ -66,24 +65,30 @@ function Header() {
     }, [])
 
     useEffect(() => {
-        const feachStatus = async () => {
+        const fetchStatus = async () => {
             try {
-                const result = await api.get('/customer/get-payment-status')
+                const result = await api.get('/customer/get-payment-status');
 
                 if (result.data.status) {
-                    console.log(result.data.paymentStatuses)
-                    console.log(result.data.orders)
-                    setPaymentStatus(result.data.paymentStatuses)
+                    // console.log('Payment statuses:', result.data.paymentStatuses);
+                    setPaymentStatuses(result.data.paymentStatuses);
                 } else {
-                    console.log(result.data.message)
+                    console.log(result.data.message);
+                    toast.error(result.data.message);
                 }
             } catch (err) {
-                toast.error(err.response.data.message)
+                console.error('Error fetching payment statuses:', err);
+                toast.error(err.response?.data?.message || 'Failed to fetch payment statuses');
             }
-        }
+        };
 
-        feachStatus()
-    }, [])
+        fetchStatus();
+    }, []);
+
+
+
+
+
 
 
     return (
@@ -119,34 +124,25 @@ function Header() {
                                                 <div className="flex items-center justify-between mb-2">
                                                     <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">PENDING PAYMENTS</h3>
                                                     {
-                                                        paymentStatus.status === 'PENDING' ? (
+                                                        paymentStatus.filter(c => c.status === 'PENDING').length > 2 && (
                                                             <Link to="/payments/pending" className="text-xs text-yellow-500 hover:underline">View All</Link>
-                                                        ) : (
-                                                            <Link to="/payments/pending" className="text-xs text-yellow-500 hover:underline"></Link>
                                                         )
                                                     }
                                                 </div>
                                                 {
-                                                    paymentStatus.status === 'PENDING' ? (
-                                                        <div className="space-y-2">
-                                                            <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                                                                <div className="flex justify-between">
-                                                                    <span className="font-medium text-sm">{paymentStatus.status}</span>
-                                                                    <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">$1,240</span>
+                                                    paymentStatus
+                                                        .filter(c => c.status === 'PENDING')
+                                                        .map(c => (
+                                                            <div key={c.id} className="space-y-2">
+                                                                <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                                                    <div className="flex justify-between mb-1">
+                                                                        <span className="font-medium text-sm">{c.status}</span>
+                                                                        <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">birr {c.totalPrice}</span>
+                                                                    </div>
+                                                                    <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 3 days</div>
                                                                 </div>
-                                                                <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 3 days</div>
                                                             </div>
-                                                            <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                                                                <div className="flex justify-between">
-                                                                    <span className="font-medium text-sm">Invoice #1094</span>
-                                                                    <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">$840</span>
-                                                                </div>
-                                                                <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 7 days</div>
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        null
-                                                    )
+                                                        ))
                                                 }
                                             </div>
 
@@ -154,25 +150,29 @@ function Header() {
                                             <div className="mb-4">
                                                 <div className="flex items-center justify-between mb-2">
                                                     <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">COMPLETED PAYMENTS</h3>
-                                                    <Link to="/payments/completed" className="text-xs text-yellow-500 hover:underline">View All</Link>
+                                                    {
+                                                        paymentStatus.filter(c => c.status === 'COMPLETED').length > 2 && (
+                                                            <Link to="/payments/completed" className="text-xs text-green-500 hover:underline">View All</Link>
+                                                        )
+                                                    }
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <div className="bg-green-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                                                        <div className="flex justify-between">
-                                                            <span className="font-medium text-sm">Invoice #1078</span>
-                                                            <span className="text-green-600 dark:text-green-400 text-sm font-medium">$2,350</span>
-                                                        </div>
-                                                        <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Paid on Apr 1</div>
-                                                    </div>
-                                                    <div className="bg-green-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                                                        <div className="flex justify-between">
-                                                            <span className="font-medium text-sm">Invoice #1065</span>
-                                                            <span className="text-green-600 dark:text-green-400 text-sm font-medium">$1,120</span>
-                                                        </div>
-                                                        <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Paid on Mar 28</div>
-                                                    </div>
-                                                </div>
+                                                {
+                                                    paymentStatus
+                                                        .filter(c => c.status === 'COMPLETED')
+                                                        .map(c => (
+                                                            <div key={c.id} className="space-y-2">
+                                                                <div className="bg-green-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                                                    <div className="flex justify-between">
+                                                                        <span className="font-medium text-sm">{c.status}</span>
+                                                                        <span className="text-green-600 dark:text-green-400 text-sm font-medium">birr {c.totalPrice}</span>
+                                                                    </div>
+                                                                    <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Paid on Apr 1</div>
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                }
                                             </div>
+
 
                                             {/* Orders Section */}
                                             <div>
