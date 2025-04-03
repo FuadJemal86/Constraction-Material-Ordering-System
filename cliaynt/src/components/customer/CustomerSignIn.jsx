@@ -9,33 +9,33 @@ function CustomerSignIn() {
 
     const navigate = useNavigate()
 
-    const [customer , setCustomer] = useState({
-        email:'',
-        password:''
-        
+    const [customer, setCustomer] = useState({
+        email: '',
+        password: ''
+
     })
 
-    const handelSubmit = async(c) => {
+    const handelSubmit = async (c) => {
 
         c.preventDefault()
 
-        const {email , password} = customer
+        const { email, password } = customer
 
-        if(!email || !password) {
+        if (!email || !password) {
             return toast.error('fill the input fild')
         }
 
         try {
-            const result = await api.post('/customer/login',customer)
+            const result = await api.post('/customer/login', customer)
 
-            if(result.data.loginStatus) {
+            if (result.data.loginStatus) {
                 toast.success(result.data.message)
-                navigate('/supplier-products')
+                navigate('/products')
 
             } else {
                 toast.error(result.data.message)
             }
-        } catch(err) {
+        } catch (err) {
             console.log(err)
             toast.error(err.response.data.message)
         }
@@ -45,18 +45,21 @@ function CustomerSignIn() {
 
     return (
         <div>
-            <div className="flex justify-center items-center min-h-screen gap-32">
+            <div className="flex flex-col lg:flex-row justify-center items-center min-h-screen gap-8 lg:gap-32 p-4 bg-gradient-to-br from-gray-50 to-gray-100 ">
                 <Toaster position="top-center" reverseOrder={false} />
                 <form onSubmit={handelSubmit}>
                     <div className="grid gap-5 text-center ml-52">
                         <div className="grid items-center">
-                            <img className="w-24 h-24 mx-auto dark:bg-white rounded-full" src={logo} alt="Logo" />
-                            <span className="text-xl font-bold font-poppins ">ConstructEasy</span>
+                            <div className="relative mx-auto">
+                                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur-sm opacity-70"></div>
+                                <img className="relative w-24 h-24 mx-auto bg-white rounded-full border-2 border-white shadow-lg" src={logo} alt="Logo" />
+                            </div>
+                            <span className="text-xl font-bold font-poppins mt-2 bg-gradient-to-r from-blue-700 to-purple-700 bg-clip-text text-transparent">ConstructEasy</span>
                         </div>
 
                         <div className="grid gap-1">
-                            <span className="text-3xl font-bold font-poppins">Welcome Customer!</span>
-                            <span className="text-sm font-light font-poppins">
+                            <span className="text-3xl font-bold font-poppins dark:text-gray-400">Welcome Customer!</span>
+                            <span className="text-sm font-light font-poppins dark:text-gray-400">
                                 have not an account <span><Link to={'/customer-sign-up'} className='text-blue-800 font-bold'>Sign Up</Link></span>
                             </span>
                         </div>
@@ -66,7 +69,7 @@ function CustomerSignIn() {
                                 <label className='text-xs mb-1 font-light font-poppins text-gray-500'>Email</label>
                                 <input
                                     onChange={e => setCustomer({ ...customer, email: e.target.value })}
-                                    className='w-[336px] h-9 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition dark:bg-slate-200 placeholder:text-gray-500'
+                                    className='w-[336px] h-8 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-gray-500 transition shadow-sm hover:shadow-md'
                                     placeholder='your email'
                                 />
                             </div>
@@ -76,26 +79,32 @@ function CustomerSignIn() {
                                 <input
                                     onChange={e => setCustomer({ ...customer, password: e.target.value })}
                                     placeholder='your password'
-                                    className='w-[336px] h-9 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 text-gray-500 transition dark:bg-slate-200 placeholder:text-gray-500'
+                                    className='w-[336px] h-8 border p-1 rounded-lg text-sm border-gray-300 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-gray-500 transition shadow-sm hover:shadow-md'
                                 />
                             </div>
 
                             <div>
-                                <button className='w-[336px] h-8 mt-4 text-white rounded-xl bg-custom-radial font-poppins font-medium'>
-                                    Login
+                                <button
+                                    type="submit"
+                                    className="w-[336px] h-8 text-white rounded-xl font-poppins font-medium relative overflow-hidden group"
+                                >
+                                    <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-300 group-hover:scale-110"></div>
+                                    <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-600 to-purple-700 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+                                    <span className="relative z-10">Login</span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </form>
 
-                <div className="flex justify-end">
+                <div className="hidden lg:flex justify-end">
                     <div
                         style={{ backgroundImage: `url(${banner})` }}
-                        className="bg-cover bg-center w-[500px] h-[650px] rounded-3xl relative"
+                        className="bg-cover bg-center w-[500px] h-[650px] rounded-3xl relative shadow-xl transform transition-transform hover:scale-[1.01] hover:shadow-2xl"
                     >
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent rounded-3xl"></div>
                         <div className="absolute bottom-4 text-5xl text-white px-6 py-3 rounded-lg font-bold shadow-lg font-poppins">
-                            Welcome to, <br />Login page
+                            Quality Materials, <br /> <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Solid Result</span>
                         </div>
                     </div>
                 </div>

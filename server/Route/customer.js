@@ -177,7 +177,7 @@ router.post('/place-order', async (req, res) => {
     const token = req.cookies["x-auth-token"];
 
     if (!token) {
-        return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });
+        return res.status(401).json({ valid: false, message: "login first" });
     }
 
     let customerId
