@@ -238,7 +238,7 @@ router.get('/get-transitionId', async (req, res) => {
     const token = req.cookies['x-auth-token']
 
     if (!token) {
-        return res.status(400).json({ status: false, message: "Unauthorized: No token provided" })
+        return res.status(400).json({ status: false, message: "login first" })
     }
 
     const decoded = jwt.verify(token, process.env.CUSTOMER_KEY)
@@ -361,7 +361,7 @@ router.get('/get-payment-status', async (req, res) => {
     const token = req.cookies['x-auth-token'];
 
     if (!token) {
-        return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });
+        return res.status(401).json({ valid: false, message: "login first" });
     }
 
     let customerId;

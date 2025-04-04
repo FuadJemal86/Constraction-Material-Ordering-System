@@ -11,10 +11,10 @@ function SupplierOrders() {
     })
     const getStatusBadgeColor = (status) => {
         const statusColors = {
-            Completed: "bg-green-100 text-green-800",
-            Processing: "bg-blue-100 text-blue-800",
-            Pending: "bg-yellow-100 text-yellow-800",
-            Cancelled: "bg-red-100 text-red-800"
+            COMPLETED: "bg-green-100 text-green-800",
+            PROCESSING: "bg-blue-100 text-blue-800",
+            PENDING: "bg-yellow-100 text-yellow-800",
+            CANSELLED: "bg-red-100 text-red-800"
         };
 
         return statusColors[status] || "bg-gray-100 text-gray-800";
@@ -103,8 +103,7 @@ function SupplierOrders() {
                                     <select
                                         value={c.status || "PROCESSING"} // ✅ Ensure default value if undefined
                                         onChange={e => handleStatus(e.target.value, c.id)}
-                                        className={`px-2 py-1 rounded-full text-xs font-medium outline-none 
-                                        ${c.status === 'PROCESSING' ? 'bg-red-200 text-blue-800' : 'bg-blue-100 text-blue-800'}`}
+                                        className={`px-2 py-1 rounded-full text-xs font-medium outline-none} ${getStatusBadgeColor(c.status)}`}
                                     >
                                         <option value="PENDING">PENDING</option>
                                         <option value="PROCESSING">PROCESSING</option>
