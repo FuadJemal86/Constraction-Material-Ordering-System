@@ -21,9 +21,9 @@ function SupplierOrders() {
     };
 
     useEffect(() => {
-        
+
         feaheOrder()
-    },[])
+    }, [])
 
     const feaheOrder = async () => {
         try {
@@ -38,26 +38,25 @@ function SupplierOrders() {
         }
     }
 
-    const handleStatus = async (newStatus , id) => {
-
-
+    const handleStatus = async (newStatus, id) => {
         try {
             const result = await api.put(`/supplier/update-order-status/${id}`, {
                 ...statusState,
                 status: newStatus
-            })
+            });
             if (result.data.status) {
-                setStatusState(prev => ({ ...prev, status: newStatus }));
-                toast.success(result.data.message)
-                feaheOrder()
+                setStatusState({ status: newStatus });
+                toast.success(result.data.message);
+                feaheOrder();
             } else {
-                console.log(result.data.message)
+                console.log(result.data.message);
             }
         } catch (err) {
-            console.log(err)
-            toast.error(err.response.data.message)
+            console.log(err);
+            toast.error(err.response.data.message);
         }
-    }
+    };
+
 
     return (
         <div className="p-4 mt-16 bg-white rounded-lg shadow ">
@@ -85,8 +84,12 @@ function SupplierOrders() {
                             >
                                 <td className="p-3 text-sm text-indigo-600 font-medium">{c.id}</td>
                                 <td className="p-3 text-sm text-gray-800">{c.customer.name}</td>
-                                <td className="p-3 text-sm text-gray-800"><span className={` ${c.address && c.address.length > 0}` ? 'bg-green-100 px-2 py-1 rounded-full text-green-800' : 'bg-red-100 px-2 py-1 rounded-full text-green-800'}>{c.address && c.address.length > 0 ? c.address : 'not delivery'}</span>
+                                <td className="p-3 text-sm text-gray-800">
+                                    <span className={` ${c.address && c.address.length > 0}` ? 'bg-green-100 px-2 py-1 rounded-full text-green-800' : 'bg-red-100 px-2 py-1 rounded-full text-green-800'}>
+                                        {c.address && c.address.length > 0 ? c.address : 'not delivery'}
+                                    </span>
                                 </td>
+
                                 <td className="p-3 text-sm text-gray-500">
                                     {new Date(c.createdAt).toLocaleDateString('en-GB', {
                                         day: 'numeric',
@@ -98,18 +101,19 @@ function SupplierOrders() {
                                 <td className="p-3 text-sm text-gray-800 font-medium">{c.totalPrice}</td>
                                 <td className="p-3 text-sm">
                                     <select
-                                        value={c.status}  
-                                        onChange={e => handleStatus(e.target.value , c.id)}
-                                        className={`px-2 py-1 rounded-full text-xs font-medium ${c.status === 'PROCESSING' ? 'bg-red-200 text-blue-800' : 'bg-blue-100 text-blue-800'
-                                            }`}
+                                        value={c.status || "PROCESSING"} // ✅ Ensure default value if undefined
+                                        onChange={e => handleStatus(e.target.value, c.id)}
+                                        className={`px-2 py-1 rounded-full text-xs font-medium outline-none 
+                                        ${c.status === 'PROCESSING' ? 'bg-red-200 text-blue-800' : 'bg-blue-100 text-blue-800'}`}
                                     >
+                                        <option value="PENDING">PENDING</option>
                                         <option value="PROCESSING">PROCESSING</option>
                                         <option value="SHIPPED">SHIPPED</option>
                                         <option value="DELIVERED">DELIVERED</option>
                                         <option value="CANCELLED">CANCELLED</option>
                                     </select>
-
                                 </td>
+
                             </tr>
                         ))}
                         {order.length === 0 && (
