@@ -387,7 +387,7 @@ router.delete('/delete-account/:id', async (req, res) => {
         }
 
         await prisma.bank.delete({ where: { id: Number(id) } });
-        res.status(200).json({status:true, message: "Bank record deleted successfully." });
+        res.status(200).json({ status: true, message: "Bank record deleted successfully." });
 
 
     } catch (err) {
@@ -400,10 +400,52 @@ router.delete('/delete-account/:id', async (req, res) => {
 // get order
 
 router.get('/get-order', async (req, res) => {
-    try {
-        const order = await prisma.order.findMany()
 
-        return res.status(200).json({ status: true, result: order })
+    const token = req.cookies['t-auth-token']
+
+    if (!token) {
+        return res.status(400).json({ status: false, message: 'no token provide' })
+    }
+
+    const decoded = jwt.verify(token, process.env.SUPPLIER_KEY)
+
+    const supplierId = parseInt(decoded.id)
+
+    try {
+        const order = await prisma.order.findMany({
+            where: { supplierId: supplierId },
+
+            include: {
+                customer: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
+        })
+
+        return res.status(200).json({ status: true, order })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({ status: false, error: 'server error' })
+    }
+})
+
+// update the status of order 
+
+router.put('/update-order-status/:id', async (req, res) => {
+    const { id } = req.params
+    const { status } = req.body
+
+    try {
+        await prisma.order.update({
+            where: { id: parseInt(id) },
+            data : {
+                status:status
+            }
+        })
+
+        return res.status(200).json({ status: true, message:`order updated in to ${status}` })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ status: false, error: 'server error' })

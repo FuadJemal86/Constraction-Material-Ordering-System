@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import api from '../../api';
+import toast, { Toaster } from 'react-hot-toast';
 
-function SupplierOrders({ orders = [] }) {
+function SupplierOrders() {
     // Status badge colors
+
+    const [order, setOrder] = useState([])
+    const [statusState, setStatusState] = useState({
+        status: ''
+    })
     const getStatusBadgeColor = (status) => {
         const statusColors = {
             Completed: "bg-green-100 text-green-800",
@@ -13,9 +20,49 @@ function SupplierOrders({ orders = [] }) {
         return statusColors[status] || "bg-gray-100 text-gray-800";
     };
 
+    useEffect(() => {
+        
+        feaheOrder()
+    },[])
+
+    const feaheOrder = async () => {
+        try {
+            const result = await api.get('/supplier/get-order')
+            if (result.data.status) {
+                setOrder(result.data.order)
+            } else {
+                console.log(result.data.message)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    const handleStatus = async (newStatus , id) => {
+
+
+        try {
+            const result = await api.put(`/supplier/update-order-status/${id}`, {
+                ...statusState,
+                status: newStatus
+            })
+            if (result.data.status) {
+                setStatusState(prev => ({ ...prev, status: newStatus }));
+                toast.success(result.data.message)
+                feaheOrder()
+            } else {
+                console.log(result.data.message)
+            }
+        } catch (err) {
+            console.log(err)
+            toast.error(err.response.data.message)
+        }
+    }
+
     return (
         <div className="p-4 mt-16 bg-white rounded-lg shadow ">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Supplier Orders</h2>
+            <Toaster position="top-center" reverseOrder={false} />
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Customer Orders</h2>
 
             {/* Desktop View */}
             <div className="hidden md:block overflow-x-auto">
@@ -31,24 +78,41 @@ function SupplierOrders({ orders = [] }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map((order, index) => (
+                        {order.map((c, index) => (
                             <tr
-                                key={order.id || index}
+                                key={c.id || index}
                                 className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
                             >
-                                <td className="p-3 text-sm text-indigo-600 font-medium">{order.id}</td>
-                                <td className="p-3 text-sm text-gray-800">{order.customer}</td>
-                                <td className="p-3 text-sm text-gray-800">{order.address}</td>
-                                <td className="p-3 text-sm text-gray-500">{order.date}</td>
-                                <td className="p-3 text-sm text-gray-800 font-medium">{order.totalPrice}</td>
+                                <td className="p-3 text-sm text-indigo-600 font-medium">{c.id}</td>
+                                <td className="p-3 text-sm text-gray-800">{c.customer.name}</td>
+                                <td className="p-3 text-sm text-gray-800"><span className={` ${c.address && c.address.length > 0}` ? 'bg-green-100 px-2 py-1 rounded-full text-green-800' : 'bg-red-100 px-2 py-1 rounded-full text-green-800'}>{c.address && c.address.length > 0 ? c.address : 'not delivery'}</span>
+                                </td>
+                                <td className="p-3 text-sm text-gray-500">
+                                    {new Date(c.createdAt).toLocaleDateString('en-GB', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric'
+                                    }).replace(' ', '.')}
+                                </td>
+
+                                <td className="p-3 text-sm text-gray-800 font-medium">{c.totalPrice}</td>
                                 <td className="p-3 text-sm">
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(order.status)}`}>
-                                        {order.status}
-                                    </span>
+                                    <select
+                                        value={c.status}  
+                                        onChange={e => handleStatus(e.target.value , c.id)}
+                                        className={`px-2 py-1 rounded-full text-xs font-medium ${c.status === 'PROCESSING' ? 'bg-red-200 text-blue-800' : 'bg-blue-100 text-blue-800'
+                                            }`}
+                                    >
+                                        <option value="PROCESSING">PROCESSING</option>
+                                        <option value="SHIPPED">SHIPPED</option>
+                                        <option value="DELIVERED">DELIVERED</option>
+                                        <option value="CANCELLED">CANCELLED</option>
+                                    </select>
+
                                 </td>
                             </tr>
                         ))}
-                        {orders.length === 0 && (
+                        {order.length === 0 && (
                             <tr>
                                 <td colSpan="6" className="p-4 text-center text-gray-500">
                                     No orders found
@@ -61,7 +125,7 @@ function SupplierOrders({ orders = [] }) {
 
             {/* Mobile View */}
             <div className="md:hidden space-y-3">
-                {orders.map((order, index) => (
+                {order.map((order, index) => (
                     <div key={order.id || index} className="border rounded-lg overflow-hidden">
                         <div className="p-3 border-b bg-gray-50 flex justify-between">
                             <span className="font-medium text-indigo-600">{order.id}</span>
@@ -72,7 +136,7 @@ function SupplierOrders({ orders = [] }) {
                         <div className="p-3">
                             <div className="grid grid-cols-3 gap-1 mb-2">
                                 <span className="text-xs text-gray-500">Customer:</span>
-                                <span className="text-sm col-span-2">{order.customer}</span>
+                                <span className="text-sm col-span-2">{'order.customer'}</span>
                             </div>
                             <div className="grid grid-cols-3 gap-1 mb-2">
                                 <span className="text-xs text-gray-500">Address:</span>
@@ -80,7 +144,7 @@ function SupplierOrders({ orders = [] }) {
                             </div>
                             <div className="grid grid-cols-3 gap-1 mb-2">
                                 <span className="text-xs text-gray-500">Date:</span>
-                                <span className="text-sm col-span-2">{order.date}</span>
+                                <span className="text-sm col-span-2">{'order.date'}</span>
                             </div>
                             <div className="grid grid-cols-3 gap-1">
                                 <span className="text-xs text-gray-500">Total:</span>
@@ -89,7 +153,7 @@ function SupplierOrders({ orders = [] }) {
                         </div>
                     </div>
                 ))}
-                {orders.length === 0 && (
+                {order.length === 0 && (
                     <div className="text-center p-4 border rounded-lg text-gray-500">
                         No orders found
                     </div>
