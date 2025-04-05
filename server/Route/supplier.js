@@ -19,7 +19,7 @@ router.use(cookieParser());
 
 
 
-// sign up 
+
 
 
 // uplode images
@@ -35,6 +35,8 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage: storage
 })
+
+// sign up 
 
 router.post('/sign-up', async (req, res) => {
     try {
@@ -54,6 +56,11 @@ router.post('/sign-up', async (req, res) => {
             return res.status(400).json({ status: false, message: 'Invalid License Number format' });
         }
 
+        const licenseExists = await prisma.supplier.findFirst({ where: { licenseNumber } });
+        if (licenseExists) {
+            return res.status(409).json({ status: false, message: 'Account with this license number already exists' });
+        }
+
         const isExist = await prisma.supplier.findUnique({ where: { email } });
 
         if (isExist) {
@@ -62,7 +69,7 @@ router.post('/sign-up', async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        await prisma.supplier.create({
+        const supplier = await prisma.supplier.create({
             data: {
                 companyName,
                 email,
@@ -71,16 +78,31 @@ router.post('/sign-up', async (req, res) => {
                 tinNumber,
                 licenseNumber,
                 password: hashedPassword,
-                lat,   // Store latitude
-                lng    // Store longitude
+                lat,
+                lng
             }
+        });
+
+        // Generate JWT
+        const token = jwt.sign(
+            { supplier: true, email: supplier.email, id: supplier.id },
+            process.env.SUPPLIER_KEY,
+            { expiresIn: '30d' }
+        );
+
+        // Set cookie
+        res.cookie('s-auth-token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
+            sameSite: 'lax'
         });
 
         return res.status(200).json({ status: true, message: 'Supplier registered successfully' });
 
     } catch (err) {
-        console.log(err);
-        return res.status(500).json({ status: false, error: 'Server error' });
+        console.error('Sign-up error:', err);
+        return res.status(500).json({ status: false, message: 'Server error' });
     }
 });
 
@@ -109,7 +131,7 @@ router.post('/login', async (req, res) => {
             supplier: true, email: supplier.email, id: supplier.id
         }, process.env.SUPPLIER_KEY, { expiresIn: "30d" })
 
-        res.cookie("t-auth-token", token, {
+        res.cookie("s-auth-token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             maxAge: 24 * 60 * 60 * 1000,
@@ -146,7 +168,7 @@ router.get('/get-category', async (req, res) => {
 router.post('/add-product', upload.single('image'), async (req, res) => {
     try {
 
-        const token = req.cookies["t-auth-token"];
+        const token = req.cookies["s-auth-token"];
         if (!token) {
             return res.status(401).json({ status: false, message: 'Unauthorized, no token found' });
         }
@@ -187,7 +209,7 @@ router.post('/add-product', upload.single('image'), async (req, res) => {
 
 router.get('/get-product', async (req, res) => {
 
-    const token = req.cookies['t-auth-token'];
+    const token = req.cookies['s-auth-token'];
 
     if (!token) {
         return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });
@@ -196,6 +218,8 @@ router.get('/get-product', async (req, res) => {
 
         const decoded = jwt.verify(token, process.env.SUPPLIER_KEY)
         const supplierId = decoded.id
+
+        console.log(supplierId)
 
 
         const product = await prisma.product.findMany({
@@ -296,7 +320,7 @@ router.put('/update-product/:id', upload.single('image'), async (req, res) => {
 
 router.get('/get-account', async (req, res) => {
 
-    const token = req.cookies['x-auth-token'];
+    const token = req.cookies['s-auth-token'];
 
     if (!token) {
         return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });
@@ -323,7 +347,7 @@ router.get('/get-account', async (req, res) => {
 
 router.post('/add-account', async (req, res) => {
 
-    const token = req.cookies['t-auth-token']
+    const token = req.cookies['s-auth-token']
 
     if (!token) {
         return res.status(401).json({ valid: false, message: "Unauthorized: No token provided" });
@@ -387,7 +411,7 @@ router.delete('/delete-account/:id', async (req, res) => {
 
 router.get('/get-order', async (req, res) => {
 
-    const token = req.cookies['t-auth-token']
+    const token = req.cookies['s-auth-token']
 
     if (!token) {
         return res.status(400).json({ status: false, message: 'no token provide' })
@@ -446,7 +470,7 @@ router.put('/update-order-status/:id', async (req, res) => {
 // get payment
 
 router.get('/get-payment', async (req, res) => {
-    const token = req.cookies['t-auth-token']
+    const token = req.cookies['s-auth-token']
 
     if (!token) {
         return res.status(400).json({ status: false, message: 'token not provide' })

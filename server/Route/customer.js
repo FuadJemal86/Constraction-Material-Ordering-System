@@ -347,7 +347,6 @@ router.get('/get-pending-payment/:id', async (req, res) => {
             }
         })
 
-        return res.status(200).json({ status: true, paymentStatus: pendingSatus })
     } catch (err) {
         console.error(err);
         return res.status(500).json({ status: false, error: "Server error" });
