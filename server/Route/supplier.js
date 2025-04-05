@@ -154,42 +154,28 @@ router.post('/add-product', upload.single('image'), async (req, res) => {
         const decoded = jwt.verify(token, process.env.SUPPLIER_KEY);
         const supplierId = decoded.id;
 
-        const { name, price, stock, categoryId, unit, deliveryPricePerKm, bankName, account } = req.body;
+        const { name, price, stock, categoryId, unit, deliveryPricePerKm } = req.body;
 
         if (!req.file) {
             return res.status(400).json({ status: false, message: 'Image is required' });
         }
 
 
-        prisma.$transaction([
-            prisma.product.create({
-                data: {
-                    name,
-                    price: parseFloat(price),
-                    stock: parseInt(stock),
-                    supplierId,
-                    categoryId: parseInt(categoryId),
-                    unit,
-                    deliveryPricePerKm: parseFloat(deliveryPricePerKm),
-                    image: req.file ? req.file.filename : null,
-                },
-            }),
-            prisma.bank.create({
-                data: {
-                    supplierId,
-                    bankName,
-                    account,
-                },
-            }),
-        ])
-            .then(([product, bank]) => {
-                console.log("Product created:", product);
-                console.log("Bank created:", bank);
-                return res.status(200).json({ status: 200, message: 'product add' })
-            })
-            .catch((error) => {
-                console.error("Transaction failed:", error);
-            });
+        await prisma.product.create({
+            data: {
+                name,
+                price: parseFloat(price),
+                stock: parseInt(stock),
+                supplierId,
+                categoryId: parseInt(categoryId),
+                unit,
+                deliveryPricePerKm: parseFloat(deliveryPricePerKm),
+                image: req.file ? req.file.filename : null,
+            },
+        })
+
+        return res.status(200).json({ status: 200, message: 'product add' })
+
 
     } catch (err) {
         console.error(err);
@@ -424,6 +410,10 @@ router.get('/get-order', async (req, res) => {
             }
         })
 
+        if (order == 0) {
+            return res.status(400).json({ status: false, message: 'order not found' })
+        }
+
         return res.status(200).json({ status: true, order })
     } catch (err) {
         console.log(err)
@@ -476,7 +466,7 @@ router.get('/get-payment', async (req, res) => {
                         select: {
                             id: true,
                             name: true,
-                            phone:true
+                            phone: true
                         }
                     }
                 }
@@ -494,6 +484,10 @@ router.get('/get-payment', async (req, res) => {
                 transactionId: { in: transactionIds }
             }
         });
+
+        if (actualPayments == 0) {
+            return res.status(400).json({ status: false, message: 'payment not found' })
+        }
 
         const transactionToCustomerMap = {};
         orders.forEach(o => {

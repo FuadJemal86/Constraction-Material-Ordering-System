@@ -105,7 +105,7 @@ function Payment() {
 
                                         onChange={e => handleStatus(e.target.value, c.id)}
 
-                                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(c.status)}`}>
+                                        className={`px-2 py-1 rounded-full text-xs font-medium outline-none ${getStatusBadgeColor(c.status)}`}>
                                         <option value="PENDING">PENDING</option>
                                         <option value="COMPLETED">COMPLETED</option>
                                         <option value="FAILED">FAILED</option>

@@ -54,7 +54,8 @@ function AddProduct() {
             return toast.error('Please provide delivery price per kilometer');
         }
 
-        if (accounts.length === 0) {
+        if (supplierAccount.length == 0) {
+
             return toast.error('Please add at least one bank account');
         }
 
