@@ -98,7 +98,7 @@ function SupplierOrders() {
                                     }).replace(' ', '.')}
                                 </td>
 
-                                <td className="p-3 text-sm text-gray-800 font-medium">{c.totalPrice}</td>
+                                <td className="p-3 text-sm text-gray-800 font-medium">birr {c.totalPrice}</td>
                                 <td className="p-3 text-sm">
                                     <select
                                         value={c.status || "PROCESSING"} // ✅ Ensure default value if undefined

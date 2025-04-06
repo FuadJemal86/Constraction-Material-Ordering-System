@@ -16,6 +16,7 @@ import CustomerSignIn from './components/customer/CustomerSignIn';
 import SignUp from './components/customer/SignUp';
 import Nearby from './components/SupplyNav/Nearby';
 import PaymentForm from './components/order cards/PaymentForm';
+import OrderItem from './components/SupplyNav/OrderItem';
 
 
 
@@ -39,6 +40,7 @@ function App() {
                     <Route path='product' element={<Product />} />
                     <Route path='add-product' element={<AddProduct />} />
                     <Route path='payment' element={<Payment />} />
+                    <Route path='order-item' element={<OrderItem />} />
                 </Route>
             </Routes>
         </Router>
