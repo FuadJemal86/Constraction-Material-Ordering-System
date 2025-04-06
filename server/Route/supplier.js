@@ -468,41 +468,54 @@ router.put('/update-order-status/:id', async (req, res) => {
 
 // get order item
 
-router.get('/get-order-item' , async(req , res) => {
+router.get('/get-order-item', async (req, res) => {
     const token = req.cookies['s-auth-token']
 
-    if(!token) {
-        return res.status(400).json({status:false , message:'no token provide'})
+    if (!token) {
+        return res.status(400).json({ status: false, message: 'no token provide' })
     }
 
-    const decoded = jwt.verify(token , process.env.SUPPLIER_KEY)
+    const decoded = jwt.verify(token, process.env.SUPPLIER_KEY)
 
     const supplierId = parseInt(decoded.id)
 
     try {
-        const order = await prisma.order.findMany({
-            where: {supplierId:supplierId},
-            select : {
-                id:true
-            }
-        })
+        const orders = await prisma.order.findMany({
+            where: { supplierId: supplierId },
+            select: { id: true },
+        });
 
-        const orderId = order.id
+        const orderIds = orders.map(order => order.id);
+
+        if (orderIds.length === 0) {
+            return res.status(200).json({ status: true, orderItem: [] });
+        }
 
         const orderItem = await prisma.orderitem.findMany({
-            where : {orderId : orderId} ,
+            where: {
+                orderId: { in: orderIds },
+            },
+            include: {
+                order: {
+                    include: {
+                        customer: true,
+                    },
+                },
+                product: {
+                    select: {
+                        name: true,
+                        category: true,
+                    },
+                },
+            },
+        });
 
-            include : {
-                product:true,
-            }
-            
-        })
-
-        return res.status(200).json({status:true , orderItem})
-    } catch(err) {
-        console.log(err)
-        return res.status(500).json({status:false , message: 'server error'})
+        return res.status(200).json({ status: true, orderItem });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ status: false, message: 'Server error' });
     }
+
 })
 
 
