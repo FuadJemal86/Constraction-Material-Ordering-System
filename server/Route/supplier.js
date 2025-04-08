@@ -505,7 +505,7 @@ router.get('/get-order-item', async (req, res) => {
                     select: {
                         name: true,
                         category: true,
-                    },
+                    },  
                 },
             },
         });

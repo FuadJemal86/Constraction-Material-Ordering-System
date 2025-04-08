@@ -36,6 +36,7 @@ function SignIn() {
             return toast.error(err.response.data.message || 'An error occurred. Please try again.')
         }
     }
+
     return (
         <div>
             <div className="flex flex-col lg:flex-row justify-center items-center min-h-screen gap-8 lg:gap-32 p-4 bg-gradient-to-br from-gray-50 to-gray-100">
