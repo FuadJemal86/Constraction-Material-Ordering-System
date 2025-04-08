@@ -101,16 +101,10 @@ function Payment() {
                                     }).replace(' ', '.')}
                                 </td>
                                 <td className="p-3 text-sm">
-                                    <select value={c.status}
-
-                                        onChange={e => handleStatus(e.target.value, c.id)}
-
+                                    <span
                                         className={`px-2 py-1 rounded-full text-xs font-medium outline-none ${getStatusBadgeColor(c.status)}`}>
-                                        <option value="PENDING">PENDING</option>
-                                        <option value="COMPLETED">COMPLETED</option>
-                                        <option value="FAILED">FAILED</option>
-                                        <option value="REFUNDED">REFUNDED</option>
-                                    </select>
+                                        {c.status}
+                                    </span>
                                 </td>
                             </tr>
                         ))}

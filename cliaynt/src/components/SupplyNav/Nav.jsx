@@ -21,16 +21,10 @@ function Nav() {
                                 <Package /><Link to={'order'} className='w-full pl-1'>Orders</Link>
                             </li>
                             <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'>
-                                <ShoppingCart /><Link to={'order-item'} className='w-full pl-1'>Order Item</Link>
-                            </li>
-                            <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'>
                                 <Box /><Link to={'product'} className='w-full pl-1'>Products</Link>
                             </li>
                             <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'>
                                 <CreditCard /><Link to={'payment'} className='w-full pl-1'>Payments</Link>
-                            </li>
-                            <li className='hover:bg-slate-700 w-full p-1 transition cursor-pointer rounded-md hover:text-white flex gap-2'>
-                                <MessageCircle /><Link className='w-full pl-1'>Messages</Link>
                             </li>
                         </ul>
                     </nav>

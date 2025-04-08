@@ -468,32 +468,15 @@ router.put('/update-order-status/:id', async (req, res) => {
 
 // get order item
 
-router.get('/get-order-item', async (req, res) => {
-    const token = req.cookies['s-auth-token']
+router.get('/get-order-item/:id', async (req, res) => {
 
-    if (!token) {
-        return res.status(400).json({ status: false, message: 'no token provide' })
-    }
+    const { id } = parseInt(req.params)
 
-    const decoded = jwt.verify(token, process.env.SUPPLIER_KEY)
-
-    const supplierId = parseInt(decoded.id)
 
     try {
-        const orders = await prisma.order.findMany({
-            where: { supplierId: supplierId },
-            select: { id: true },
-        });
-
-        const orderIds = orders.map(order => order.id);
-
-        if (orderIds.length === 0) {
-            return res.status(200).json({ status: true, orderItem: [] });
-        }
-
         const orderItem = await prisma.orderitem.findMany({
             where: {
-                orderId: { in: orderIds },
+                id: id,
             },
             include: {
                 order: {
@@ -505,7 +488,7 @@ router.get('/get-order-item', async (req, res) => {
                     select: {
                         name: true,
                         category: true,
-                    },  
+                    },
                 },
             },
         });
