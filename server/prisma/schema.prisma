@@ -148,6 +148,7 @@ model supplier {
   password      String
   phone         String
   address       String
+  isActive      Boolean  @default(true)
   lat            Float
   lng            Float 
   tinNumber     String   @unique(map: "Supplier_tinNumber_key") @db.VarChar(10)

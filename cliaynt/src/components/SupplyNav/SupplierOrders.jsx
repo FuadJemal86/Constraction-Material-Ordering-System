@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import api from '../../api';
 import toast, { Toaster } from 'react-hot-toast';
 import { Edit, Trash2, Eye } from "lucide-react";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 function SupplierOrders() {
     // Status badge colors
@@ -82,6 +84,41 @@ function SupplierOrders() {
         }
     }
 
+    // print the customer table
+    const handlePrint = () => {
+        const printContent = document.getElementById("order-table");
+        const WindowPrt = window.open('', '', 'width=900,height=650');
+        WindowPrt.document.write(`
+                <html>
+                    <head>
+                        <title>Customer</title>
+                        <style>
+                            body { font-family: Arial; padding: 20px; }
+                            table { width: 100%; border-collapse: collapse; }
+                            th, td { padding: 8px; border: 1px solid #ccc; }
+                            th { background: #f0f0f0; }
+                        </style>
+                    </head>
+                    <body>${printContent.innerHTML}</body>
+                </html>
+            `);
+        WindowPrt.document.close();
+        WindowPrt.focus();
+        WindowPrt.print();
+        WindowPrt.close();
+    };
+
+    //  export Excel file
+    const exportToExcel = () => {
+        const ws = XLSX.utils.json_to_sheet(customer);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Customers");
+
+        const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+        const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+        saveAs(data, "Customers.xlsx");
+    };
+
 
 
     return (
@@ -90,7 +127,21 @@ function SupplierOrders() {
             <h2 className="text-xl font-bold text-gray-800 mb-4">Customer Orders</h2>
 
             {/* Desktop View */}
-            <div className="hidden md:block overflow-x-auto">
+            <div className="hidden md:block overflow-x-auto" id='order-table'>
+                <div className="flex justify-end mb-4 gap-2">
+                    <button
+                        onClick={handlePrint}
+                        className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        🖨️ Print
+                    </button>
+                    <button
+                        onClick={exportToExcel}
+                        className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700"
+                    >
+                        📥 Excel
+                    </button>
+                </div>
                 <table className="w-full border-collapse">
                     <thead className="bg-gray-50">
                         <tr>
