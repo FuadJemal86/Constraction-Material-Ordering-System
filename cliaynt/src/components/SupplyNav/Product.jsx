@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import api from '../../api';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 function Product({ orders = [] }) {
 
-    const [product , setProduct] = useState([])
+    const [product, setProduct] = useState([])
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     const getStatusBadgeColor = (status) => {
         const statusColors = {
@@ -18,34 +22,90 @@ function Product({ orders = [] }) {
     }
 
     useEffect(() => {
+        fetchData()
+    }, [])
 
-        const feachData = async() => {
-            try {
-                const result = await api.get('/supplier/get-product')
+    const fetchData = async () => {
+        try {
+            const result = await api.get(`/supplier/get-product?page=${page}&limit=10`)
 
-                if(result.data.status) {
+            if (result.data.status) {
+                setProduct(result.data.result)
+                setPage(result.data.currentPage);
+                setTotalPages(result.data.totalPages);
 
-                    setProduct(result.data.result)
-
-                } else {
-                    console.log(result.data.message)
-                }
-            } catch(err) {
-                console.log(err) 
+            } else {
+                console.log(result.data.message)
             }
-
+        } catch (err) {
+            console.log(err)
         }
-        feachData()
-    },[])
+    }
+
+    // print the customer table
+    const handlePrint = () => {
+        const printContent = document.getElementById("order-table");
+        const WindowPrt = window.open('', '', 'width=900,height=650');
+        WindowPrt.document.write(`
+                    <html>
+                        <head>
+                            <title>Customer</title>
+                            <style>
+                                body { font-family: Arial; padding: 20px; }
+                                table { width: 100%; border-collapse: collapse; }
+                                th, td { padding: 8px; border: 1px solid #ccc; }
+                                th { background: #f0f0f0; }
+                            </style>
+                        </head>
+                        <body>${printContent.innerHTML}</body>
+                    </html>
+                `);
+        WindowPrt.document.close();
+        WindowPrt.focus();
+        WindowPrt.print();
+        WindowPrt.close();
+    };
+
+    //  export Excel file
+    const exportToExcel = () => {
+        const ws = XLSX.utils.json_to_sheet(customer);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Customers");
+
+        const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+        const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+        saveAs(data, "Customers.xlsx");
+    };
+
     return (
         <div>
             <div className="p-4 mt-16 bg-white rounded-lg shadow ">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">Product</h2>
 
+
+
                 {/* Desktop View */}
                 <div className="hidden md:block overflow-x-auto">
-                    <div className='flex justify-end '>
-                        <Link to={'/supplier-page/add-product'} className='bg-blue-950 p-2 mb-2 rounded-lg text-gray-300'>Post Product</Link>
+
+                    <div className='flex justify-end gap-2'>
+                        <div className="flex justify-end mb-4 gap-2">
+                            <button
+                                onClick={handlePrint}
+                                className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                            >
+                                🖨️ Print
+                            </button>
+                            <button
+                                onClick={exportToExcel}
+                                className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700"
+                            >
+                                📥 Excel
+                            </button>
+                        </div>
+                        <span className=''>
+                            <Link to={'/supplier-page/add-product'} className='bg-blue-950 flex items-center rounded-lg text-gray-300 px-4 py-2'>Post Product</Link>
+                        </span>
+
                     </div>
                     <table className="w-full border-collapse">
                         <thead className="bg-gray-50">
@@ -85,6 +145,34 @@ function Product({ orders = [] }) {
                             )}
                         </tbody>
                     </table>
+                    <div className="flex justify-center items-center mt-6 space-x-2">
+                        <button
+                            disabled={page === 1}
+                            onClick={() => fetchData(page - 1)}
+                            className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
+                        >
+                            Prev
+                        </button>
+
+                        {Array.from({ length: totalPages }, (_, index) => index + 1).map(num => (
+                            <button
+                                key={num}
+                                onClick={() => fetchData(num)}
+                                className={`px-3 py-1 border rounded ${num === page ? 'bg-indigo-500 text-white' : 'bg-white text-gray-700'
+                                    } hover:bg-indigo-100`}
+                            >
+                                {num}
+                            </button>
+                        ))}
+
+                        <button
+                            disabled={page === totalPages}
+                            onClick={() => fetchData(page + 1)}
+                            className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
+                        >
+                            Next
+                        </button>
+                    </div>
                 </div>
 
                 {/* Mobile View */}
@@ -115,7 +203,36 @@ function Product({ orders = [] }) {
                                     <span className="text-sm col-span-2 font-medium">{order.totalPrice}</span>
                                 </div>
                             </div>
+                            <div className="flex justify-center items-center mt-6 space-x-2">
+                                <button
+                                    disabled={page === 1}
+                                    onClick={() => fetchData(page - 1)}
+                                    className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
+                                >
+                                    Prev
+                                </button>
+
+                                {Array.from({ length: totalPages }, (_, index) => index + 1).map(num => (
+                                    <button
+                                        key={num}
+                                        onClick={() => fetchData(num)}
+                                        className={`px-3 py-1 border rounded ${num === page ? 'bg-indigo-500 text-white' : 'bg-white text-gray-700'
+                                            } hover:bg-indigo-100`}
+                                    >
+                                        {num}
+                                    </button>
+                                ))}
+
+                                <button
+                                    disabled={page === totalPages}
+                                    onClick={() => fetchData(page + 1)}
+                                    className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
+                                >
+                                    Next
+                                </button>
+                            </div>
                         </div>
+
                     ))}
                     {orders.length === 0 && (
                         <div className="text-center p-4 border rounded-lg text-gray-500">

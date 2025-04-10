@@ -208,6 +208,9 @@ router.post('/add-product', upload.single('image'), async (req, res) => {
 // get all product
 
 router.get('/get-product', async (req, res) => {
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
+    const skip = (page - 1) * limit
 
     const token = req.cookies['s-auth-token'];
 
@@ -222,12 +225,24 @@ router.get('/get-product', async (req, res) => {
         console.log(supplierId)
 
 
-        const product = await prisma.product.findMany({
-            where: { supplierId: supplierId },
-            include: { category: true }
-        });
+        const [product, totalProduct] = await Promise.all([
+            prisma.product.findMany({
+                skip,
+                take: limit,
+                orderBy: { createdAt: 'desc' },
+                where: { supplierId: supplierId },
+                include: { category: true }
+            }),
+            prisma.product.count()
 
-        return res.status(200).json({ status: true, result: product })
+        ]);
+
+        return res.status(200).json({
+            status: true,
+            result: product,
+            totalPages: Math.ceil(totalProduct / limit),
+            currentPage: page,
+        })
 
     } catch (err) {
         console.log(err)
@@ -522,7 +537,11 @@ router.get('/get-order-item/:id', async (req, res) => {
 // get payment
 
 router.get('/get-payment', async (req, res) => {
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
+    const skip = (page - 1) * 10
     const token = req.cookies['s-auth-token']
+
 
     if (!token) {
         return res.status(400).json({ status: false, message: 'token not provide' })
@@ -555,11 +574,14 @@ router.get('/get-payment', async (req, res) => {
 
         const transactionIds = orders.map(o => o.transactionId);
 
-        const actualPayments = await prisma.payment.findMany({
-            where: {
-                transactionId: { in: transactionIds }
-            }
-        });
+        const [actualPayments, totalPayment] = await Promise.all([
+            prisma.payment.findMany({
+                where: {
+                    transactionId: { in: transactionIds }
+                }
+            }),
+            prisma.payment.count()
+        ]);
 
         if (actualPayments == 0) {
             return res.status(400).json({ status: false, message: 'payment not found' })
@@ -575,8 +597,12 @@ router.get('/get-payment', async (req, res) => {
             customer: transactionToCustomerMap[payment.transactionId] || null
         }));
 
-        return res.status(200).json({ status: true, payments: enrichedPayments });
-
+        return res.status(200).json({
+            status: true,
+            payments: enrichedPayments,
+            totalPages: Math.ceil(totalPayment / limit),
+            currentPage: page,
+        });
 
     } catch (err) {
         console.log(err)

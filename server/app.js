@@ -3,7 +3,8 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const { supplier } = require('./Route/supplier');
 const { customer } = require('./Route/customer');
-const { admin } = require('./Route/admin');
+const adminRout = require('./Route/adminRout')
+
 
 
 const app = express()
@@ -19,7 +20,7 @@ app.use(cors({
 app.use(express.static('public'));
 app.use('/supplier', supplier);
 app.use('/customer', customer);
-app.use('/admin', admin)
+app.use('/admin', adminRout)
 
 
 

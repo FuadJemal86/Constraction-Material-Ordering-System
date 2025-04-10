@@ -2,10 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import api from '../../api';
 import toast, { Toaster } from 'react-hot-toast';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 function Payment() {
 
     const [paymentStatus, setPaymentStatus] = useState([])
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const [status, setStatus] = useState({
         status: ''
     })
@@ -13,37 +17,18 @@ function Payment() {
 
     useEffect(() => {
 
-        feachPayment()
+        fetchData()
 
     }, [])
 
-    const feachPayment = async () => {
+    const fetchData = async () => {
         try {
-            const result = await api.get('/supplier/get-payment')
+            const result = await api.get(`/supplier/get-payment?page=${page}&limit=10`)
 
             if (result.data.status) {
                 setPaymentStatus(result.data.payments)
-                console.log(result.data.payments)
-            } else {
-                console.log(result.data.message)
-            }
-        } catch (err) {
-            console.log(err)
-        }
-    }
-
-    const handleStatus = async (newStatus, id) => {
-        try {
-            const result = await api.put(`/supplier/update-payment-status/${id}`, {
-                ...status,
-                status: newStatus
-            })
-
-            if (result.data.status) {
-                setStatus({ status: newStatus })
-                feachPayment()
-                toast.success(result.data.message)
-
+                setPage(result.data.currentPage);
+                setTotalPages(result.data.totalPages);
             } else {
                 console.log(result.data.message)
             }
@@ -63,10 +48,61 @@ function Payment() {
 
         return statusColors[status] || "bg-gray-100 text-gray-800";
     }
+
+    // print the customer table
+    const handlePrint = () => {
+        const printContent = document.getElementById("order-table");
+        const WindowPrt = window.open('', '', 'width=900,height=650');
+        WindowPrt.document.write(`
+                        <html>
+                            <head>
+                                <title>Customer</title>
+                                <style>
+                                    body { font-family: Arial; padding: 20px; }
+                                    table { width: 100%; border-collapse: collapse; }
+                                    th, td { padding: 8px; border: 1px solid #ccc; }
+                                    th { background: #f0f0f0; }
+                                </style>
+                            </head>
+                            <body>${printContent.innerHTML}</body>
+                        </html>
+                    `);
+        WindowPrt.document.close();
+        WindowPrt.focus();
+        WindowPrt.print();
+        WindowPrt.close();
+    };
+
+    //  export Excel file
+    const exportToExcel = () => {
+        const ws = XLSX.utils.json_to_sheet(customer);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Customers");
+
+        const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+        const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+        saveAs(data, "Customers.xlsx");
+    };
+
     return (
         <div className="p-4 mt-16 bg-white rounded-lg shadow ">
             <Toaster position="top-center" reverseOrder={false} />
             <h2 className="text-xl font-bold text-gray-800 mb-4">Payment</h2>
+
+            <div className="flex justify-end mb-4 gap-2">
+                <button
+                    onClick={handlePrint}
+                    className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                    🖨️ Print
+                </button>
+                <button
+                    onClick={exportToExcel}
+                    className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700"
+                >
+                    📥 Excel
+                </button>
+            </div>
 
             {/* Desktop View */}
             <div className="hidden md:block overflow-x-auto">
@@ -117,6 +153,34 @@ function Payment() {
                         )}
                     </tbody>
                 </table>
+                <div className="flex justify-center items-center mt-6 space-x-2">
+                    <button
+                        disabled={page === 1}
+                        onClick={() => fetchData(page - 1)}
+                        className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
+                    >
+                        Prev
+                    </button>
+
+                    {Array.from({ length: totalPages }, (_, index) => index + 1).map(num => (
+                        <button
+                            key={num}
+                            onClick={() => fetchData(num)}
+                            className={`px-3 py-1 border rounded ${num === page ? 'bg-indigo-500 text-white' : 'bg-white text-gray-700'
+                                } hover:bg-indigo-100`}
+                        >
+                            {num}
+                        </button>
+                    ))}
+
+                    <button
+                        disabled={page === totalPages}
+                        onClick={() => fetchData(page + 1)}
+                        className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
 
             {/* Mobile View */}
@@ -157,7 +221,36 @@ function Payment() {
                                 </span>
                             </div>
                         </div>
+                        <div className="flex justify-center items-center mt-6 space-x-2">
+                            <button
+                                disabled={page === 1}
+                                onClick={() => fetchData(page - 1)}
+                                className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
+                            >
+                                Prev
+                            </button>
+
+                            {Array.from({ length: totalPages }, (_, index) => index + 1).map(num => (
+                                <button
+                                    key={num}
+                                    onClick={() => fetchData(num)}
+                                    className={`px-3 py-1 border rounded ${num === page ? 'bg-indigo-500 text-white' : 'bg-white text-gray-700'
+                                        } hover:bg-indigo-100`}
+                                >
+                                    {num}
+                                </button>
+                            ))}
+
+                            <button
+                                disabled={page === totalPages}
+                                onClick={() => fetchData(page + 1)}
+                                className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
+                            >
+                                Next
+                            </button>
+                        </div>
                     </div>
+
                 ))}
                 {paymentStatus.length === 0 && (
                     <div className="text-center p-4 border rounded-lg text-gray-500">
