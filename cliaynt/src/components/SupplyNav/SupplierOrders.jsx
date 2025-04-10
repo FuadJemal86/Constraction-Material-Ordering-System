@@ -9,6 +9,8 @@ function SupplierOrders() {
     // Status badge colors
 
     const [order, setOrder] = useState([])
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const [orderItem, setOrderItem] = useState([])
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [statusState, setStatusState] = useState({
@@ -27,14 +29,16 @@ function SupplierOrders() {
 
     useEffect(() => {
 
-        feaheOrder()
+        fetchData()
     }, [])
 
-    const feaheOrder = async () => {
+    const fetchData = async () => {
         try {
-            const result = await api.get('/supplier/get-order')
+            const result = await api.get(`/supplier/get-order?page=${page}&limit=10`)
             if (result.data.status) {
                 setOrder(result.data.order)
+                setPage(result.data.currentPage);
+                setTotalPages(result.data.totalPages);
             } else {
                 console.log(result.data.message)
             }
@@ -205,6 +209,34 @@ function SupplierOrders() {
                         )}
                     </tbody>
                 </table>
+                <div className="flex justify-center items-center mt-6 space-x-2">
+                    <button
+                        disabled={page === 1}
+                        onClick={() => fetchData(page - 1)}
+                        className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
+                    >
+                        Prev
+                    </button>
+
+                    {Array.from({ length: totalPages }, (_, index) => index + 1).map(num => (
+                        <button
+                            key={num}
+                            onClick={() => fetchData(num)}
+                            className={`px-3 py-1 border rounded ${num === page ? 'bg-indigo-500 text-white' : 'bg-white text-gray-700'
+                                } hover:bg-indigo-100`}
+                        >
+                            {num}
+                        </button>
+                    ))}
+
+                    <button
+                        disabled={page === totalPages}
+                        onClick={() => fetchData(page + 1)}
+                        className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
             {isModalOpen && (
                 <div className="hidden md:flex fixed inset-0 bg-gray-600 bg-opacity-50 justify-center items-center z-50">

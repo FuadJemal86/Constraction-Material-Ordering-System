@@ -411,6 +411,10 @@ router.delete('/delete-account/:id', async (req, res) => {
 
 router.get('/get-order', async (req, res) => {
 
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.body.limit) || 10
+    const skip = (page - 1) * limit
+
     const token = req.cookies['s-auth-token']
 
     if (!token) {
@@ -422,23 +426,37 @@ router.get('/get-order', async (req, res) => {
     const supplierId = parseInt(decoded.id)
 
     try {
-        const order = await prisma.order.findMany({
-            where: { supplierId: supplierId },
+        const [order, orderCount] = await Promise.all([
+            prisma.order.findMany({
+                skip,
+                take: limit,
+                orderBy: { createdAt: 'desc' },
+                where: { supplierId: supplierId },
 
-            include: {
-                customer: {
-                    select: {
-                        name: true
+                include: {
+                    customer: {
+                        select: {
+                            name: true
+                        }
                     }
                 }
-            }
-        })
+            }),
+            prisma.order.count()
+        ])
 
         if (order == 0) {
-            return res.status(400).json({ status: false, message: 'order not found' })
+            return res.status(400).json({
+                status: false,
+                message: 'order not found'
+            })
         }
 
-        return res.status(200).json({ status: true, order })
+        return res.status(200).json({
+            status: true,
+            order,
+            totalPages: Math.ceil(orderCount / limit),
+            currentPage: page,
+        })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ status: false, error: 'server error' })
