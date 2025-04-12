@@ -215,11 +215,13 @@ router.post('/place-order', async (req, res) => {
                         unitPrice: parseFloat(p.unitPrice, 10),
                         subtotal: parseFloat(p.quantity * p.unitPrice, 10)
                     }))
-
                 }
             },
             include: { orderitem: true }
         });
+
+        console.log("Products being ordered:", products);
+
 
         console.log(newOrder)
 
