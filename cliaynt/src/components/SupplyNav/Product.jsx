@@ -79,11 +79,11 @@ function Product({ orders = [] }) {
 
     return (
         <div>
+            <span className='flex justify-end mt-2'>
+                <Link to={'/supplier-page/add-product'} className='bg-blue-950 flex items-center rounded-lg text-gray-300 px-4 py-2'>Post Product</Link>
+            </span>
             <div className="p-4 mt-16 bg-white rounded-lg shadow ">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">Product</h2>
-
-
-
                 {/* Desktop View */}
                 <div className="hidden md:block overflow-x-auto">
 
@@ -102,9 +102,6 @@ function Product({ orders = [] }) {
                                 📥 Excel
                             </button>
                         </div>
-                        <span className=''>
-                            <Link to={'/supplier-page/add-product'} className='bg-blue-950 flex items-center rounded-lg text-gray-300 px-4 py-2'>Post Product</Link>
-                        </span>
 
                     </div>
                     <table className="w-full border-collapse">
