@@ -15,7 +15,7 @@ function ShoppingCart({ onClose }) {
     // Map related state
     const mapRef = useRef(null);
     const [map, setMap] = useState(null);
-    const [orderId , setOrderId] = useState([])
+    const [orderId , setOrderId] = useState()
     const [isPayment , setPayment] = useState(false)
     const [userMarker, setUserMarker] = useState(null);
     const [userLocation, setUserLocation] = useState(null);
@@ -31,6 +31,7 @@ function ShoppingCart({ onClose }) {
         deliveryOption: "pickup", // Default to pickup
         address: ""
     });
+
 
     // Cart calculations
     const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -250,7 +251,8 @@ function ShoppingCart({ onClose }) {
                 products: cart.map(item => ({
                     productId: item.id,
                     quantity: item.quantity,
-                    unitPrice: item.price
+                    unitPrice: item.price,
+                    supplierId: item.supplierId,
                 }))
             };
 
@@ -262,10 +264,12 @@ function ShoppingCart({ onClose }) {
 
             const result = await api.post('/customer/place-order', orderData);
             if (result.data.status) {
-                setOrderId(result.data.orderId)
+                
+                setOrderId(result.data.customer)
+                console.log(result.data.customer)
                 toast.success(result.data.message);
                 setPayment(true)
-                navigator(`/products/payment-form/${result.data.orderId}`)
+                navigator(`/products/payment-form/${result.data.customer}`)
 
                 onClose(); // Close cart modal after order
             } else {

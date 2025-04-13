@@ -16,6 +16,7 @@ function PaymentForm() {
     const [cartItems, setCartItems] = useState([]);
     const [paymentPayed, setPaymentPayed] = useState([])
     const [supplierDetails, setSupplierDetails] = useState(null);
+    const [previewImage, setPreviewImage] = useState()
     const [isCloth, setCloth] = useState(true)
     const [account, setAccount] = useState([])
     const [payment, setPayment] = useState({
@@ -55,9 +56,15 @@ function PaymentForm() {
 
     }
 
+    if (!id) {
+        return toast.error('id emplty')
+    }
+
 
     const handleSubmit = async (c) => {
         c.preventDefault()
+
+        console.log(`id is ${id}`)
 
         const formData = new FormData()
 

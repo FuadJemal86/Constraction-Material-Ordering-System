@@ -4,6 +4,13 @@ import { Link } from 'react-router-dom'
 import api from '../../api';
 import toast from 'react-hot-toast';
 import { useCart } from "../CartContext";
+import {
+    User,
+    Settings,
+    Clock,
+    CheckCircle,
+    Package
+} from "lucide-react";
 
 function HeaderProfile() {
     // Core state management
@@ -52,7 +59,6 @@ function HeaderProfile() {
                     // console.log('Payment statuses:', result.data.paymentStatuses);
                     setPaymentStatuses(result.data.paymentStatuses);
                     setOrderStatus(result.data.orders)
-                    console.log(result.data.orders)
                 } else {
                     toast.error(result.data.message);
                 }
@@ -73,35 +79,47 @@ function HeaderProfile() {
                 </button>
                 <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                     <div className="p-4">
+                        <div className='mb-2'>
+                            <Link to={'/my-account'} className='flex items-center justify-between mb-2 hover:bg-slate-400 py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900'>
+                                <span className='p-1'>
+                                    <User />
+                                </span>
+                                <span className='font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white '>My Account</span>
+                            </Link>
+                        </div>
+
+                        <div className="mb-2">
+                            <Link className="flex items-center justify-between mb-2 hover:bg-slate-400 py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900">
+                                <span className='p-1'>
+                                    <Clock />
+                                </span>
+                                <span className="font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white  ">pending payment</span> {paymentStatus.filter(c => c.status === 'PENDING').length}
+                            </Link>
+                        </div>
+
+                        <div className="mb-2">
+                            <Link className="flex items-center justify-between mb-2 hover:bg-slate-400 py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900">
+                                <span className='p-1'>
+                                    <CheckCircle />
+                                </span>
+                                <span className="font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white">completed payment</span> {paymentStatus.filter(c => c.status === 'COMPLETED').length}
+                            </Link>
+                        </div>
+
                         <div>
-                            <div>
-                                <span>My Account</span>
-                            </div>
-                            <div>
-                                <span>Setting</span>
-                            </div>
+                            <Link className="flex items-center justify-between mb-2 dark:text-white py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900">
+                                <span className='p-1'>
+                                    <Package />
+                                </span>
+                                <span className="font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white">recent order</span> {orderStatus.filter(c => c.status === 'PENDING').length}
+                            </Link>
                         </div>
-                        {/* Pending Payments */}
-                        <div className="mb-4">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">PENDING PAYMENTS</h3> {paymentStatus.filter(c => c.status === 'PENDING').length}
-                            </div>
-                        </div>
-
-                        {/* Completed Payments */}
-                        <div className="mb-4">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">COMPLETED PAYMENTS</h3> {paymentStatus.filter(c => c.status === 'COMPLETED').length}
-                            </div>
-                        </div>
-
-
-                        {/* Orders Section */}
-                        <div>
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">RECENT ORDERS</h3> {orderStatus.filter(c => c.status === 'PENDING').length}
-                            </div>
-                        </div>
+                        <Link className='flex items-center justify-between mb-2 dark:text-white py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900'>
+                            <span className='p-1'>
+                                <Settings />
+                            </span>
+                            <span className='font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white'>setting</span>
+                        </Link>
                     </div>
                 </div>
             </span>

@@ -77,7 +77,6 @@ function Header() {
                     // console.log('Payment statuses:', result.data.paymentStatuses);
                     setPaymentStatuses(result.data.paymentStatuses);
                     setOrderStatus(result.data.orders)
-                    console.log(result.data.orders)
                 } else {
                     toast.error(result.data.message);
                 }
@@ -115,16 +114,6 @@ function Header() {
                                 <li><Link to="/category" className="hover:text-yellow-500 transition-colors">Category</Link></li>
                                 <li><Link to="/about" className="hover:text-yellow-500 transition-colors">About Us</Link></li>
                                 <li><Link to="/contact" className="hover:text-yellow-500 transition-colors">Contact</Link></li>
-                                <div>
-                                    {count > 0 && (
-                                        <Link to="/orders" className="group flex items-center">
-                                            <span className="text-sm md:text-base font-medium mr-1.5 transition-colors group-hover:text-yellow-500">Orders</span>
-                                            <span className="flex items-center justify-center h-6 w-6 md:h-7 md:w-7 bg-yellow-500 text-white text-xs md:text-sm font-bold rounded-full transform transition-transform group-hover:scale-110">
-                                                {count}
-                                            </span>
-                                        </Link>
-                                    )}
-                                </div>
                             </ul>
                         </nav>
                     </div>

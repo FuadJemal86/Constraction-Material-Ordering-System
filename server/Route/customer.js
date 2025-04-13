@@ -177,58 +177,99 @@ router.post('/place-order', async (req, res) => {
     const token = req.cookies["x-auth-token"];
 
     if (!token) {
-        return res.status(401).json({ valid: false, message: "login first" });
+        return res.status(401).json({ valid: false, message: "Login first" });
     }
 
-    let customerId
+    let customerId;
     try {
         const decoded = jwt.verify(token, process.env.CUSTOMER_KEY);
-        customerId = parseInt(decoded.id, 10)
+        customerId = parseInt(decoded.id, 10);
     } catch (err) {
         return res.status(401).json({ valid: false, message: "Invalid token" });
     }
 
     try {
-        const { supplierId, address, latitude, longitude, deliveryOption, products } = req.body;
+        const { address, latitude, longitude, deliveryOption, products } = req.body;
 
         if (!Array.isArray(products) || products.length === 0) {
             return res.status(400).json({ status: false, message: "Invalid cart data" });
         }
 
-        let totalPrice = products.reduce((sum, p) => sum + (p.quantity * p.unitPrice), 0);
-        const transactionId = uuidv4();
-
-        const newOrder = await prisma.order.create({
-            data: {
-                customerId,
-                supplierId,
-                address,
-                latitude,
-                longitude,
-                deliveryOption,
-                totalPrice,
-                transactionId,
-                orderitem: {
-                    create: products.map(p => ({
-                        productId: parseInt(p.productId, 10),
-                        quantity: parseInt(p.quantity, 10),
-                        unitPrice: parseFloat(p.unitPrice, 10),
-                        subtotal: parseFloat(p.quantity * p.unitPrice, 10)
-                    }))
-                }
-            },
-            include: { orderitem: true }
+        // Group products by supplierId
+        const productsBySupplier = {};
+        products.forEach(p => {
+            const supplierId = p.supplierId;
+            if (!productsBySupplier[supplierId]) {
+                productsBySupplier[supplierId] = [];
+            }
+            productsBySupplier[supplierId].push(p);
         });
 
-        console.log("Products being ordered:", products);
+        const createdOrders = [];
 
+        for (const [supplierId, groupProducts] of Object.entries(productsBySupplier)) {
+            const totalPrice = groupProducts.reduce((sum, p) => sum + p.quantity * p.unitPrice, 0);
+            const transactionId = uuidv4();
 
-        console.log(newOrder)
+            const orderItems = [];
 
-        return res.status(201).json({ status: true, message: "Order placed successfully", orderId: newOrder.id });
+            for (const p of groupProducts) {
+                const productId = parseInt(p.productId, 10);
+                const quantity = parseInt(p.quantity, 10);
+                const unitPrice = parseFloat(p.unitPrice);
+
+                if (!productId || !quantity || isNaN(unitPrice)) {
+                    return res.status(400).json({ status: false, message: "Invalid product data in cart" });
+                }
+
+                orderItems.push({
+                    product: {
+                        connect: { id: productId }
+                    },
+                    quantity,
+                    unitPrice,
+                    subtotal: quantity * unitPrice,
+                });
+            }
+
+            const newOrder = await prisma.order.create({
+                data: {
+                    customer: {
+                        connect: { id: customerId }
+                    },
+                    supplier: {
+                        connect: { id: parseInt(supplierId, 10) }
+                    },
+                    address,
+                    latitude,
+                    longitude,
+                    deliveryOption,
+                    totalPrice,
+                    transactionId,
+                    orderitem: {
+                        create: orderItems
+                    }
+                },
+                include: { orderitem: true },
+            });
+
+            createdOrders.push({
+                customer: newOrder.customerId,
+                supplierId: newOrder.supplierId,
+                totalPrice: newOrder.totalPrice,
+            });
+
+        }
+
+        return res.status(201).json({
+            status: true,
+            customer: customerId,
+            message: "Orders placed successfully",
+            orders: createdOrders,
+        });
 
     } catch (error) {
-        console.error(error);
+        console.error("Order creation error:", error);
         return res.status(500).json({ status: false, error: "Server error" });
     }
 });
@@ -280,12 +321,17 @@ router.post('/make-payment/:id', upload.single('image'), async (req, res) => {
     const { id } = req.params;
     const { bankTransactionId, bankId } = req.body;
 
+    if(!id) {
+        return res.status(400).json({status: false , message:'Order Not Found'})
+    }
+
     try {
-        const order = await prisma.order.findUnique({
-            where: { id: parseInt(id) },
+        const order = await prisma.order.findFirst({
+            where: { customerId: parseInt(id) },
             select: {
                 transactionId: true,
-                totalPrice: true
+                totalPrice: true,
+                customer: true
             }
         });
 
@@ -314,7 +360,8 @@ router.post('/make-payment/:id', upload.single('image'), async (req, res) => {
             }
         });
 
-        return res.status(201).json({ status: true, message: "Payment successful", payment: newPayment });
+        return res.status(201).json({ status: true, message: "Payment submitted and pending confirmation"
+            , payment: newPayment });
 
     } catch (err) {
         console.error(err);
@@ -381,11 +428,11 @@ router.get('/get-payment-status', async (req, res) => {
                 select: { id: true, transactionId: true, status: true, totalPrice: true }
             }),
             prisma.payment.findMany({
-                where: { 
+                where: {
                     transactionId: {
                         in: (await prisma.order.findMany({
                             where: { customerId },
-                            select: { id:true , transactionId: true , status: true  , totalPrice:true }
+                            select: { id: true, transactionId: true, status: true, totalPrice: true }
                         })).map(order => order.transactionId)
                     }
                 },
