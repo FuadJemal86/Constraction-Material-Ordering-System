@@ -3,26 +3,24 @@ import Setting from './Setting';
 import RecentOrder from './RecentOrder';
 import api from '../../api';
 import toast from 'react-hot-toast';
+import { User , Camera } from 'lucide-react';
 
 
 function MyAccount() {
     const [activeTab, setActiveTab] = useState('profile');
     const [editMode, setEditMode] = useState(false);
+    const [imageSrc, setImageSrc] = useState(null);
+    const [imageFile, setImageFile] = useState(null);
 
     // Example user data
-    const [userData, setUserData] = useState({
-        name: "John Smith",
-        email: "john.smith@example.com",
-        phone: "(555) 123-4567",
-        address: "123 Main Street, Anytown, ST 12345"
-    });
+    const [userData, setUserData] = useState({});
 
     useEffect(() => {
         const feachData = async () => {
             try {
-                const result = await api.get('/customer/get-profile')
+                const result = await api.get('/customer/my-account')
                 if (result.data.status) {
-                    setUserData(result.data.customer)
+                    setUserData(result.data.user[0])
                 } else {
                     toast.error(result.data.message)
                 }
@@ -31,8 +29,7 @@ function MyAccount() {
             }
         }
         feachData()
-    })
-
+    },[])
 
     // Form handlers
     const handleInputChange = (e) => {
@@ -48,6 +45,19 @@ function MyAccount() {
         // Submit logic would go here
         setEditMode(false);
     };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setImageSrc(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     return (
         <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
             <h1 className="text-2xl md:text-3xl font-bold mb-6">My Account</h1>
@@ -90,6 +100,47 @@ function MyAccount() {
                         </button>
                     </div>
 
+                    {/* Profile Picture Area */}
+                    <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
+                        <div className="relative">
+                            <div className="h-32 w-32 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center border-4 border-gray-100 dark:border-gray-600">
+                                {imageSrc ? (
+                                    <img
+                                        src={imageSrc}
+                                        alt="Profile"
+                                        className="h-full w-full object-cover"
+                                    />
+                                ) : (
+                                    <User size={64} className="text-gray-400" />
+                                )}
+                            </div>
+
+                            {editMode && (
+                                <label htmlFor="profile-upload" className="absolute bottom-0 right-0 bg-yellow-500 p-2 rounded-full cursor-pointer shadow-md hover:bg-yellow-600 transition-colors">
+                                    <Camera size={16} className="text-white" />
+                                    <input
+                                        type="file"
+                                        id="profile-upload"
+                                        className="hidden"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                    />
+                                </label>
+                            )}
+                        </div>
+
+                        <div className="text-center md:text-left">
+                            <h3 className="text-lg font-medium">{userData.name || 'Your Name'}</h3>
+                            <p className="text-gray-500 dark:text-gray-400">{userData.email || 'your.email@example.com'}</p>
+                            {editMode && (
+                                <p className="text-sm mt-2 text-gray-500 max-w-md">
+                                    Upload a new profile picture by clicking the camera icon.
+                                    For best results, use an image at least 400×400 pixels.
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
                     {editMode ? (
                         <form onSubmit={handleSubmit}>
                             <div className="grid md:grid-cols-2 gap-6">
@@ -98,7 +149,7 @@ function MyAccount() {
                                     <input
                                         type="text"
                                         name="name"
-                                        value={userData.name}
+                                        value={userData.name || ''}
                                         onChange={handleInputChange}
                                         className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md dark:bg-gray-700"
                                     />
@@ -108,7 +159,7 @@ function MyAccount() {
                                     <input
                                         type="email"
                                         name="email"
-                                        value={userData.email}
+                                        value={userData.email || ''}
                                         onChange={handleInputChange}
                                         className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md dark:bg-gray-700"
                                     />
@@ -118,7 +169,7 @@ function MyAccount() {
                                     <input
                                         type="tel"
                                         name="phone"
-                                        value={userData.phone}
+                                        value={userData.phone || ''}
                                         onChange={handleInputChange}
                                         className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md dark:bg-gray-700"
                                     />
@@ -128,7 +179,7 @@ function MyAccount() {
                                     <input
                                         type="text"
                                         name="address"
-                                        value={userData.address}
+                                        value={userData.address || ''}
                                         onChange={handleInputChange}
                                         className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md dark:bg-gray-700"
                                     />
@@ -147,19 +198,19 @@ function MyAccount() {
                         <div className="grid md:grid-cols-2 gap-6">
                             <div>
                                 <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Full Name</h3>
-                                <p className="mt-1">{userData.name}</p>
+                                <p className="mt-1">{userData.name || '-'}</p>
                             </div>
                             <div>
                                 <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Email Address</h3>
-                                <p className="mt-1">{userData.email}</p>
+                                <p className="mt-1">{userData.email || '-'}</p>
                             </div>
                             <div>
                                 <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone Number</h3>
-                                <p className="mt-1">{userData.phone}</p>
+                                <p className="mt-1">{userData.phone || '-'}</p>
                             </div>
                             <div>
                                 <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Address</h3>
-                                <p className="mt-1">{userData.address}</p>
+                                <p className="mt-1">{userData.address || '-'}</p>
                             </div>
                         </div>
                     )}

@@ -5,6 +5,7 @@ const { supplier } = require('./Route/supplier');
 const { customer } = require('./Route/customer');
 const adminRout = require('./Route/adminRout');
 const {admin} = require('./Route/admin');
+const customerRout = require('./Route/customerRout');
 
 
 
@@ -20,7 +21,7 @@ app.use(cors({
 
 app.use(express.static('public'));
 app.use('/supplier', supplier);
-app.use('/customer', customer);
+app.use('/customer', customerRout);
 app.use('/admin', admin)
 
 

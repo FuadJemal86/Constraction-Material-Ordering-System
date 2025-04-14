@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Minus, Plus, MapPin, Wrench } from 'lucide-react';
+import { X, Minus, Plus, MapPin, Wrench  , user} from 'lucide-react';
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import { useCart } from "../CartContext";
 import { Link, useNavigate } from 'react-router-dom';

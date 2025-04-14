@@ -1,5 +1,4 @@
 const prisma = require("../../prismaCliaynt");
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const getCustomerAccount = async(req , res) => {
@@ -10,7 +9,7 @@ const getCustomerAccount = async(req , res) => {
     }
     const decoded = jwt.verify(token , process.env.SUPPLIER_KEY)
 
-    const customerId = decoded.id
+    const customerId = parseInt(decoded.id)
 
     try {
         const user = await prisma.customer.findMany({
@@ -24,4 +23,4 @@ const getCustomerAccount = async(req , res) => {
     } 
 }
 
-module.exports = getCustomerAccount
+module.exports = {getCustomerAccount}

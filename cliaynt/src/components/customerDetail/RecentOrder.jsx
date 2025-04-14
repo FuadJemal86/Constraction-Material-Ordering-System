@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import api from '../../api';
 
 function RecentOrder() {
     // Example order history
@@ -7,6 +8,26 @@ function RecentOrder() {
         { id: "ORD-2025-002", date: "March 28, 2025", status: "In Progress", total: "$189.50" },
         { id: "ORD-2025-003", date: "February 15, 2025", status: "Cancelled", total: "$78.25" }
     ];
+
+    const [customerOrder , setCustomer] = useState([])
+
+    useEffect(() => {
+        const feachOrder = async() => {
+            try {
+                const result = await api.get('/customer/get-order')
+
+                if(result.data.status) {
+                    setCustomer(result.data.order)
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch(err) {
+                console.log(err)
+            }
+        }
+
+        feachOrder()
+    },[])
     return (
         <div>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
