@@ -13,6 +13,7 @@ const { updateOrderStatus } = require('../controllers/supplier controllers/updat
 const { getPament } = require('../controllers/supplier controllers/getPyment')
 const { getOrderItem } = require('../controllers/supplier controllers/get.orderItem')
 const { getProduct } = require('../controllers/supplier controllers/get.product')
+const { editCustomerProfile } = require('../controllers/supplier controllers/edit.account')
 
 const router = express.Router()
 
@@ -30,4 +31,5 @@ router.get('/update-order-status/:id' , updateOrderStatus)
 router.get('/get-payment' , getPament)
 router.get('/get-order-item/:id' , getOrderItem)
 router.get('/get-product' , getProduct)
+router.put('/update-customer-account' , editCustomerProfile)
 module.exports = router

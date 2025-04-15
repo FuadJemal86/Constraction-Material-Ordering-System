@@ -11,6 +11,12 @@ function MyAccount() {
     const [editMode, setEditMode] = useState(false);
     const [imageSrc, setImageSrc] = useState(null);
     const [imageFile, setImageFile] = useState(null);
+    const [customerInfo, setCustomerInfo] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        image: ''
+    })
 
     // Example user data
     const [userData, setUserData] = useState({});
@@ -57,6 +63,32 @@ function MyAccount() {
             reader.readAsDataURL(file);
         }
     };
+
+
+    const handleSubmitAccount = async (c) => {
+
+        c.preventDefault()
+
+        const formData = new FormData();
+
+        formData.append('name', customerInfo.name)
+        formData.append('email', customerInfo.email)
+        formData.append('email', customerInfo.email)
+        formData.append('image', customerInfo.image)
+
+        try {
+            const result = await api.post('/customer/update-customer-account', formData)
+            if (result.data.status) {
+                toast.success(result.data.message)
+            } else {
+                toast.error(result.data.message)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+
+
+    }
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
@@ -113,6 +145,7 @@ function MyAccount() {
                                 ) : (
                                     <User size={64} className="text-gray-400" />
                                 )}
+
                             </div>
 
                             {editMode && (
