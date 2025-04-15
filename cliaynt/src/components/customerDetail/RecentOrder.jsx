@@ -2,32 +2,25 @@ import React, { useEffect, useState } from 'react'
 import api from '../../api';
 
 function RecentOrder() {
-    // Example order history
-    const orders = [
-        { id: "ORD-2025-001", date: "April 10, 2025", status: "Delivered", total: "$245.00" },
-        { id: "ORD-2025-002", date: "March 28, 2025", status: "In Progress", total: "$189.50" },
-        { id: "ORD-2025-003", date: "February 15, 2025", status: "Cancelled", total: "$78.25" }
-    ];
 
-    const [customerOrder , setCustomer] = useState([])
+    const [orders, setCustomer] = useState([])
 
     useEffect(() => {
-        const feachOrder = async() => {
+        const feachOrder = async () => {
             try {
                 const result = await api.get('/customer/get-order')
 
-                if(result.data.status) {
+                if (result.data.status) {
                     setCustomer(result.data.order)
                 } else {
                     console.log(result.data.message)
                 }
-            } catch(err) {
+            } catch (err) {
                 console.log(err)
             }
         }
-
         feachOrder()
-    },[])
+    }, [])
     return (
         <div>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
@@ -51,7 +44,13 @@ function RecentOrder() {
                                 {orders.map((order) => (
                                     <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <td className="px-6 py-4 whitespace-nowrap font-medium">{order.id}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{order.date}</td>
+                                        <td className="p-3 text-sm text-gray-500">
+                                            {new Date(order.createdAt).toLocaleDateString('en-GB', {
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric'
+                                            }).replace(' ', '.')}
+                                        </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className={`px-2 py-1 rounded-full text-xs ${order.status === 'Delivered' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
                                                 order.status === 'In Progress' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
@@ -60,7 +59,7 @@ function RecentOrder() {
                                                 {order.status}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{order.total}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{order.totalPrice}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right">
                                             <button className="text-yellow-500 hover:text-yellow-600 font-medium">
                                                 View Details

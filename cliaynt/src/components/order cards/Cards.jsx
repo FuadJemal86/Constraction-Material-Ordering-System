@@ -19,7 +19,7 @@ function Cards() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await api.get(`/supplier/get-products/${id}`)
+                const result = await api.get(`/customer/get-products/${id}`)
 
                 if (result.data.status) {
                     console.log(result.data.product)

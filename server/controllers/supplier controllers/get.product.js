@@ -1,9 +1,12 @@
 const prisma = require("../../prismaCliaynt");
+const jwt = require('jsonwebtoken')
 
 const getProduct =  async (req, res) => {
-    const page = parseInt(req.query.page) || 1
+    const page = parseInt(2)
     const limit = parseInt(req.query.limit) || 10
     const skip = (page - 1) * limit
+
+    console.log(page)
 
     const token = req.cookies['s-auth-token'];
 

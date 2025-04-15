@@ -6,9 +6,6 @@ const path = require('path');
 
 
 
-router.use(cookieParser());
-
-
 // uplode images
 
 const storage = multer.diskStorage({

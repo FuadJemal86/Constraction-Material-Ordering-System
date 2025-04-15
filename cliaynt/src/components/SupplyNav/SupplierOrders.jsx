@@ -29,23 +29,26 @@ function SupplierOrders() {
 
     useEffect(() => {
 
-        fetchData()
-    }, [])
-
-    const fetchData = async () => {
-        try {
-            const result = await api.get(`/supplier/get-order?page=${page}&limit=10`)
-            if (result.data.status) {
-                setOrder(result.data.order)
-                setPage(result.data.currentPage);
-                setTotalPages(result.data.totalPages);
-            } else {
-                console.log(result.data.message)
+        const fetchData = async () => {
+            console.log(page)
+            try {
+                const result = await api.get(`/supplier/get-order?page=${page}&limit=10`)
+                if (result.data.status) {
+                    setOrder(result.data.order)
+                    setPage(result.data.currentPage);
+                    setTotalPages(result.data.totalPages);
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
             }
-        } catch (err) {
-            console.log(err)
         }
-    }
+
+        fetchData()
+    }, [page])
+
+    
 
     const handleStatus = async (newStatus, id) => {
         try {
@@ -212,7 +215,7 @@ function SupplierOrders() {
                 <div className="flex justify-center items-center mt-6 space-x-2">
                     <button
                         disabled={page === 1}
-                        onClick={() => fetchData(page - 1)}
+                        onClick={() => setPage(page - 1)}
                         className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
                     >
                         Prev
@@ -221,7 +224,7 @@ function SupplierOrders() {
                     {Array.from({ length: totalPages }, (_, index) => index + 1).map(num => (
                         <button
                             key={num}
-                            onClick={() => fetchData(num)}
+                            onClick={() => setPage(num)}
                             className={`px-3 py-1 border rounded ${num === page ? 'bg-indigo-500 text-white' : 'bg-white text-gray-700'
                                 } hover:bg-indigo-100`}
                         >
@@ -231,7 +234,7 @@ function SupplierOrders() {
 
                     <button
                         disabled={page === totalPages}
-                        onClick={() => fetchData(page + 1)}
+                        onClick={() => setPage(page + 1)}
                         className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
                     >
                         Next

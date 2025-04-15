@@ -1,12 +1,36 @@
 const express = require('express')
 const { getCustomerAccount } = require('../controllers/customer controllers/supplier.getProfile')
 const { getCustomerOrder } = require('../controllers/customer controllers/supplier.getOrder')
+const { custoemrSignUp } = require('../controllers/customer controllers/signUp')
+const { customerLogin } = require('../controllers/customer controllers/login')
+const { verifyCustomerToken } = require('../controllers/customer controllers/validate.token')
+const { customerGetCategory } = require('../controllers/customer controllers/get.categoty')
+const { getSupplier } = require('../controllers/customer controllers/get.suppliers')
+const { customerPlaceOrder } = require('../controllers/customer controllers/place.order')
+const { customerGetTransaction } = require('../controllers/customer controllers/get.transaction')
+const { customerPayment } = require('../controllers/customer controllers/payment')
+const { customerNearbt } = require('../controllers/customer controllers/get.nearby')
+const { getCustomerPayment } = require('../controllers/customer controllers/get.paymentStatus')
+const { getProduct } = require('../controllers/customer controllers/get.products')
+const { getPendingOrder } = require('../controllers/customer controllers/customer.pending.payment')
 
 
 
 const router = express.Router()
 
+router.post('/sign-up' , custoemrSignUp)
 router.get('/my-account' , getCustomerAccount)
 router.get('/get-order' , getCustomerOrder )
+router.post('/login' , customerLogin)
+router.get('/verify-token' , verifyCustomerToken)
+router.get('/get-category' , customerGetCategory)
+router.get('/get-supplier' , getSupplier)
+router.post('/place-order' , customerPlaceOrder)
+router.get('/get-transitionId' , customerGetTransaction)
+router.post('/make-payment/:id' , customerPayment)
+router.get('/get-payment-status'  , getCustomerPayment)
+router.get('/nearby-suppliers' , customerNearbt)
+router.get('/get-products/:id' , getProduct)
+router.get('/get-pending-payment/:id' , getPendingOrder)
 
 module.exports = router;

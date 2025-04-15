@@ -3,7 +3,7 @@ import Setting from './Setting';
 import RecentOrder from './RecentOrder';
 import api from '../../api';
 import toast from 'react-hot-toast';
-import { User , Camera } from 'lucide-react';
+import { User, Camera } from 'lucide-react';
 
 
 function MyAccount() {
@@ -29,7 +29,7 @@ function MyAccount() {
             }
         }
         feachData()
-    },[])
+    }, [])
 
     // Form handlers
     const handleInputChange = (e) => {
@@ -170,16 +170,6 @@ function MyAccount() {
                                         type="tel"
                                         name="phone"
                                         value={userData.phone || ''}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md dark:bg-gray-700"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Address</label>
-                                    <input
-                                        type="text"
-                                        name="address"
-                                        value={userData.address || ''}
                                         onChange={handleInputChange}
                                         className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md dark:bg-gray-700"
                                     />

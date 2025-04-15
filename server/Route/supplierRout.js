@@ -10,6 +10,9 @@ const { addAcount } = require('../controllers/supplier controllers/add.account')
 const { deleteAccount } = require('../controllers/supplier controllers/delete.account')
 const { getOrder } = require('../controllers/supplier controllers/get.order')
 const { updateOrderStatus } = require('../controllers/supplier controllers/update.status.order')
+const { getPament } = require('../controllers/supplier controllers/getPyment')
+const { getOrderItem } = require('../controllers/supplier controllers/get.orderItem')
+const { getProduct } = require('../controllers/supplier controllers/get.product')
 
 const router = express.Router()
 
@@ -24,4 +27,7 @@ router.post('/add-account' , addAcount)
 router.delete('/delete-account/:id' , deleteAccount)
 router.get('/get-order' , getOrder)
 router.get('/update-order-status/:id' , updateOrderStatus)
+router.get('/get-payment' , getPament)
+router.get('/get-order-item/:id' , getOrderItem)
+router.get('/get-product' , getProduct)
 module.exports = router
