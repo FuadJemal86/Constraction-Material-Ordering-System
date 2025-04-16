@@ -11,12 +11,7 @@ function MyAccount() {
     const [editMode, setEditMode] = useState(false);
     const [imageSrc, setImageSrc] = useState(null);
     const [imageFile, setImageFile] = useState(null);
-    const [customerInfo, setCustomerInfo] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        image: ''
-    })
+
 
     // Example user data
     const [userData, setUserData] = useState({});
@@ -72,14 +67,6 @@ function MyAccount() {
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            setImageFile(null);
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                setImageSrc(null);
-            };
-            reader.readAsDataURL(file);
-        }
         
         setUserData({
             ...userData,
