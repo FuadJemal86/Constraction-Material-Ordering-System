@@ -4,26 +4,18 @@ import toast, { Toaster } from 'react-hot-toast';
 
 function Setting() {
 
-    const [password, setPassword] = useState({
-        password: ''
+    const [newPassword, setPassword] = useState({
+        passwors: ''
     })
     const [activeTap, setActioveTap] = useState(false)
 
-
-    const handleInputChange = () => {
-        const { name, value } = e.target;
-        setPassword({
-            ...password,
-            [name]: value
-        });
-    }
 
     const handelPasswordChange = async (c) => {
 
         c.preventDefault()
 
         try {
-            const result = await api.put('/customer/password-change', password)
+            const result = await api.put('/customer/password-change', newPassword)
 
             if (result.data.status) {
                 toast.success(result.data.message)
@@ -56,8 +48,8 @@ function Setting() {
                                     <input
                                         type="text"
                                         name="name"
-                                        value={password.name || ''}
-                                        onChange={handleInputChange}
+                                        placeholder='new password'
+                                        onChange={e => setPassword({...newPassword , password: e.target.value})}
                                         className="w-1/2 p-2 border border-gray-300 dark:border-gray-700 rounded-md dark:bg-gray-700"
                                     />
                                 </div>
