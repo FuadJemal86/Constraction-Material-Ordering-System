@@ -33,7 +33,7 @@ function PaymentForm() {
 
     useEffect(() => {
         const feachAccount = async () => {
-            const result = await api.get('/supplier/get-account')
+            const result = await api.get('/customer/get-account')
 
             try {
                 if (result.data.status) {

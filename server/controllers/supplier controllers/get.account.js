@@ -1,6 +1,7 @@
 // get-account
 
 const prisma = require("../../prismaCliaynt");
+const jwt = require('jsonwebtoken')
 
 
 const getAccount = async (req, res) => {

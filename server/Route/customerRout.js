@@ -13,6 +13,8 @@ const { customerNearbt } = require('../controllers/customer controllers/get.near
 const { getCustomerPayment } = require('../controllers/customer controllers/get.paymentStatus')
 const { getProduct } = require('../controllers/customer controllers/get.products')
 const { getPendingOrder } = require('../controllers/customer controllers/customer.pending.payment')
+const { getAccount } = require('../controllers/customer controllers/get.account')
+const { editCustomerProfile } = require('../controllers/supplier controllers/edit.account')
 
 
 
@@ -32,5 +34,7 @@ router.get('/get-payment-status'  , getCustomerPayment)
 router.get('/nearby-suppliers' , customerNearbt)
 router.get('/get-products/:id' , getProduct)
 router.get('/get-pending-payment/:id' , getPendingOrder)
+router.get('/get-account' , getAccount)
+router.put('/update-customer-account' , editCustomerProfile)
 
 module.exports = router;

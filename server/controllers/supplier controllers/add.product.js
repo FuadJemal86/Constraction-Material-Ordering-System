@@ -1,7 +1,7 @@
 const prisma = require("../../prismaCliaynt");
 const multer = require('multer')
 const path = require('path');
-
+const jwt = require('jsonwebtoken')
 
 
 
@@ -20,7 +20,7 @@ const upload = multer({
     storage: storage
 })
 
-const addProduct =  (upload.single('image'), async (req, res) => {
+const addProduct =  [upload.single('image'), async (req, res) => {
     try {
 
         const token = req.cookies["s-auth-token"];
@@ -58,6 +58,6 @@ const addProduct =  (upload.single('image'), async (req, res) => {
         console.error(err);
         res.status(500).json({ status: false, error: 'Server error' });
     }
-});
+}];
 
 module.exports = {addProduct}

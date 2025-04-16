@@ -18,7 +18,7 @@ const upload = multer({
     storage: storage
 })
 
-const updateProduct = (upload.single('image'), async (req, res) => {
+const updateProduct = [upload.single('image'), async (req, res) => {
 
     try {
         const { id } = req.params;
@@ -52,7 +52,7 @@ const updateProduct = (upload.single('image'), async (req, res) => {
         console.error('Error updating product:', err);
         return res.status(500).json({ status: false, error: 'Internal Server Error' });
     }
-});
+}];
 
 
 module.exports = {updateProduct}

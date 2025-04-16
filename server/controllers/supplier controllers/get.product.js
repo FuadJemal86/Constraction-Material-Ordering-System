@@ -2,7 +2,7 @@ const prisma = require("../../prismaCliaynt");
 const jwt = require('jsonwebtoken')
 
 const getProduct =  async (req, res) => {
-    const page = parseInt(2)
+    const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 10
     const skip = (page - 1) * limit
 

@@ -46,38 +46,19 @@ function MyAccount() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Submit logic would go here
-        setEditMode(false);
-    };
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImageFile(file);
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                setImageSrc(e.target.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-
-    const handleSubmitAccount = async (c) => {
-
-        c.preventDefault()
 
         const formData = new FormData();
 
-        formData.append('name', customerInfo.name)
-        formData.append('email', customerInfo.email)
-        formData.append('email', customerInfo.email)
-        formData.append('image', customerInfo.image)
+        formData.append('name', userData.name)
+        formData.append('email', userData.email)
+        formData.append('phone', userData.phone)
+        formData.append('image', userData.image || '');
+
 
         try {
-            const result = await api.post('/customer/update-customer-account', formData)
+            const result = await api.put('/customer/update-customer-account', formData)
             if (result.data.status) {
                 toast.success(result.data.message)
             } else {
@@ -86,9 +67,26 @@ function MyAccount() {
         } catch (err) {
             console.log(err)
         }
+        setEditMode(false);
+    };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(null);
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setImageSrc(null);
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        setUserData({
+            ...userData,
+            image: file
+        });
+    };
 
-    }
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
@@ -136,15 +134,18 @@ function MyAccount() {
                     <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
                         <div className="relative">
                             <div className="h-32 w-32 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center border-4 border-gray-100 dark:border-gray-600">
-                                {imageSrc ? (
+                                {userData.image && !imageSrc ? (
                                     <img
-                                        src={imageSrc}
+                                        src={`http://localhost:3032/images/${userData.image}`}
                                         alt="Profile"
                                         className="h-full w-full object-cover"
                                     />
+                                ) : imageSrc ? (
+                                    <img src={imageSrc} alt="Preview" className="h-full w-full object-cover" />
                                 ) : (
                                     <User size={64} className="text-gray-400" />
                                 )}
+
 
                             </div>
 
