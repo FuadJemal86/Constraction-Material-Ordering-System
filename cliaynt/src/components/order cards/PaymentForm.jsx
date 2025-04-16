@@ -37,7 +37,7 @@ function PaymentForm() {
 
             try {
                 if (result.data.status) {
-                    setAccount(result.data.result)
+                    setAccount(result.data.accounts || '')
                 } else {
                     console.log(result.data.message)
                 }
@@ -155,7 +155,7 @@ function PaymentForm() {
                                 <form className="space-y-4" onSubmit={handleSubmit}>
 
                                     <div className="grid grid-cols-1 gap-4">
-                                        <select className='w-full p-3 border rounded-lg focus:outline-none    focus:ring-2 focus:ring-blue-500'
+                                        <select className='w-full p-3 border rounded-lg focus:outline-none  focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 '
                                             onChange={e => setPayment({ ...payment, bankId: e.target.value })}
                                         >
                                             <option>
@@ -164,7 +164,7 @@ function PaymentForm() {
                                             {
                                                 account.map(c => (
                                                     <option key={c.id} value={c.id}>
-                                                        {c.bankName}: {c.account}
+                                                        {c.name}: {c.accountNumber}
                                                     </option>
                                                 ))
                                             }
@@ -176,7 +176,7 @@ function PaymentForm() {
                                             type="text"
                                             name="zipCode"
                                             placeholder="Bank Transaction Id"
-                                            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
                                             required
                                         />
                                     </div>

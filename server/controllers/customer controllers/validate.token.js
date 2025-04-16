@@ -20,7 +20,7 @@ const verifyToken = (req, res, next) => {
     }
 };
 
-const verifyCustomerToken =  (verifyToken, async (req, res) => {
+const verifyCustomerToken =  [verifyToken, async (req, res) => {
     try {
         const user = await prisma.customer.findUnique({
             where: { id: req.customer.id }
@@ -35,6 +35,6 @@ const verifyCustomerToken =  (verifyToken, async (req, res) => {
         console.error(error);
         res.status(500).json({ valid: false, message: "Server error" });
     }
-})
+}]
 
 module.exports = {verifyCustomerToken}

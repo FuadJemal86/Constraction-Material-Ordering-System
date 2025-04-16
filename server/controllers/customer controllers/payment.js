@@ -20,7 +20,7 @@ const upload = multer({
 
 
 
-const customerPayment =  (upload.single('image'), async (req, res) => {
+const customerPayment =  [upload.single('image'), async (req, res) => {
     const { id } = req.params;
     const { bankTransactionId, bankId } = req.body;
 
@@ -70,7 +70,7 @@ const customerPayment =  (upload.single('image'), async (req, res) => {
         console.error(err);
         return res.status(500).json({ status: false, error: "Server error" });
     }
-});
+}];
 
 
 module.exports = {customerPayment}
