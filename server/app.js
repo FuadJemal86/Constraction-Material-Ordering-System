@@ -23,7 +23,7 @@ app.use(cors({
 app.use(express.static('public'));
 app.use('/supplier', supplierRout);
 app.use('/customer', customerRout);
-app.use('/admin', admin)
+app.use('/admin', adminRout)
 
 
 

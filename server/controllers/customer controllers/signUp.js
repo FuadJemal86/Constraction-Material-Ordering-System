@@ -39,7 +39,7 @@ const custoemrSignUp = (upload.single('image'),async (req, res) => {
         const hashPassword = await bcrypt.hash(password, 10)
 
         await prisma.customer.create({
-            data: { name, email, password: hashPassword, phone  ,image}
+            data: { name, email, password: hashPassword, phone, image : req.file ? req.file.filename : null}
         })
 
         return res.status(200).json({ status: true, message: 'customer registed' })

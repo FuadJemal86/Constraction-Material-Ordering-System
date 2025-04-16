@@ -12,6 +12,7 @@ model admin {
   name      String
   email     String   @unique(map: "Admin_email_key")
   password  String
+  image     String?
   createdAt DateTime @default(now())
 }
 
@@ -35,7 +36,7 @@ model customer {
   email     String      @unique(map: "Customer_email_key")
   password  String
   phone     String?
-  image     String   
+  image     String?  
   isActive  Boolean     @default(true)
   createdAt DateTime    @default(now())
   complaint complaint[]
@@ -126,7 +127,7 @@ model product {
   price              Float
   stock              Int      @default(0)
   supplierId         Int
-  image              String
+  image              String?
   unit               String   @default("piece")
   createdAt          DateTime @default(now())
   offersDelivery     Boolean  @default(false)
@@ -146,6 +147,7 @@ model supplier {
   password      String
   phone         String
   address       String
+  image         String?
   isActive      Boolean  @default(true)
   lat           Float
   lng           Float

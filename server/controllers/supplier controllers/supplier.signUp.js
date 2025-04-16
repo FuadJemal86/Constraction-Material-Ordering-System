@@ -1,5 +1,6 @@
 const prisma = require("../../prismaCliaynt");
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
 
 
 const supplierUp =  async (req, res) => {
@@ -39,6 +40,7 @@ const supplierUp =  async (req, res) => {
                 email,
                 phone,
                 address,
+                image:null,
                 tinNumber,
                 licenseNumber,
                 password: hashedPassword,

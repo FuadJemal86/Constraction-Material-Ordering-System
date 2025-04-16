@@ -12,7 +12,7 @@ function SignUp() {
         email: '',
         password: '',
         phone: '',
-        image: null
+        image: ''
     })
 
 
