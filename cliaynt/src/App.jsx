@@ -19,6 +19,7 @@ import PaymentForm from './components/order cards/PaymentForm';
 import OrderItem from './components/SupplyNav/OrderItem';
 import MyAccount from './components/customerDetail/MyAccount';
 import ViewDetails from './components/customerDetail/ViewDetails';
+import PaymentTransaction from './components/customerDetail/PaymentTransaction';
 
 
 
@@ -29,9 +30,10 @@ function App() {
                 <Route path='/' element={<HomeParent />} />
                 <Route path='/sign-up' element={<Login />} />
                 <Route path='/sign-in' element={<SignIn />} />
-                <Route path='/order-items/:id' element = {<ViewDetails/>}/>
+                <Route path='/order-items/:id' element={<ViewDetails />} />
                 <Route path='/customer-sign-in' element={<CustomerSignIn />} />
                 <Route path='/customer-sign-up' element={<SignUp />} />
+                <Route path='/payment-transaction/:transactionId' element={<PaymentTransaction />} />
                 <Route path="/products" element={<OrderParent />}>
                     <Route path='/products/supplier-products/:id' element={<Cards />} />
                     <Route path='nearby' element={<Nearby />} />

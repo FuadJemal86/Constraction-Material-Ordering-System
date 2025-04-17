@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 const prisma = require('../../prismaCliaynt')
 
 const getCustomerPaymentStatus = async (req, res) => {
-    const token = req.cookies['t-auth-token']
+    const token = req.cookies['x-auth-token']
 
     if (!token) {
         return res.status(400).json({ status: false, message: 'no token provide' })
