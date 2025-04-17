@@ -16,6 +16,7 @@ const { getPendingOrder } = require('../controllers/customer controllers/custome
 const { getAccount } = require('../controllers/customer controllers/get.account')
 const { editCustomerProfile } = require('../controllers/supplier controllers/edit.account')
 const { updatePassword } = require('../controllers/customer controllers/update.password')
+const { getCustomerOrderItem } = require('../controllers/customer controllers/get.orderItem')
 
 
 
@@ -38,5 +39,6 @@ router.get('/get-pending-payment/:id' , getPendingOrder)
 router.get('/get-account' , getAccount)
 router.put('/update-customer-account' , editCustomerProfile)
 router.put('/password-change' , updatePassword)
+router.get('/get-order-item/:id', getCustomerOrderItem)
 
 module.exports = router;

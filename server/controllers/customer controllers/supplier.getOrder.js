@@ -17,6 +17,7 @@ const getCustomerOrder = async(req , res) => {
             where: {customerId: customerId},
 
             select: {
+                id:true,
                 customer: true,
                 supplierId: true,
                 totalPrice: true,

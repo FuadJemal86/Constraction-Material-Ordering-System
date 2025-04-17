@@ -18,6 +18,7 @@ import Nearby from './components/SupplyNav/Nearby';
 import PaymentForm from './components/order cards/PaymentForm';
 import OrderItem from './components/SupplyNav/OrderItem';
 import MyAccount from './components/customerDetail/MyAccount';
+import ViewDetails from './components/customerDetail/ViewDetails';
 
 
 
@@ -28,6 +29,7 @@ function App() {
                 <Route path='/' element={<HomeParent />} />
                 <Route path='/sign-up' element={<Login />} />
                 <Route path='/sign-in' element={<SignIn />} />
+                <Route path='/order-items/:id' element = {<ViewDetails/>}/>
                 <Route path='/customer-sign-in' element={<CustomerSignIn />} />
                 <Route path='/customer-sign-up' element={<SignUp />} />
                 <Route path="/products" element={<OrderParent />}>
@@ -36,6 +38,7 @@ function App() {
                     <Route path='payment-form/:id' element={<PaymentForm />} />
                 </Route>
                 <Route path='/my-account' element={<MyAccount />} />
+
 
                 <Route path="/supplier-page" element={<Nav />}>
                     <Route path='order' element={<SupplierOrders />} />

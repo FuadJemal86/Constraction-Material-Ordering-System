@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import api from '../../api';
+import { Link } from 'react-router-dom';
 
 function RecentOrder() {
 
     const [orders, setCustomer] = useState([])
+    const [activeTap, setActioveTap] = useState(false)
 
     useEffect(() => {
         const feachOrder = async () => {
@@ -61,9 +63,9 @@ function RecentOrder() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">{order.totalPrice}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right">
-                                            <button className="text-yellow-500 hover:text-yellow-600 font-medium">
+                                            <Link to={`/order-items/${order.id}`} className="text-yellow-500 hover:text-yellow-600 font-medium" >
                                                 View Details
-                                            </button>
+                                            </Link>
                                         </td>
                                     </tr>
                                 ))}
