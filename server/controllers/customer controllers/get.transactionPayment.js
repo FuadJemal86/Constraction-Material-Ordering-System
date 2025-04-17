@@ -2,33 +2,43 @@ const prisma = require("../../prismaCliaynt")
 
 
 const getTransactionPayment = async (req, res) => {
-    const { transaction } = req.params
+    const transactionId = req.params.transactionId
+
+    console.log(transactionId)
 
     try {
-        const order = await prisma.order.findMany({
-            where: { transactionId: transaction },
-
-            select: {
-                id: true
-            }
-        })
-
         const paymentTransaction = await prisma.orderitem.findMany({
-            where: { orderId: order.id },
+            where: {
+                order: {
+                    transactionId: transactionId
+                }
+            },
             select: {
                 id: true,
                 subtotal: true,
                 quantity: true,
                 unitPrice: true,
-                product: true
+                product: true,
+                order: {
+                    select: {
+                        createdAt: true,
+                        id: true,
+                        customer: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
+                }
             }
         })
 
-        return res.status(200).json({ status: true, paymentTransaction })
+
+        return res.status(200).json({ status: true, paymentTransaction , transactionId })
     } catch (error) {
         console.error(error);
         return res.status(500).json({ status: false, error: "Server error" });
     }
 }
 
-module.exports = {getTransactionPayment}
+module.exports = { getTransactionPayment }

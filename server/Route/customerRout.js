@@ -43,7 +43,7 @@ router.put('/update-customer-account' , editCustomerProfile)
 router.put('/password-change' , updatePassword)
 router.get('/get-order-item/:id', getCustomerOrderItem)
 router.get('/get-payment', getCustomerPaymentStatus)
-router.get('/get-transaction/:transaction' , getTransactionPayment)
+router.get('/get-transaction/:transactionId' , getTransactionPayment)
 
 
 module.exports = router;
