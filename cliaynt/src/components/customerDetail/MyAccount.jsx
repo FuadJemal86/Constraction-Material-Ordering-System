@@ -4,6 +4,7 @@ import RecentOrder from './RecentOrder';
 import api from '../../api';
 import toast from 'react-hot-toast';
 import { User, Camera } from 'lucide-react';
+import PaymentHistory from './PaymentHistory';
 
 
 function MyAccount() {
@@ -67,7 +68,7 @@ function MyAccount() {
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        
+
         setUserData({
             ...userData,
             image: file
@@ -94,6 +95,13 @@ function MyAccount() {
                         }`}
                 >
                     Orders
+                </button>
+                <button
+                    onClick={() => setActiveTab('payments')}
+                    className={`px-4 py-2 font-medium rounded-t-lg transition-colors ${activeTab === 'payments' ? 'bg-yellow-500 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                        }`}
+                >
+                    Payment History
                 </button>
                 <button
                     onClick={() => setActiveTab('settings')}
@@ -231,6 +239,12 @@ function MyAccount() {
             {/* Orders Tab */}
             {activeTab === 'orders' && (
                 <RecentOrder />
+            )}
+
+            {/* payment history */}
+
+            {activeTab === 'payments' && (
+                <PaymentHistory />
             )}
 
             {/* Settings Tab */}
