@@ -19,6 +19,7 @@ const { updatePassword } = require('../controllers/customer controllers/update.p
 const { getCustomerOrderItem } = require('../controllers/customer controllers/get.orderItem')
 const { getCustomerPaymentStatus } = require('../controllers/customer controllers/get.payment')
 const { getTransactionPayment } = require('../controllers/customer controllers/get.transactionPayment')
+const { getProfile } = require('../controllers/customer controllers/get.profile')
 
 
 
@@ -44,6 +45,7 @@ router.put('/password-change' , updatePassword)
 router.get('/get-order-item/:id', getCustomerOrderItem)
 router.get('/get-payment', getCustomerPaymentStatus)
 router.get('/get-transaction/:transactionId' , getTransactionPayment)
+router.get('/profile' , getProfile)
 
 
 module.exports = router;

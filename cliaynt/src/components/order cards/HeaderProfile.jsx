@@ -19,6 +19,8 @@ function HeaderProfile() {
     const [orderStatus, setOrderStatus] = useState([])
     const [count, setCount] = useState([])
     const [cartOpen, setCartOpen] = useState(false);
+    const [isProfile, setProfile] = useState(false)
+    const [profilePicture, setProfilePicture] = useState()
 
 
     const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
@@ -71,12 +73,36 @@ function HeaderProfile() {
         fetchStatus();
     }, []);
 
+    useEffect(() => {
+
+        const feachData = async () => {
+            try {
+                const result = await api.get('/customer/profile')
+                if (result.data.status) {
+                    setProfile(true)
+                    setProfilePicture(result.data.customer)
+
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+        feachData()
+
+    }, [])
+
     return (
         <div>
             <span className="relative group">
-                <button className="h-8 w-8  border border-gray-500  rounded-full overflow-hidden">
-                    <img src={img} alt="Profile picture" className="w-full h-full object-cover p-[2px] rounded-full" />
-                </button>
+                {
+                    isProfile && (
+                        <button className="h-8 w-8  border border-gray-500  rounded-full overflow-hidden">
+                            <img src={`http://localhost:3032/images/${profilePicture.image}`} alt="Profile picture" className="w-full h-full object-cover p-[2px] rounded-full" />
+                        </button>
+                    )
+                }
                 <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                     <div className="p-4">
                         <div className='mb-2'>
