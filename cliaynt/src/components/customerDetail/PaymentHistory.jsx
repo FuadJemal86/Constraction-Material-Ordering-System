@@ -24,7 +24,7 @@ function PaymentHistory() {
         <div className='max-w-6xl mx-auto px-4 py-8 pt-24'>
             <div className='bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden'>
                 <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <h2 className="text-xl font-semibold">Order item</h2>
+                    <h2 className="text-xl font-semibold">Payment</h2>
                 </div>
                 <div className="overflow-x-auto">
 
