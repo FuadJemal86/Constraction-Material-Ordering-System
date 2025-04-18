@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Minus, Plus, MapPin, Wrench  , User} from 'lucide-react';
+import { X, Minus, Plus, MapPin, Wrench, User } from 'lucide-react';
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import { useCart } from "../CartContext";
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,19 +8,20 @@ import api from '../../api';
 
 function ShoppingCart({ onClose }) {
     // Core state management
-    const { cart, removeItem , updateQuantity } = useCart();
-    
+    const { cart, removeItem, updateQuantity } = useCart();
+
     const navigator = useNavigate()
 
     // Map related state
     const mapRef = useRef(null);
     const [map, setMap] = useState(null);
-    const [orderId , setOrderId] = useState()
-    const [isPayment , setPayment] = useState(false)
+    const [orderId, setOrderId] = useState({})
+    const [isPayment, setPayment] = useState(false)
     const [userMarker, setUserMarker] = useState(null);
     const [userLocation, setUserLocation] = useState(null);
     const [locationAddress, setLocationAddress] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [transactionId, setTransactionId] = useState({})
 
     // Order state
     const [order, setOrder] = useState({
@@ -264,14 +265,19 @@ function ShoppingCart({ onClose }) {
 
             const result = await api.post('/customer/place-order', orderData);
             if (result.data.status) {
-                
-                setOrderId(result.data.customer)
-                console.log(result.data.customer)
-                toast.success(result.data.message);
-                setPayment(true)
-                navigator(`/products/payment-form/${result.data.customer}`)
 
-                onClose(); // Close cart modal after order
+                const transactionId = result.data.orders[0]?.transactionId;
+
+                console.log("Transaction ID:", transactionId);
+
+                setOrderId(result.data.orders);
+                toast.success(result.data.message);
+                setPayment(true);
+                localStorage.removeItem("cart");
+
+                navigator(`/payment-form/${transactionId}`);
+
+                onClose();
             } else {
                 toast.error(result.data.message);
             }
@@ -481,7 +487,6 @@ function ShoppingCart({ onClose }) {
                                 </div>
 
                                 <button
-
                                     type="submit"
                                     className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-3 px-4 rounded-md mb-2 transition-all"
                                     disabled={order.deliveryOption === 'delivery' && !userLocation}

@@ -20,16 +20,16 @@ const upload = multer({
 
 
 
-const customerPayment =  [upload.single('image'), async (req, res) => {
+const customerPayment = [upload.single('image'), async (req, res) => {
     const { id } = req.params;
     const { bankTransactionId, bankId } = req.body;
 
-    if(!id) {
-        return res.status(400).json({status: false , message:'Order Not Found'})
+    if (!id) {
+        return res.status(400).json({ status: false, message: 'Order Not Found' })
     }
 
     try {
-        const order = await prisma.order.findFirst({
+        const order = await prisma.order.findMany({
             where: { customerId: parseInt(id) },
             select: {
                 transactionId: true,
@@ -37,6 +37,7 @@ const customerPayment =  [upload.single('image'), async (req, res) => {
                 customer: true
             }
         });
+
 
         if (!order) {
             return res.status(404).json({ status: false, message: "Order not found" });
@@ -63,8 +64,10 @@ const customerPayment =  [upload.single('image'), async (req, res) => {
             }
         });
 
-        return res.status(201).json({ status: true, message: "Payment submitted and pending confirmation"
-            , payment: newPayment });
+        return res.status(201).json({
+            status: true, message: "Payment submitted and pending confirmation"
+            , payment: newPayment
+        });
 
     } catch (err) {
         console.error(err);
@@ -73,4 +76,4 @@ const customerPayment =  [upload.single('image'), async (req, res) => {
 }];
 
 
-module.exports = {customerPayment}
+module.exports = { customerPayment }

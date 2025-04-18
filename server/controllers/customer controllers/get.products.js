@@ -7,11 +7,14 @@ const prisma = require("../../prismaCliaynt");
 
 const getProduct =  async (req, res) => {
     const id = parseInt(req.params.id, 10);
+    const categoryId = parseInt(req.query.category)
+
+    console.log(categoryId)
     try {
 
         const product = await prisma.product.findMany(
             {
-                where: { supplierId: id }
+                where: { supplierId: id  , categoryId:categoryId }
             })
 
         if (product.length == 0) {

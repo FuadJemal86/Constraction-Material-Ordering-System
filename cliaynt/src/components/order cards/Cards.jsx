@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams , useLocation  } from 'react-router-dom';
 import { useCart } from '../CartContext';
 import image1 from '../../images/image1_0.jpg';
 // import { Notyf } from "notyf";
@@ -15,11 +15,14 @@ function Cards() {
     const navigate = useNavigate();
     const [product, setProduct] = useState([]);
     const { addToCart } = useCart()
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const category = queryParams.get('category');
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await api.get(`/customer/get-products/${id}`)
+                const result = await api.get(`/customer/get-products/${id}?category=${category}`)
 
                 if (result.data.status) {
                     console.log(result.data.product)
@@ -34,7 +37,7 @@ function Cards() {
         }
 
         fetchData()
-    }, [id]);
+    }, [category , id]);
 
 
 
@@ -45,7 +48,7 @@ function Cards() {
             });
 
             if (result.data.valid) {
-                addToCart(product); // ✅ Use context to update cart
+                addToCart(product);
                 toast.success("Item added to cart");
             } else {
                 toast.error(result.data.message);

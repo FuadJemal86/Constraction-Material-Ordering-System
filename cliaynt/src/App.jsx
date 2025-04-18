@@ -33,11 +33,11 @@ function App() {
                 <Route path='/order-items/:id' element={<ViewDetails />} />
                 <Route path='/customer-sign-in' element={<CustomerSignIn />} />
                 <Route path='/customer-sign-up' element={<SignUp />} />
+                <Route path='/payment-form/:transactionId' element={<PaymentForm />} />
                 <Route path='/payment-transaction/:transactionId' element={<PaymentTransaction />} />
                 <Route path="/products" element={<OrderParent />}>
                     <Route path='/products/supplier-products/:id' element={<Cards />} />
                     <Route path='nearby' element={<Nearby />} />
-                    <Route path='payment-form/:id' element={<PaymentForm />} />
                 </Route>
                 <Route path='/my-account' element={<MyAccount />} />
 

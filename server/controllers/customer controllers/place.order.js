@@ -1,12 +1,8 @@
-
-
-// place order
-
 const prisma = require("../../prismaCliaynt");
-const jwt = require('jsonwebtoken')
-const { v4: uuidv4 } = require('uuid')
+const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 
-const customerPlaceOrder =  async (req, res) => {
+const customerPlaceOrder = async (req, res) => {
     const token = req.cookies["x-auth-token"];
 
     if (!token) {
@@ -39,31 +35,29 @@ const customerPlaceOrder =  async (req, res) => {
         });
 
         const createdOrders = [];
+        const transactionId = uuidv4(); // same ID for all orders in this session
 
         for (const [supplierId, groupProducts] of Object.entries(productsBySupplier)) {
             const totalPrice = groupProducts.reduce((sum, p) => sum + p.quantity * p.unitPrice, 0);
-            const transactionId = uuidv4();
 
-            const orderItems = [];
-
-            for (const p of groupProducts) {
+            const orderItems = groupProducts.map(p => {
                 const productId = parseInt(p.productId, 10);
                 const quantity = parseInt(p.quantity, 10);
                 const unitPrice = parseFloat(p.unitPrice);
 
                 if (!productId || !quantity || isNaN(unitPrice)) {
-                    return res.status(400).json({ status: false, message: "Invalid product data in cart" });
+                    throw new Error("Invalid product data in cart");
                 }
 
-                orderItems.push({
+                return {
                     product: {
                         connect: { id: productId }
                     },
                     quantity,
                     unitPrice,
                     subtotal: quantity * unitPrice,
-                });
-            }
+                };
+            });
 
             const newOrder = await prisma.order.create({
                 data: {
@@ -87,11 +81,11 @@ const customerPlaceOrder =  async (req, res) => {
             });
 
             createdOrders.push({
-                customer: newOrder.customerId,
+                customerId: newOrder.customerId,
                 supplierId: newOrder.supplierId,
                 totalPrice: newOrder.totalPrice,
+                transactionId: newOrder.transactionId,
             });
-
         }
 
         return res.status(201).json({
@@ -99,6 +93,7 @@ const customerPlaceOrder =  async (req, res) => {
             customer: customerId,
             message: "Orders placed successfully",
             orders: createdOrders,
+            transactionId
         });
 
     } catch (error) {
@@ -107,6 +102,4 @@ const customerPlaceOrder =  async (req, res) => {
     }
 };
 
-
-
-module.exports = {customerPlaceOrder}
+module.exports = { customerPlaceOrder };
