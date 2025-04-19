@@ -99,9 +99,9 @@ function HeaderProfile() {
                 {
                     isProfile && (
                         <button className="h-8 w-8  border border-gray-500  rounded-full overflow-hidden">
-                            <img src={`http://localhost:3032/images/${profilePicture.image}`} alt="Profile picture" className="w-full h-full object-cover p-[2px] rounded-full" />
+                            <img src={`http://localhost:3032/images/${profilePicture?.image}`} alt="Profile picture" className="w-full h-full object-cover p-[2px] rounded-full" />
                         </button>
-                    )
+                    ) 
                 }
                 <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                     <div className="p-4">

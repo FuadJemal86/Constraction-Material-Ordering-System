@@ -24,6 +24,7 @@ const customerPlaceOrder = async (req, res) => {
             return res.status(400).json({ status: false, message: "Invalid cart data" });
         }
 
+        // Group products by supplierId
         const productsBySupplier = {};
         products.forEach(p => {
             const supplierId = p.supplierId;
@@ -80,13 +81,16 @@ const customerPlaceOrder = async (req, res) => {
                     longitude,
                     deliveryOption,
                     totalPrice,
-                    transactionId,
+                    transaction: {
+                        connect: { transactionId: transactionId }
+                    },
                     orderitem: {
                         create: orderItems
                     }
                 },
                 include: { orderitem: true }
             });
+            ;
 
             createdOrders.push({
                 customerId: newOrder.customerId,
