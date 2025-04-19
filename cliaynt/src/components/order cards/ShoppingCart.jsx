@@ -263,6 +263,7 @@ function ShoppingCart({ onClose }) {
                 orderData.address = '';
             }
 
+
             const result = await api.post('/customer/place-order', orderData);
             if (result.data.status) {
 

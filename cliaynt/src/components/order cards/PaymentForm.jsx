@@ -119,9 +119,6 @@ function PaymentForm() {
     const tax = subtotal * taxRate;
     const total = subtotal + tax + shippingCost;
 
-    if (!id) {
-        return <div className="flex items-center justify-center h-screen">Order ID is missing</div>;
-    }
 
     const isPending = paymentStatus?.status === 'PENDING';
 

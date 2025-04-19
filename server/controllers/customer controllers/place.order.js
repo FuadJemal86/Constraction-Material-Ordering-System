@@ -24,7 +24,6 @@ const customerPlaceOrder = async (req, res) => {
             return res.status(400).json({ status: false, message: "Invalid cart data" });
         }
 
-        // Group products by supplierId
         const productsBySupplier = {};
         products.forEach(p => {
             const supplierId = p.supplierId;
@@ -34,9 +33,22 @@ const customerPlaceOrder = async (req, res) => {
             productsBySupplier[supplierId].push(p);
         });
 
-        const createdOrders = [];
-        const transactionId = uuidv4(); // same ID for all orders in this session
+        // Generate a unique transaction ID
+        const transactionId = uuidv4();
 
+        // 1. Create the Transaction
+        await prisma.transaction.create({
+            data: {
+                transactionId,
+                customer: {
+                    connect: { id: customerId }
+                }
+            }
+        });
+
+        const createdOrders = [];
+
+        // 2. Create orders for each supplier group
         for (const [supplierId, groupProducts] of Object.entries(productsBySupplier)) {
             const totalPrice = groupProducts.reduce((sum, p) => sum + p.quantity * p.unitPrice, 0);
 
@@ -61,12 +73,8 @@ const customerPlaceOrder = async (req, res) => {
 
             const newOrder = await prisma.order.create({
                 data: {
-                    customer: {
-                        connect: { id: customerId }
-                    },
-                    supplier: {
-                        connect: { id: parseInt(supplierId, 10) }
-                    },
+                    customer: { connect: { id: customerId } },
+                    supplier: { connect: { id: parseInt(supplierId, 10) } },
                     address,
                     latitude,
                     longitude,
@@ -77,7 +85,7 @@ const customerPlaceOrder = async (req, res) => {
                         create: orderItems
                     }
                 },
-                include: { orderitem: true },
+                include: { orderitem: true }
             });
 
             createdOrders.push({
@@ -92,8 +100,8 @@ const customerPlaceOrder = async (req, res) => {
             status: true,
             customer: customerId,
             message: "Orders placed successfully",
-            orders: createdOrders,
-            transactionId
+            transactionId,
+            orders: createdOrders
         });
 
     } catch (error) {
