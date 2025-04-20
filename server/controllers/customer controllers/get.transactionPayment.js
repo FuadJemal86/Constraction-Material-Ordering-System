@@ -18,7 +18,17 @@ const getTransactionPayment = async (req, res) => {
                 subtotal: true,
                 quantity: true,
                 unitPrice: true,
-                product: true,
+                product: {
+                    select : {
+                        price: true,
+                        name: true,
+                        supplier: {
+                            select: {
+                                companyName:true
+                            }
+                        }
+                    }
+                },
                 order: {
                     select: {
                         createdAt: true,

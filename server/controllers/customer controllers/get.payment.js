@@ -16,7 +16,11 @@ const getCustomerPaymentStatus = async (req, res) => {
             where: { customerId },
             select: {
                 transactionId: true,
-                supplier: true
+                supplier: {
+                    select: {
+                        companyName:true
+                    }
+                }
             }
         });
 

@@ -32,10 +32,11 @@ function PaymentHistory() {
                         <thead className="bg-gray-50 dark:bg-gray-700">
                             <tr>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Supplier</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Transaction Id</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">status</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Detail</th>
                             </tr>
                         </thead>
@@ -43,6 +44,7 @@ function PaymentHistory() {
                             {paymentHistory.map((payment) => (
                                 <tr key={payment.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <td className="px-6 py-4 whitespace-nowrap font-medium">{payment.id}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap font-medium">{payment.supplier.companyName}</td>
                                     <td className="px-6 py-4 whitespace-nowrap font-medium">birr {payment.amount}</td>
                                     <td className="px-6 py-4 whitespace-nowrap font-medium">{payment.transactionId}</td>
                                     <td>
@@ -64,9 +66,17 @@ function PaymentHistory() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                    <Link to={`/payment-transaction/${payment.transactionId}`} className="text-yellow-500 hover:text-yellow-600 font-medium" >
-                                            View Details
-                                        </Link>
+                                        {
+                                            payment.status == 'COMPLETED' ? (
+                                                <Link to={`/payment-transaction/${payment.transactionId}`} className="text-yellow-500 hover:text-yellow-600 font-medium" >
+                                                    View Details
+                                                </Link>
+                                            ) : (
+                                                <Link className="text-yellow-500 hover:text-yellow-600 font-medium cursor-not-allowed" >
+                                                    View Details
+                                                </Link>
+                                            )
+                                        }
                                     </td>
                                 </tr>
                             ))}

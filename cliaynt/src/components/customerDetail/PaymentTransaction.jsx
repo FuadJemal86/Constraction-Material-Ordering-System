@@ -66,6 +66,10 @@ function PaymentTransaction() {
                                     <span className="font-medium">Customer:</span>
                                     <span>{payment[0]?.order?.customer?.name}</span>
                                 </div>
+                                <div className="flex justify-between">
+                                    <span className="font-medium">Supplier:</span>
+                                    <span>{payment[0]?.product?.supplier?.companyName}</span>
+                                </div>
                             </div>
 
                             <div className="border-t border-dashed my-4"></div>
