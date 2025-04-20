@@ -21,30 +21,27 @@ const upload = multer({
 
 
 const customerPayment = [upload.single('image'), async (req, res) => {
-    const  transactionId  = req.params.transactionId;
+    const transactionId = req.params.transactionId;
     const { bankTransactionId, bankId } = req.body;
 
-    console.log(transactionId)
-
     if (!transactionId) {
-        return res.status(400).json({ status: false, message: 'Order Not Found' })
+        return res.status(400).json({ status: false, message: 'Order Not Found' });
     }
 
     try {
-        const order = await prisma.order.findMany({
-            where: { transactionId: transactionId },
+        const order = await prisma.order.findFirst({
+            where: { transactionId },
             select: {
                 totalPrice: true,
                 customer: true
             }
         });
 
-
         if (!order) {
             return res.status(404).json({ status: false, message: "Order not found" });
         }
 
-        const { totalPrice: amount } = order;
+        const amount = parseFloat(order.totalPrice);
 
         const existingPayment = await prisma.payment.findFirst({
             where: { transactionId }
@@ -56,7 +53,7 @@ const customerPayment = [upload.single('image'), async (req, res) => {
 
         const newPayment = await prisma.payment.create({
             data: {
-                amount: parseInt(amount),
+                amount,
                 bankId: parseInt(bankId),
                 status: "PENDING",
                 transactionId,
@@ -66,8 +63,9 @@ const customerPayment = [upload.single('image'), async (req, res) => {
         });
 
         return res.status(201).json({
-            status: true, message: "Payment submitted and pending confirmation"
-            , payment: newPayment
+            status: true,
+            message: "Payment submitted and pending confirmation",
+            payment: newPayment
         });
 
     } catch (err) {
@@ -75,6 +73,7 @@ const customerPayment = [upload.single('image'), async (req, res) => {
         return res.status(500).json({ status: false, error: "Server error" });
     }
 }];
+
 
 
 module.exports = { customerPayment }
