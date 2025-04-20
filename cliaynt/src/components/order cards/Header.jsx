@@ -26,6 +26,8 @@ function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "dark");
     const [cartOpen, setCartOpen] = useState(false);
+    const [islogin, setIsLogin] = useState(true)
+    const [isBell , setIsBell] = useState(false)
 
 
     const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
@@ -88,6 +90,26 @@ function Header() {
 
         fetchStatus();
     }, []);
+
+
+    useEffect(() => {
+
+        const feachData = async () => {
+            try {
+                const result = await api.get('/customer/verify-token')
+                if (result.data.valid) {
+                    setIsLogin(false)
+                    setIsBell(true)
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+        feachData()
+
+    }, [])
 
 
 
@@ -213,8 +235,18 @@ function Header() {
                             <img src={img} alt="Profile picture" className="w-full h-full object-cover p-[2px] rounded-full" />
                         </button> */}
 
-                            <HeaderProfile />
-                        
+                        <HeaderProfile />
+
+                        {
+                            islogin && (
+                                <span className='bg-blue-900 px-2 py-1 rounded-md'>
+                                    <Link to={'/customer-sign-in'} className='px-2 py-1 text-white'>
+                                        Login
+                                    </Link>
+                                </span>
+                            )
+                        }
+
 
 
                         <button
@@ -232,14 +264,18 @@ function Header() {
                         </button>
 
                         {/* Notification Icon */}
-                        <div className="relative hidden md:block">
-                            <button className="w-10 h-10 flex items-center justify-center">
-                                <NotificationsNoneIcon className="text-2xl" />
-                            </button>
-                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                                3
-                            </span>
-                        </div>
+                        {
+                            isBell && (
+                                <div className="relative hidden md:block">
+                                    <button className="w-10 h-10 flex items-center justify-center">
+                                        <NotificationsNoneIcon className="text-2xl" />
+                                    </button>
+                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                        3
+                                    </span>
+                                </div>
+                            )
+                        }
 
                         {/* Dark Mode Toggle */}
                         <button

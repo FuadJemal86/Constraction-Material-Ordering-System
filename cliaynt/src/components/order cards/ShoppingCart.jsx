@@ -274,7 +274,6 @@ function ShoppingCart({ onClose }) {
                 setOrderId(result.data.orders);
                 toast.success(result.data.message);
                 setPayment(true);
-                localStorage.removeItem("cart");
 
                 navigator(`/payment-form/${transactionId}`);
 

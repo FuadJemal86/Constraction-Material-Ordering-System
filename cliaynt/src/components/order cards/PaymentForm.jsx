@@ -5,7 +5,7 @@ import { Toaster, toast } from 'react-hot-toast';
 import api from '../../api';
 
 function PaymentForm() {
-    const { id } = useParams();
+    const { transactionId } = useParams();
     const navigate = useNavigate();
     const [cartItems, setCartItems] = useState([]);
     const [paymentStatus, setPaymentStatus] = useState({});
@@ -44,13 +44,13 @@ function PaymentForm() {
     // Fetch pending payment status
     useEffect(() => {
         fetchPaymentStatus();
-    }, [id]);
+    }, [transactionId]);
 
     const fetchPaymentStatus = async () => {
-        if (!id) return;
+        if (!transactionId) return;
 
         try {
-            const result = await api.get(`/customer/get-pending-payment/${id}`);
+            const result = await api.get(`/customer/get-pending-payment/${transactionId}`);
             if (result.data.status) {
                 setPaymentStatus(result.data.paymentStatus);
             }
@@ -98,7 +98,7 @@ function PaymentForm() {
         formData.append('image', payment.image);
 
         try {
-            const result = await api.post(`/customer/make-payment/${id}`, formData);
+            const result = await api.post(`/customer/make-payment/${transactionId}`, formData);
             if (result.data.status) {
                 toast.success(result.data.message);
                 fetchPaymentStatus();

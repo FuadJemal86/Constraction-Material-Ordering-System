@@ -21,18 +21,19 @@ const upload = multer({
 
 
 const customerPayment = [upload.single('image'), async (req, res) => {
-    const { id } = req.params;
+    const  transactionId  = req.params.transactionId;
     const { bankTransactionId, bankId } = req.body;
 
-    if (!id) {
+    console.log(transactionId)
+
+    if (!transactionId) {
         return res.status(400).json({ status: false, message: 'Order Not Found' })
     }
 
     try {
         const order = await prisma.order.findMany({
-            where: { customerId: parseInt(id) },
+            where: { transactionId: transactionId },
             select: {
-                transactionId: true,
                 totalPrice: true,
                 customer: true
             }
@@ -43,7 +44,7 @@ const customerPayment = [upload.single('image'), async (req, res) => {
             return res.status(404).json({ status: false, message: "Order not found" });
         }
 
-        const { transactionId, totalPrice: amount } = order;
+        const { totalPrice: amount } = order;
 
         const existingPayment = await prisma.payment.findFirst({
             where: { transactionId }
@@ -55,7 +56,7 @@ const customerPayment = [upload.single('image'), async (req, res) => {
 
         const newPayment = await prisma.payment.create({
             data: {
-                amount,
+                amount: parseInt(amount),
                 bankId: parseInt(bankId),
                 status: "PENDING",
                 transactionId,

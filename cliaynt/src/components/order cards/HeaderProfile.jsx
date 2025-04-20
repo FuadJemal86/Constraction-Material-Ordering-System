@@ -21,6 +21,7 @@ function HeaderProfile() {
     const [cartOpen, setCartOpen] = useState(false);
     const [isProfile, setProfile] = useState(false)
     const [profilePicture, setProfilePicture] = useState()
+    const [login, isLogin] = useState(false)
 
 
     const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
@@ -93,62 +94,84 @@ function HeaderProfile() {
 
     }, [])
 
+    useEffect(() => {
+
+        const feachData = async () => {
+            try {
+                const result = await api.get('/customer/verify-token')
+                if (result.data.valid) {
+                    isLogin(true)
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+        feachData()
+
+    }, [])
+
     return (
         <div>
-            <span className="relative group">
-                {
-                    isProfile && (
-                        <button className="h-8 w-8  border border-gray-500  rounded-full overflow-hidden">
-                            <img src={`http://localhost:3032/images/${profilePicture?.image}`} alt="Profile picture" className="w-full h-full object-cover p-[2px] rounded-full" />
-                        </button>
-                    ) 
-                }
-                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                    <div className="p-4">
-                        <div className='mb-2'>
-                            <Link to={'/my-account'} className='flex items-center justify-between mb-2 hover:bg-slate-400 py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900'>
-                                <span className='p-1'>
-                                    <User />
-                                </span>
-                                <span className='font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white '>My Account</span>
-                            </Link>
-                        </div>
+            {
+                login && (
+                    <span className="relative group">
+                        {
+                            isProfile && (
+                                <button className="h-8 w-8  border border-gray-500  rounded-full overflow-hidden">
+                                    <img src={`http://localhost:3032/images/${profilePicture?.image}`} alt="Profile picture" className="w-full h-full object-cover p-[2px] rounded-full" />
+                                </button>
+                            )
+                        }
+                        <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                            <div className="p-4">
+                                <div className='mb-2'>
+                                    <Link to={'/my-account'} className='flex items-center justify-between mb-2 hover:bg-slate-400 py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900'>
+                                        <span className='p-1'>
+                                            <User />
+                                        </span>
+                                        <span className='font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white '>My Account</span>
+                                    </Link>
+                                </div>
 
-                        <div className="mb-2">
-                            <Link className="flex items-center justify-between mb-2 hover:bg-slate-400 py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900">
-                                <span className='p-1'>
-                                    <Clock />
-                                </span>
-                                <span className="font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white  ">pending payment</span> {paymentStatus.filter(c => c.status === 'PENDING').length}
-                            </Link>
-                        </div>
+                                <div className="mb-2">
+                                    <Link className="flex items-center justify-between mb-2 hover:bg-slate-400 py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900">
+                                        <span className='p-1'>
+                                            <Clock />
+                                        </span>
+                                        <span className="font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white  ">pending payment</span> {paymentStatus.filter(c => c.status === 'PENDING').length}
+                                    </Link>
+                                </div>
 
-                        <div className="mb-2">
-                            <Link className="flex items-center justify-between mb-2 hover:bg-slate-400 py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900">
-                                <span className='p-1'>
-                                    <CheckCircle />
-                                </span>
-                                <span className="font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white">completed payment</span> {paymentStatus.filter(c => c.status === 'COMPLETED').length}
-                            </Link>
-                        </div>
+                                <div className="mb-2">
+                                    <Link className="flex items-center justify-between mb-2 hover:bg-slate-400 py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900">
+                                        <span className='p-1'>
+                                            <CheckCircle />
+                                        </span>
+                                        <span className="font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white">completed payment</span> {paymentStatus.filter(c => c.status === 'COMPLETED').length}
+                                    </Link>
+                                </div>
 
-                        <div>
-                            <Link className="flex items-center justify-between mb-2 dark:text-white py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900">
-                                <span className='p-1'>
-                                    <Package />
-                                </span>
-                                <span className="font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white">recent order</span> {orderStatus.filter(c => c.status === 'PENDING').length}
-                            </Link>
+                                <div>
+                                    <Link className="flex items-center justify-between mb-2 hover:bg-slate-400 py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900">
+                                        <span className='p-1'>
+                                            <Package />
+                                        </span>
+                                        <span className="font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white">recent order</span> {orderStatus.filter(c => c.status === 'PENDING').length}
+                                    </Link>
+                                </div>
+                                <Link className='flex items-center justify-between mb-2 hover:bg-slate-400 py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900'>
+                                    <span className='p-1'>
+                                        <Settings />
+                                    </span>
+                                    <span className='font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white'>setting</span>
+                                </Link>
+                            </div>
                         </div>
-                        <Link className='flex items-center justify-between mb-2 dark:text-white py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900'>
-                            <span className='p-1'>
-                                <Settings />
-                            </span>
-                            <span className='font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white'>setting</span>
-                        </Link>
-                    </div>
-                </div>
-            </span>
+                    </span>
+                )
+            }
         </div>
     )
 }
