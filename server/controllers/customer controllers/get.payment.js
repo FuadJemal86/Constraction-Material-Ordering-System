@@ -1,36 +1,56 @@
-const jwt = require('jsonwebtoken')
-const prisma = require('../../prismaCliaynt')
+const jwt = require('jsonwebtoken');
+const prisma = require('../../prismaCliaynt');
 
 const getCustomerPaymentStatus = async (req, res) => {
-    const token = req.cookies['x-auth-token']
+    const token = req.cookies['x-auth-token'];
 
     if (!token) {
-        return res.status(400).json({ status: false, message: 'no token provide' })
+        return res.status(400).json({ status: false, message: 'No token provided' });
     }
-
-    const decoded = jwt.verify(token, process.env.CUSTOMER_KEY)
-
-    const customerId = parseInt(decoded.id)
 
     try {
-        const order = await prisma.order.findMany({
-            where: { customerId: customerId },
+        const decoded = jwt.verify(token, process.env.CUSTOMER_KEY);
+        const customerId = parseInt(decoded.id);
 
+        const orders = await prisma.order.findMany({
+            where: { customerId },
             select: {
-                transactionId: true
+                transactionId: true,
+                supplier: true
             }
-        })
+        });
 
+        const transactionIds = orders.map(order => order.transactionId);
 
-        const payment = await prisma.payment.findMany({
-            where: { transactionId: order.transactionId }
-        })
+        if (transactionIds.length === 0) {
+            return res.status(200).json({ status: true, payment: [], supplier: null });
+        }
 
-        return res.status(200).json({ status: true, payment })
+        const payments = await prisma.payment.findMany({
+            where: {
+                transactionId: {
+                    in: transactionIds
+                }
+            },
+            include: {
+                transaction: {
+                    include: {
+                        order: {
+                            include: {
+                                supplier: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        return res.status(200).json({ status: true, payment: payments });
+
     } catch (err) {
-        console.log(err)
-        res.status(500).json({ status: false, message: 'server error' })
+        console.log(err);
+        return res.status(500).json({ status: false, message: 'Server error' });
     }
-}
+};
 
-module.exports = {getCustomerPaymentStatus}
+module.exports = { getCustomerPaymentStatus };
