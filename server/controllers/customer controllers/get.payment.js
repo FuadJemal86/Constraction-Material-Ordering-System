@@ -22,34 +22,26 @@ const getCustomerPaymentStatus = async (req, res) => {
 
         const transactionIds = orders.map(order => order.transactionId);
 
-        if (transactionIds.length === 0) {
-            return res.status(200).json({ status: true, payment: [], supplier: null });
-        }
-
         const payments = await prisma.payment.findMany({
             where: {
                 transactionId: {
                     in: transactionIds
                 }
-            },
-            include: {
-                transaction: {
-                    include: {
-                        order: {
-                            include: {
-                                supplier: true
-                            }
-                        }
-                    }
-                }
             }
         });
 
-        return res.status(200).json({ status: true, payment: payments });
+        const payment = payments.map(payment => {
+            const matchingOrder = orders.find(order => order.transactionId === payment.transactionId);
+            return {
+                ...payment,
+                supplier: matchingOrder?.supplier || null
+            };
+        });
 
+        return res.status(200).json({ status: true, payment });
     } catch (err) {
         console.log(err);
-        return res.status(500).json({ status: false, message: 'Server error' });
+        res.status(500).json({ status: false, message: 'Server error' });
     }
 };
 
