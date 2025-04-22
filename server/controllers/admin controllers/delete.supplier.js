@@ -4,10 +4,11 @@
 
 const prisma = require("../../prismaCliaynt");
 
-const deleteSupplier =  async (req, res) => {
+const deleteSupplier = async (req, res) => {
+
+    const { id } = req.params
 
     try {
-        const { id } = req.params
 
         const existingSupplier = await prisma.supplier.findUnique({
             where: { id: Number(id) }
@@ -17,7 +18,13 @@ const deleteSupplier =  async (req, res) => {
             return res.status(404).json({ status: false, message: 'Supplier not found' });
         }
 
-        await prisma.supplier.delete({ where: { id: Number(id) } })
+        await prisma.supplier.update({
+            where: { id: id },
+
+            data: {
+                isActive: false
+            }
+        })
 
         return res.status(200).json({ status: true, message: 'supplier deleted successfully!' })
 
@@ -27,4 +34,4 @@ const deleteSupplier =  async (req, res) => {
     }
 }
 
-module.exports = {deleteSupplier}
+module.exports = { deleteSupplier }

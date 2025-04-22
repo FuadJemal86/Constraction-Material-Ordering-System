@@ -4,7 +4,6 @@ const cookieParser = require('cookie-parser');
 const { supplier } = require('./Route/supplier');
 const { customer } = require('./Route/customer');
 const adminRout = require('./Route/adminRout');
-const {admin} = require('./Route/admin');
 const customerRout = require('./Route/customerRout');
 const supplierRout = require('./Route/supplierRout')
 

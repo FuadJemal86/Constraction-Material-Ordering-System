@@ -16,6 +16,7 @@ const { getCategory } = require('../controllers/admin controllers/get.category')
 const deleteCategory = require('../controllers/admin controllers/delete.category');
 const { getPayment } = require('../controllers/admin controllers/get.payment');
 const { getCustomer } = require('../controllers/admin controllers/get.customer');
+const { orderdelete } = require('../controllers/admin controllers/delete.order');
 const router = express.Router();
 
 
@@ -30,9 +31,10 @@ router.get('/get-order-item/:id' , getOrderItem)
 router.get('/get-category' , getCategory)
 router.get('/get-customer'  ,getCustomer)
 router.get('/get-payment' , getPayment)
-router.delete('/delete-supplier/:id' , deleteSupplier)
+router.put('/delete-supplier/:id' , deleteSupplier)
 router.delete('/delete-customer/:id' , deleteCustomer)
 router.delete('/delete-category/:id' , deleteCategory)
+router.delete('/delete-order/:id' , orderdelete)
 router.put('/update-supplier/:id' , updatedSupplier)
 router.put('/update-order-status/:id' , updateOrderStatus)
 router.put('/update-supplier-status/:supplierId' , updateCustomerApprove)
