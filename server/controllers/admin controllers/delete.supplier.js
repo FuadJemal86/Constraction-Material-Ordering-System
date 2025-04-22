@@ -6,12 +6,12 @@ const prisma = require("../../prismaCliaynt");
 
 const deleteSupplier = async (req, res) => {
 
-    const { id } = req.params
+    const  id  = parseInt(req.params.id)
 
     try {
 
         const existingSupplier = await prisma.supplier.findUnique({
-            where: { id: Number(id) }
+            where: { id: id }
         });
 
         if (!existingSupplier) {
