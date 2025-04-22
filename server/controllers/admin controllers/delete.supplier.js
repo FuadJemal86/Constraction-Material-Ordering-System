@@ -10,7 +10,7 @@ const deleteSupplier = async (req, res) => {
 
     try {
 
-        const existingSupplier = await prisma.supplier.findUnique({
+        const existingSupplier = await prisma.supplier.findFirst({
             where: { id: id }
         });
 

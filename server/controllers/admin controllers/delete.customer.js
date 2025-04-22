@@ -4,12 +4,28 @@
 
 const prisma = require("../../prismaCliaynt")
 
-const deleteCustomer =  async (req, res) => {
+const deleteCustomer = async (req, res) => {
+
+    const  id  = parseInt(req.params.id)
+
 
     try {
-        const { id } = req.params
 
-        await prisma.customer.delete({ where: { id: Number(id) } })
+        const isExist = await prisma.customer.findFirst({
+            where: { id: id }
+        })
+
+        if (!isExist) {
+            return res.status(400).json({ status: false, message: 'customer not found!' })
+        }
+
+        await prisma.customer.update({
+            where: { id: id},
+
+            data: {
+                isActive: false
+            }
+        })
 
         return res.status(200).json({ status: true, message: 'customer deleted successfully!' })
 
@@ -20,4 +36,4 @@ const deleteCustomer =  async (req, res) => {
 }
 
 
-module.exports = {deleteCustomer}
+module.exports = { deleteCustomer }
