@@ -1,6 +1,7 @@
 const jsw = require('jsonwebtoken')
 const prisma = require('../../prismaCliaynt')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs');
+
 
 const updatePassword = async (req, res) => {
 

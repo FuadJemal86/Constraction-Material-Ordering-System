@@ -1,5 +1,5 @@
 const prisma = require("../../prismaCliaynt");
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const addAccount = async (req, res) => {
     const { name, email, password } = req.body;

@@ -3,13 +3,13 @@ const prisma = require("../../prismaCliaynt")
 
 
 const getCustomerOrderItem = async (req, res) => {
-    const {id} = parseInt(req.params)
+    const id = parseInt(req.params.id)
 
 
     try {
         const orderItem = await prisma.orderitem.findMany({
             where: { orderId: id },
-            include : {
+            include: {
                 product: true
             }
         })

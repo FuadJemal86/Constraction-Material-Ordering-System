@@ -36,6 +36,7 @@ function RecentOrder() {
                             <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Order ID</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Supplier</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total</th>
@@ -46,6 +47,7 @@ function RecentOrder() {
                                 {orders.map((order) => (
                                     <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <td className="px-6 py-4 whitespace-nowrap font-medium">{order.id}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap font-medium">{order.supplier.companyName}</td>
                                         <td className="p-3 text-sm text-gray-500">
                                             {new Date(order.createdAt).toLocaleDateString('en-GB', {
                                                 day: 'numeric',
