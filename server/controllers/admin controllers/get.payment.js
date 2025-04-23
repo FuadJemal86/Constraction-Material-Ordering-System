@@ -5,7 +5,7 @@
 
 const prisma = require("../../prismaCliaynt");
 
-const getPayment =  async (req, res) => {
+const getPayment = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -13,13 +13,16 @@ const getPayment =  async (req, res) => {
     try {
         const [orders, count] = await prisma.$transaction([
             prisma.order.findMany({
+                select: {
+                    totalPrice: true
+                },
                 include: {
                     supplier: {
                         select: {
                             id: true,
                             companyName: true,
-                            phone: true
-                        }
+                            phone: true,
+                        },
                     },
                     customer: {
                         select: {
@@ -30,7 +33,7 @@ const getPayment =  async (req, res) => {
                     }
                 }
             }),
-            prisma.payment.count() // total count for pagination
+            prisma.payment.count()
         ]);
 
         const transactionIds = orders.map(o => o.transactionId);
@@ -53,18 +56,30 @@ const getPayment =  async (req, res) => {
             return res.status(400).json({ status: false, message: 'No payments found' });
         }
 
-        const transactionToCustomerMap = {};
-        const transactionToSupplierMap = {};
+        const transactionMap = {};
+
         orders.forEach(o => {
-            transactionToCustomerMap[o.transactionId] = o.customer;
-            transactionToSupplierMap[o.transactionId] = o.supplier;
+            const txId = o.transactionId;
+
+            if (!transactionMap[txId]) {
+                transactionMap[txId] = {
+                    totalPrice: o.totalPrice,
+                    customer: o.customer,
+                    supplier: o.supplier
+                };
+            } else {
+                transactionMap[txId].totalPrice += o.totalPrice;
+            }
         });
+
 
         const enrichedPayments = actualPayments.map(payment => ({
             ...payment,
-            customer: transactionToCustomerMap[payment.transactionId] || null,
-            supplier: transactionToSupplierMap[payment.transactionId] || null
+            totalPrice: transactionMap[payment.transactionId]?.totalPrice || 0,
+            customer: transactionMap[payment.transactionId]?.customer || null,
+            supplier: transactionMap[payment.transactionId]?.supplier || null
         }));
+
 
         return res.status(200).json({
             status: true,
@@ -81,4 +96,4 @@ const getPayment =  async (req, res) => {
 }
 
 
-module.exports = {getPayment}
+module.exports = { getPayment }
