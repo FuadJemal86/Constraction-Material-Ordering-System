@@ -17,6 +17,7 @@ const deleteCategory = require('../controllers/admin controllers/delete.category
 const { getPayment } = require('../controllers/admin controllers/get.payment');
 const { getCustomer } = require('../controllers/admin controllers/get.customer');
 const { orderdelete } = require('../controllers/admin controllers/delete.order');
+const { getPaymentDetali } = require('../controllers/admin controllers/get.detail.payment');
 const router = express.Router();
 
 
@@ -38,5 +39,6 @@ router.delete('/delete-order/:id' , orderdelete)
 router.put('/update-supplier/:id' , updatedSupplier)
 router.put('/update-order-status/:id' , updateOrderStatus)
 router.put('/update-supplier-status/:supplierId' , updateCustomerApprove)
+router.get('/get-detil-paymen/:transactionId' , getPaymentDetali)
 
 module.exports = router;
