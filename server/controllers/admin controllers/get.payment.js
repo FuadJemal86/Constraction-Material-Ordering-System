@@ -14,9 +14,8 @@ const getPayment = async (req, res) => {
         const [orders, count] = await prisma.$transaction([
             prisma.order.findMany({
                 select: {
-                    totalPrice: true
-                },
-                include: {
+                    totalPrice: true,
+                    transactionId: true,
                     supplier: {
                         select: {
                             id: true,
@@ -32,6 +31,7 @@ const getPayment = async (req, res) => {
                         }
                     }
                 }
+
             }),
             prisma.payment.count()
         ]);
