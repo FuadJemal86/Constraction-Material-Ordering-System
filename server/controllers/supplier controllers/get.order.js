@@ -6,10 +6,8 @@ const jwt = require('jsonwebtoken')
 const getOrder = async (req, res) => {
 
     const page = parseInt(req.query.page) || 1
-    const limit = parseInt(req.body.limit) || 10
+    const limit = parseInt(req.query.limit) || 10
     const skip = (page - 1) * limit
-
-    console.log(page , limit)
 
     const token = req.cookies['s-auth-token']
 
@@ -59,4 +57,4 @@ const getOrder = async (req, res) => {
     }
 }
 
-module.exports = {getOrder}
+module.exports = { getOrder }

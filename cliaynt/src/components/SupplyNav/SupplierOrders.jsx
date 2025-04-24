@@ -48,7 +48,7 @@ function SupplierOrders() {
         fetchData()
     }, [page])
 
-    
+
 
     const handleStatus = async (newStatus, id) => {
         try {
