@@ -3,7 +3,7 @@
 const prisma = require("../../prismaCliaynt")
 const jwt = require('jsonwebtoken')
 
-const getPament =  async (req, res) => {
+const getPayment = async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 10
     const skip = (page - 1) * 10
@@ -20,7 +20,7 @@ const getPament =  async (req, res) => {
 
 
     try {
-        const [orders, payments] = await prisma.$transaction([
+        const [orders] = await prisma.$transaction([
             prisma.order.findMany({
                 where: { supplierId: supplierId },
                 include: {
@@ -32,10 +32,6 @@ const getPament =  async (req, res) => {
                         }
                     }
                 }
-            }),
-            prisma.payment.findMany({
-                where: {
-                }
             })
         ]);
 
@@ -43,11 +39,16 @@ const getPament =  async (req, res) => {
 
         const [actualPayments, totalPayment] = await Promise.all([
             prisma.payment.findMany({
+                skip,
+                take: limit,
+                orderBy: { createdAt: 'desc' },
                 where: {
                     transactionId: { in: transactionIds }
                 }
             }),
-            prisma.payment.count()
+            prisma.payment.count({
+                where: { transactionId: { in: transactionIds } }
+            })
         ]);
 
         if (actualPayments == 0) {
@@ -79,4 +80,4 @@ const getPament =  async (req, res) => {
 
 
 
-module.exports = {getPament}
+module.exports = { getPayment }

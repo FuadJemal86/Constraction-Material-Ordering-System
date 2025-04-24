@@ -2,15 +2,17 @@
 
 const prisma = require("../../prismaCliaynt");
 
-const getOrderItem =  async (req, res) => {
+const getOrderItem = async (req, res) => {
 
-    const { id } = parseInt(req.params)
+    const id = parseInt(req.params.id)
+
+    console.log(id)
 
 
     try {
         const orderItem = await prisma.orderitem.findMany({
             where: {
-                id: id,
+                orderId: id,
             },
             include: {
                 order: {
@@ -35,4 +37,4 @@ const getOrderItem =  async (req, res) => {
 }
 
 
-module.exports = {getOrderItem}
+module.exports = { getOrderItem }

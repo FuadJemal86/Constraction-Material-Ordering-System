@@ -1,7 +1,7 @@
 const prisma = require("../../prismaCliaynt");
 const jwt = require('jsonwebtoken')
 
-const getProduct =  async (req, res) => {
+const getProduct = async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 10
     const skip = (page - 1) * limit
@@ -29,7 +29,9 @@ const getProduct =  async (req, res) => {
                 where: { supplierId: supplierId },
                 include: { category: true }
             }),
-            prisma.product.count()
+            prisma.product.count({
+                where: { supplierId: supplierId }
+            })
 
         ]);
 
@@ -47,4 +49,4 @@ const getProduct =  async (req, res) => {
 }
 
 
-module.exports = {getProduct}
+module.exports = { getProduct }

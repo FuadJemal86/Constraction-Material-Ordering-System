@@ -35,7 +35,9 @@ const getOrder = async (req, res) => {
                     }
                 }
             }),
-            prisma.order.count()
+            prisma.order.count({
+                where: { supplierId: supplierId }
+            })
         ])
 
         if (order == 0) {

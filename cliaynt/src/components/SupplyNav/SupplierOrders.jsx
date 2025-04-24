@@ -131,7 +131,7 @@ function SupplierOrders() {
     return (
         <div className="p-4 mt-16 bg-white rounded-lg shadow ">
             <Toaster position="top-center" reverseOrder={false} />
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Customer Orders</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Orders</h2>
 
             {/* Desktop View */}
             <div className="hidden md:block overflow-x-auto" id='order-table'>
@@ -150,7 +150,7 @@ function SupplierOrders() {
                     </button>
                 </div>
                 <table className="w-full border-collapse">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-gray-100">
                         <tr>
                             <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Id</th>
                             <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
@@ -166,7 +166,7 @@ function SupplierOrders() {
                         {order.map((c, index) => (
                             <tr
                                 key={c.id || index}
-                                className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                                className={index % 2 === 0 ? "bg-white hover:bg-gray-100" : "bg-gray-100 hover:bg-gray-100"}
                             >
                                 <td className="p-3 text-sm text-indigo-600 font-medium">{c.id}</td>
                                 <td className="p-3 text-sm text-gray-800">{c.customer.name}</td>

@@ -19,7 +19,7 @@ function Payment() {
 
         fetchData()
 
-    }, [])
+    }, [page])
 
     const fetchData = async () => {
         try {
@@ -105,9 +105,9 @@ function Payment() {
             </div>
 
             {/* Desktop View */}
-            <div className="hidden md:block overflow-x-auto">
-                <table className="w-full border-collapse">
-                    <thead className="bg-gray-50">
+            <div className="w-full overflow-x-auto">
+                <table className="min-w-[1185px] border-collapse">
+                    <thead className="bg-gray-100">
                         <tr>
                             <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Id</th>
                             <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
@@ -122,7 +122,7 @@ function Payment() {
                         {paymentStatus.map((c, index) => (
                             <tr
                                 key={c.id || index}
-                                className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                                className={index % 2 === 0 ? "bg-white hover:bg-gray-100" : "bg-gray-100 hover:bg-gray-100"}
                             >
                                 <td className="p-3 text-sm text-indigo-600 font-medium">{c.id}</td>
                                 <td className="p-3 text-sm text-gray-800">{c.customer.name}</td>
@@ -153,110 +153,34 @@ function Payment() {
                         )}
                     </tbody>
                 </table>
-                <div className="flex justify-center items-center mt-6 space-x-2">
-                    <button
-                        disabled={page === 1}
-                        onClick={() => fetchData(page - 1)}
-                        className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
-                    >
-                        Prev
-                    </button>
-
-                    {Array.from({ length: totalPages }, (_, index) => index + 1).map(num => (
-                        <button
-                            key={num}
-                            onClick={() => fetchData(num)}
-                            className={`px-3 py-1 border rounded ${num === page ? 'bg-indigo-500 text-white' : 'bg-white text-gray-700'
-                                } hover:bg-indigo-100`}
-                        >
-                            {num}
-                        </button>
-                    ))}
-
-                    <button
-                        disabled={page === totalPages}
-                        onClick={() => fetchData(page + 1)}
-                        className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
-                    >
-                        Next
-                    </button>
-                </div>
             </div>
+            <div className="flex justify-center items-center mt-6 space-x-2">
+                <button
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                    className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
+                >
+                    Prev
+                </button>
 
-            {/* Mobile View */}
-            <div className="md:hidden space-y-3">
-                {paymentStatus.map((c, index) => (
-                    <div key={c.id || index} className="border rounded-lg overflow-hidden">
-                        <div className="p-3 border-b bg-gray-50 flex justify-between">
-                            <span className="font-medium text-indigo-600">{c.id}</span>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(c.status)}`}>
-                                {c.status}
-                            </span>
-                        </div>
-                        <div className="p-3">
-                            <div className="grid grid-cols-3 gap-1 mb-2">
-                                <span className="text-xs text-gray-500">Customer:</span>
-                                <span className="text-sm col-span-2">{c.customer.name}</span>
-                            </div>
-                            <div className="grid grid-cols-3 gap-1 mb-2">
-                                <span className="text-xs text-gray-500">Price:</span>
-                                <span className="text-sm col-span-2">{c.amount}</span>
-                            </div>
-                            <div className="grid grid-cols-3 gap-1 mb-2">
-                                <span className="text-xs text-gray-500">Bank Transaction:</span>
-                                <span className="text-sm col-span-2">{c.bankTransactionId}</span>
-                            </div>
-                            <div className="grid grid-cols-3 gap-1">
-                                <span className="text-xs text-gray-500">Phone:</span>
-                                <span className="text-sm col-span-2 font-medium">{c.customer.phone}</span>
-                            </div>
-                            <div className="grid grid-cols-3 gap-1">
-                                <span className="text-xs text-gray-500">Date:</span>
-                                <span className="p-3 text-sm text-gray-500">
-                                    {new Date(c.createdAt).toLocaleDateString('en-GB', {
-                                        day: 'numeric',
-                                        month: 'long',
-                                        year: 'numeric'
-                                    }).replace(' ', '.')}
-                                </span>
-                            </div>
-                        </div>
-                        <div className="flex justify-center items-center mt-6 space-x-2">
-                            <button
-                                disabled={page === 1}
-                                onClick={() => fetchData(page - 1)}
-                                className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
-                            >
-                                Prev
-                            </button>
-
-                            {Array.from({ length: totalPages }, (_, index) => index + 1).map(num => (
-                                <button
-                                    key={num}
-                                    onClick={() => fetchData(num)}
-                                    className={`px-3 py-1 border rounded ${num === page ? 'bg-indigo-500 text-white' : 'bg-white text-gray-700'
-                                        } hover:bg-indigo-100`}
-                                >
-                                    {num}
-                                </button>
-                            ))}
-
-                            <button
-                                disabled={page === totalPages}
-                                onClick={() => fetchData(page + 1)}
-                                className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
-                            >
-                                Next
-                            </button>
-                        </div>
-                    </div>
-
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map(num => (
+                    <button
+                        key={num}
+                        onClick={() => setPage(num)}
+                        className={`px-3 py-1 border rounded ${num === page ? 'bg-indigo-500 text-white' : 'bg-white text-gray-700'
+                            } hover:bg-indigo-100`}
+                    >
+                        {num}
+                    </button>
                 ))}
-                {paymentStatus.length === 0 && (
-                    <div className="text-center p-4 border rounded-lg text-gray-500">
-                        No orders found
-                    </div>
-                )}
+
+                <button
+                    disabled={page === totalPages}
+                    onClick={() => setPage(page + 1)}
+                    className="px-3 py-1 border rounded bg-white text-gray-700 hover:bg-indigo-100 disabled:opacity-50"
+                >
+                    Next
+                </button>
             </div>
         </div>
     )
