@@ -31,10 +31,11 @@ function Nav() {
             {/* Mobile overlay */}
             {mobileOpen && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+                    className=" fixed inset-0 z-20 lg:hidden"
                     onClick={toggleMobileSidebar}
                 />
             )}
+
 
             {/* Sidebar */}
             <aside className={`
@@ -44,10 +45,10 @@ function Nav() {
                 ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             `}>
                 {/* Logo section */}
-                <div className="p-4 flex items-center">
+                <div className="p-4 flex flex-row items-center">
                     <div className={`
-                        mt-2 mb-4  rounded-xl  
-                        flex items-center ${collapsed ? 'justify-center' : 'gap-3'}
+                        rounded-xl  
+                        flex items-center   ${collapsed ? 'justify-center' : 'gap-3'}
                     `}>
                         <span className="bg-white rounded-full flex-shrink-0">
                             <img className="w-10 h-10 rounded-full" src={logo} alt="Logo" />
@@ -139,7 +140,8 @@ function Nav() {
                 </header>
 
                 {/* Page content */}
-                <main className="flex-1 p-4 md:p-6 custom-scrollbar bg-gray-50">
+                <main className="flex-1 p-4 md:p-6 overflow-auto">
+
                     <Outlet />
                 </main>
             </div>
