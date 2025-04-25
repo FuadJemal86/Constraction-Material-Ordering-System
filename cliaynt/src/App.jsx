@@ -20,6 +20,7 @@ import OrderItem from './components/SupplyNav/OrderItem';
 import MyAccount from './components/customerDetail/MyAccount';
 import ViewDetails from './components/customerDetail/ViewDetails';
 import PaymentTransaction from './components/customerDetail/PaymentTransaction';
+import SupplierVerification from './components/SupplyNav/SupplierVerification';
 
 
 
@@ -42,6 +43,7 @@ function App() {
                 <Route path='/my-account' element={<MyAccount />} />
 
 
+                <Route path='/supplier-verification' element={<SupplierVerification />} />
                 <Route path="/supplier-page" element={<Nav />}>
                     <Route path='order' element={<SupplierOrders />} />
                     <Route path='product' element={<Product />} />

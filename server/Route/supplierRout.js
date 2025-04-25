@@ -13,6 +13,7 @@ const { updateOrderStatus } = require('../controllers/supplier controllers/updat
 const { getPayment } = require('../controllers/supplier controllers/getPyment')
 const { getOrderItem } = require('../controllers/supplier controllers/get.orderItem')
 const { getProduct } = require('../controllers/supplier controllers/get.product')
+const { supplierVerify } = require('../controllers/supplier controllers/supplier.verifay')
 
 
 const router = express.Router()
@@ -31,5 +32,6 @@ router.get('/update-order-status/:id', updateOrderStatus)
 router.get('/get-payment', getPayment)
 router.get('/get-order-item/:id', getOrderItem)
 router.get('/get-product', getProduct)
+router.get('/is-verify', supplierVerify)
 
 module.exports = router

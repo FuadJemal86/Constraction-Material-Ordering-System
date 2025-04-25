@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import logo from '../../images/logo constraction.jpeg';
+import toast from 'react-hot-toast';
 import {
     Menu, X, ChevronLeft, Eye, Package, Box,
     CreditCard, MessageCircle, MoreVertical, Bell, Search, User
 } from "lucide-react";
+import api from '../../api';
 
 function Nav() {
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [isVerifiy, setVerifay] = useState()
     const location = useLocation();
 
     const toggleSidebar = () => {
@@ -25,6 +28,24 @@ function Nav() {
         { icon: <Box size={20} />, title: 'Products', path: '/supplier-page/product' },
         { icon: <CreditCard size={20} />, title: 'Payments', path: '/supplier-page/payment' },
     ];
+
+    useEffect(() => {
+        const chekVerify = async () => {
+            try {
+                const result = await api.get('/supplier/is-verify')
+
+                if (result.data.status) {
+                    setVerifay(result.data.supplierVerifiy)
+                } else {
+                    toast.error(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+        chekVerify()
+    }, [])
+
 
     return (
         <div className="flex flex-col h-screen lg:flex-row min-h-screen bg-gray-50">
@@ -119,9 +140,14 @@ function Nav() {
                             </div>
                         </div>
                         <div className="flex items-center space-x-3">
-                            <button className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100">
-                                <Bell size={20} />
-                            </button>
+                            {
+                                !isVerifiy && (
+                                    <Link to={'/supplier-verification'} className="px-2 py-1 bg-red-100 text-red-800 hover:text-gray-900 rounded-full hover:bg-gray-100">
+                                        Unverifiy
+                                    </Link>
+                                )
+                            }
+
                             <button className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100">
                                 <MessageCircle size={20} />
                             </button>

@@ -31,16 +31,16 @@ model complaint {
 }
 
 model customer {
-  id        Int         @id @default(autoincrement())
-  name      String
-  email     String      @unique(map: "Customer_email_key")
-  password  String
-  phone     String?
-  image     String?  
-  isActive  Boolean     @default(true)
-  createdAt DateTime    @default(now())
-  complaint complaint[]
-  order     order[]
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique(map: "Customer_email_key")
+  password     String
+  phone        String?
+  image        String?
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  complaint    complaint[]
+  order        order[]
   transactions Transaction[]
 }
 
@@ -70,14 +70,14 @@ model bank {
 }
 
 model Transaction {
-  id            Int       @id @default(autoincrement())
-  transactionId String    @unique
+  id            Int      @id @default(autoincrement())
+  transactionId String   @unique
   customerId    Int
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime @default(now())
 
-  customer  customer   @relation(fields: [customerId], references: [id])
-  orders    order[]
-  payment   payment?
+  customer customer @relation(fields: [customerId], references: [id])
+  orders   order[]
+  payment  payment?
 }
 
 model order {
@@ -98,7 +98,7 @@ model order {
   transaction Transaction @relation(fields: [transactionId], references: [transactionId])
 
   orderitem orderitem[]
-  
+
   @@index([customerId], map: "Order_customerId_fkey")
   @@index([supplierId], map: "Order_supplierId_fkey")
   @@index([transactionId])
@@ -161,6 +161,7 @@ model supplier {
   address       String
   image         String?
   isActive      Boolean  @default(true)
+  isVerify      Boolean  @default(false)
   lat           Float
   lng           Float
   tinNumber     String   @unique(map: "Supplier_tinNumber_key") @db.VarChar(10)
