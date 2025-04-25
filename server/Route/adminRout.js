@@ -18,27 +18,29 @@ const { getPayment } = require('../controllers/admin controllers/get.payment');
 const { getCustomer } = require('../controllers/admin controllers/get.customer');
 const { orderdelete } = require('../controllers/admin controllers/delete.order');
 const { getPaymentDetali } = require('../controllers/admin controllers/get.detail.payment');
+const { deleteAccount } = require('../controllers/admin controllers/delete.account');
 const router = express.Router();
 
 
 router.post('/login', adminLogin);
-router.post('/add-account' , addAccount)
-router.post('/add-bank-account' , addCompanyAccount)
-router.post('/add-category' , addCategory)
-router.get('/bank-accounts' , getCompanyAccount)
-router.get('/get-supplier' , getSupplier)
-router.get('/get-order' , getOrder)
-router.get('/get-order-item/:id' , getOrderItem)
-router.get('/get-category' , getCategory)
-router.get('/get-customer'  ,getCustomer)
-router.get('/get-payment' , getPayment)
-router.put('/delete-supplier/:id' , deleteSupplier)
-router.put('/delete-customer/:id' , deleteCustomer)
-router.delete('/delete-category/:id' , deleteCategory)
-router.delete('/delete-order/:id' , orderdelete)
-router.put('/update-supplier/:id' , updatedSupplier)
-router.put('/update-order-status/:id' , updateOrderStatus)
-router.put('/update-supplier-status/:supplierId' , updateCustomerApprove)
-router.get('/get-detil-paymen/:transactionId' , getPaymentDetali)
+router.post('/add-account', addAccount)
+router.post('/add-bank-account', addCompanyAccount)
+router.post('/add-category', addCategory)
+router.get('/bank-accounts', getCompanyAccount)
+router.get('/get-supplier', getSupplier)
+router.get('/get-order', getOrder)
+router.get('/get-order-item/:id', getOrderItem)
+router.get('/get-category', getCategory)
+router.get('/get-customer', getCustomer)
+router.get('/get-payment', getPayment)
+router.put('/delete-supplier/:id', deleteSupplier)
+router.put('/delete-customer/:id', deleteCustomer)
+router.delete('/delete-category/:id', deleteCategory)
+router.delete('/delete-order/:id', orderdelete)
+router.delete('/delete-bank-account/:id', deleteAccount)
+router.put('/update-supplier/:id', updatedSupplier)
+router.put('/update-order-status/:id', updateOrderStatus)
+router.put('/update-supplier-status/:supplierId', updateCustomerApprove)
+router.get('/get-detil-paymen/:transactionId', getPaymentDetali)
 
 module.exports = router;
