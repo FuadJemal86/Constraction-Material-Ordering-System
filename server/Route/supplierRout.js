@@ -16,6 +16,8 @@ const { getProduct } = require('../controllers/supplier controllers/get.product'
 const { supplierVerify } = require('../controllers/supplier controllers/supplier.verifay')
 const { uplodeSupplierVerification } = require('../controllers/supplier controllers/uploding.detail.verification')
 const { chekReviw } = require('../controllers/supplier controllers/is.reviw')
+const { supplierData } = require('../controllers/supplier controllers/supplier.detail')
+
 
 
 const router = express.Router()
@@ -37,5 +39,6 @@ router.get('/get-order-item/:id', getOrderItem)
 router.get('/get-product', getProduct)
 router.get('/is-verify', supplierVerify)
 router.get('/chek-reviw', chekReviw)
+router.get('/supplier-data/:id', supplierData)
 
 module.exports = router

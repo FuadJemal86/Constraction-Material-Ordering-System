@@ -20,6 +20,7 @@ const { orderdelete } = require('../controllers/admin controllers/delete.order')
 const { getPaymentDetali } = require('../controllers/admin controllers/get.detail.payment');
 const { deleteAccount } = require('../controllers/admin controllers/delete.account');
 const { updatePaymentStatus } = require('../controllers/admin controllers/update.payment.status');
+const { resubmit } = require('../controllers/admin controllers/askResubmit');
 const router = express.Router();
 
 
@@ -44,5 +45,6 @@ router.put('/update-order-status/:id', updateOrderStatus)
 router.put('/update-payment-status/:id', updatePaymentStatus)
 router.put('/update-supplier-status/:supplierId', updateCustomerApprove)
 router.get('/get-detil-paymen/:transactionId', getPaymentDetali)
+router.post('/resubmit/:id', resubmit)
 
 module.exports = router;

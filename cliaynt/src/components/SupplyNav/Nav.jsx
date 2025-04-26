@@ -141,9 +141,13 @@ function Nav() {
                         </div>
                         <div className="flex items-center space-x-3">
                             {
-                                !isVerifiy && (
+                                !isVerifiy ? (
                                     <Link to={'/supplier-verification'} className="px-2 py-1 bg-red-100 text-red-800 hover:text-gray-900 rounded-full hover:bg-gray-100">
                                         Unverifiy
+                                    </Link>
+                                ) : (
+                                    <Link className="px-2 py-1 bg-green-100 text-green-800 rounded-full hover:bg-gray-100">
+                                        verifiyed
                                     </Link>
                                 )
                             }

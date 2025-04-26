@@ -49,7 +49,7 @@ const uplodeSupplierVerification = [upload.fields([{ name: 'photo', maxCount: 1 
 
         const supplierdata = {
             userImage: photo,
-            licenseFile: license
+            licenseFile: license,
         }
 
 
@@ -66,7 +66,12 @@ const uplodeSupplierVerification = [upload.fields([{ name: 'photo', maxCount: 1 
                 await prisma.supplierVerifiy.update({
                     where: { supplierId: supplierId },
 
-                    data: supplierdata
+                    data: {
+                        userImage: photo,
+                        licenseFile: license,
+                        isReviw: true
+                    }
+
                 })
                 return res.status(200).json({ status: true, message: 'supplier data successfuly updated!' })
             } else {
