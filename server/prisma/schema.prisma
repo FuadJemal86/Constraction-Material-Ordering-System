@@ -175,6 +175,13 @@ model supplier {
   bank      bank[]
 }
 
+model supplierVerifiy {
+  id          Int     @id @default(autoincrement())
+  supplierId  Int
+  userImage   String?
+  licenseFile String?
+}
+
 model bankAccount {
   id            Int    @id @default(autoincrement())
   name          String
