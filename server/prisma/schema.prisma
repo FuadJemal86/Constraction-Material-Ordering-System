@@ -177,9 +177,10 @@ model supplier {
 
 model supplierVerifiy {
   id          Int     @id @default(autoincrement())
-  supplierId  Int
+  supplierId  Int     @unique
   userImage   String?
   licenseFile String?
+  isReviw     Boolean @default(true)
 }
 
 model bankAccount {

@@ -14,12 +14,15 @@ const { getPayment } = require('../controllers/supplier controllers/getPyment')
 const { getOrderItem } = require('../controllers/supplier controllers/get.orderItem')
 const { getProduct } = require('../controllers/supplier controllers/get.product')
 const { supplierVerify } = require('../controllers/supplier controllers/supplier.verifay')
+const { uplodeSupplierVerification } = require('../controllers/supplier controllers/uploding.detail.verification')
+const { chekReviw } = require('../controllers/supplier controllers/is.reviw')
 
 
 const router = express.Router()
 
 router.post('/sign-up', supplierUp)
 router.post('/login', supplierLogin)
+router.post('/supplier-verifing', uplodeSupplierVerification)
 router.get('/get-category', getCategory)
 router.post('/add-product', addProduct)
 router.delete('/delete-product/:id', deleteProduct)
@@ -33,5 +36,6 @@ router.get('/get-payment', getPayment)
 router.get('/get-order-item/:id', getOrderItem)
 router.get('/get-product', getProduct)
 router.get('/is-verify', supplierVerify)
+router.get('/chek-reviw', chekReviw)
 
 module.exports = router

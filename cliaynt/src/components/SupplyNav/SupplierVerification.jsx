@@ -1,9 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, Upload, X, CheckCircle, FileText } from "lucide-react";
+import api from '../../api';
 
 function SupplierVerification() {
     const [photo, setPhoto] = useState(null);
+    const [isReviw, setReviw] = useState(null)
     const [license, setLicense] = useState(null);
+    const [photoFile, setPhotoFile] = useState(null);
     const [cameraActive, setCameraActive] = useState(false);
     const [cameraError, setCameraError] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,6 +28,31 @@ function SupplierVerification() {
         };
     }, []);
 
+    const dataURLtoFile = (dataUrl, filename) => {
+        const arr = dataUrl.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+
+        return new File([u8arr], filename, { type: mime });
+    };
+
+    // This will run when `photo` updates
+    useEffect(() => {
+        if (photo && typeof photo === 'string') {
+            const file = dataURLtoFile(photo, 'captured-photo.jpg');
+            setPhotoFile(file);
+        } else if (photo instanceof File) {
+            setPhotoFile(photo);
+        }
+    }, [photo]);
+
+
     // Effect to handle video element when camera becomes active
     useEffect(() => {
         if (cameraActive && videoRef.current && streamRef.current) {
@@ -32,19 +60,13 @@ function SupplierVerification() {
         }
     }, [cameraActive]);
 
-    // Handle photo file upload
     const handlePhotoUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                setPhoto(e.target.result);
-            };
-            reader.readAsDataURL(file);
+            setPhoto(file);
         }
     };
 
-    // Handle license document upload
     const handleLicenseUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -108,6 +130,8 @@ function SupplierVerification() {
         setCameraError(null);
     };
 
+
+
     const capturePhoto = () => {
         if (videoRef.current) {
             try {
@@ -129,7 +153,7 @@ function SupplierVerification() {
     };
 
     // Form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!photo || !license) {
@@ -139,34 +163,74 @@ function SupplierVerification() {
 
         setIsSubmitting(true);
 
-        // Simulate API call
-        setTimeout(() => {
-            console.log("Submitted:", { photo, license });
-            setIsSubmitting(false);
-            setSubmitted(true);
+        const formData = new FormData();
 
-            // Reset form after 2 seconds
-            setTimeout(() => {
-                setSubmitted(false);
-            }, 2000);
-        }, 1000);
+        formData.append('photo', photoFile);
+        formData.append('license', license);
+
+
+        // Simulate API call
+        try {
+            const result = await api.post('/supplier/supplier-verifing', formData)
+
+            if (result.data.status) {
+                console.log(result.data.message)
+            } else {
+                console.log(result.data.message)
+            }
+        } catch (err) {
+            console.log(err)
+        } finally {
+            setIsSubmitting(false)
+        }
     };
 
+    useEffect(() => {
+        const chekIsReviw = async () => {
+            try {
+                const result = await api.get('/supplier/chek-reviw')
+
+                if (result.data.status) {
+                    setReviw(result.data.reviw)
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+        chekIsReviw()
+
+    }, [])
+
     return (
-        <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md">
-            <div className="bg-blue-600 text-white p-4 rounded-t-lg">
-                <h2 className="text-xl font-medium">Supplier Documentation</h2>
-                <p className="text-blue-100 text-sm">Upload supplier photo and license documentation</p>
+        <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md mt-4">
+            <div className="bg-blue-600 text-white p-4 rounded-t-lg flex justify-between">
+                <div>
+                    <h2 className="text-xl font-medium">Supplier Documentation</h2>
+                    <p className="text-blue-100 text-sm">Upload supplier photo and license documentation</p>
+                </div>
+                <div>
+
+                </div>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8  justify-end items-center ">
                     {/* Photo Upload Section */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <h3 className="text-lg font-medium text-gray-800">Supplier Photo</h3>
                             <div className="text-xs text-gray-500">Required</div>
                         </div>
+
+                        {
+                            isReviw && (
+                                <span className='bg-green-100 text-green-800 w-full px-2 rounded-lg'>
+                                    <>Processing... Update if needed.</>
+                                </span>
+                            )
+                        }
 
                         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                             <div className="flex flex-col items-center">
