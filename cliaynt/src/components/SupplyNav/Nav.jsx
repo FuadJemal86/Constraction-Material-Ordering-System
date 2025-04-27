@@ -30,8 +30,9 @@ function Nav() {
         { icon: <Box size={20} />, title: 'Products', path: '/supplier-page/product' },
         isOnline
             ? { icon: <StopCircle size={20} />, title: 'Stop', path: '', onClick: () => stopSupplier() }
-            : { icon: <PlayCircle size={20} />, title: 'Start', path: '', onClick: () => stopSupplier() }
+            : { icon: <PlayCircle size={20} />, title: 'Start', path: '', onClick: () => startSupplier() }
     ];
+
 
 
     const stopSupplier = async () => {
@@ -47,6 +48,21 @@ function Nav() {
             console.log(err)
         }
     }
+
+    const startSupplier = async () => {
+        try {
+            const result = await api.put('/supplier/online');
+            if (result.data.status) {
+                toast.success(result.data.message);
+                setOnline(result.data.onlineStatus);
+            } else {
+                console.log(result.data.message);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
 
 
     useEffect(() => {
@@ -119,6 +135,7 @@ function Nav() {
                             return (
                                 <li key={item.path} className="w-full">
                                     <Link
+                                        onClick={item.onClick}
                                         to={item.path}
                                         className={`
                                             flex items-center py-3 px-3 rounded-lg transition-colors
