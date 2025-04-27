@@ -4,13 +4,14 @@ import logo from '../../images/logo constraction.jpeg';
 import toast from 'react-hot-toast';
 import {
     Menu, X, ChevronLeft, Eye, Package, Box,
-    CreditCard, MessageCircle, MoreVertical, Bell, Search, User
+    CreditCard, MessageCircle, MoreVertical, Bell, Search, User, PlayCircle, StopCircle
 } from "lucide-react";
 import api from '../../api';
 
 function Nav() {
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [isOnline, setOnline] = useState()
     const [isVerifiy, setVerifay] = useState()
     const location = useLocation();
 
@@ -25,8 +26,14 @@ function Nav() {
     const menuItems = [
         { icon: <Eye size={20} />, title: 'Overview', path: '/' },
         { icon: <Package size={20} />, title: 'Orders', path: '/supplier-page/order' },
-        { icon: <Box size={20} />, title: 'Products', path: '/supplier-page/product' },
         { icon: <CreditCard size={20} />, title: 'Payments', path: '/supplier-page/payment' },
+        { icon: <Box size={20} />, title: 'Products', path: '/supplier-page/product' },
+        isOnline ? (
+            { icon: <StopCircle size={20} />, title: 'Stop', path: '' }
+
+        ) : (
+            { icon: <PlayCircle size={20} />, title: 'Start', path: '' }
+        )
     ];
 
     useEffect(() => {
@@ -36,6 +43,8 @@ function Nav() {
 
                 if (result.data.status) {
                     setVerifay(result.data.supplierVerifiy)
+                    setOnline(result.data.chekOnline)
+
                 } else {
                     toast.error(result.data.message)
                 }

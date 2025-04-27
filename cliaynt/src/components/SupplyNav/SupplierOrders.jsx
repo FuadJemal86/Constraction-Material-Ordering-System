@@ -22,7 +22,9 @@ function SupplierOrders() {
             COMPLETED: "bg-green-100 text-green-800",
             PROCESSING: "bg-blue-100 text-blue-800",
             PENDING: "bg-yellow-100 text-yellow-800",
-            CANSELLED: "bg-red-100 text-red-800"
+            CANSELLED: "bg-red-100 text-red-800",
+            DELIVERED: "bg-red-100 text-red-800"
+
         };
 
         return statusColors[status] || "bg-gray-100 text-gray-800";
@@ -30,24 +32,24 @@ function SupplierOrders() {
 
     useEffect(() => {
 
-        const fetchData = async () => {
-            console.log(page)
-            try {
-                const result = await api.get(`/supplier/get-order?page=${page}&limit=10`)
-                if (result.data.status) {
-                    setOrder(result.data.order)
-                    setPage(result.data.currentPage);
-                    setTotalPages(result.data.totalPages);
-                } else {
-                    console.log(result.data.message)
-                }
-            } catch (err) {
-                console.log(err)
-            }
-        }
-
         fetchData()
     }, [page])
+
+    const fetchData = async () => {
+        console.log(page)
+        try {
+            const result = await api.get(`/supplier/get-order?page=${page}&limit=10`)
+            if (result.data.status) {
+                setOrder(result.data.order)
+                setPage(result.data.currentPage);
+                setTotalPages(result.data.totalPages);
+            } else {
+                console.log(result.data.message)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
 
 
 
@@ -60,7 +62,7 @@ function SupplierOrders() {
             if (result.data.status) {
                 setStatusState({ status: newStatus });
                 toast.success(result.data.message);
-                feaheOrder();
+                fetchData();
             } else {
                 console.log(result.data.message);
             }
@@ -156,7 +158,7 @@ function SupplierOrders() {
                             <tr>
                                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Id</th>
                                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">LOcation</th>
+                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Delivery</th>
                                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Total Price</th>
                                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
@@ -174,7 +176,7 @@ function SupplierOrders() {
                                     <td className="p-3 text-sm text-gray-800">{c.customer.name}</td>
                                     <td className="p-3 text-sm text-gray-800">
                                         <span className={` ${c.address && c.address.length > 0}` ? 'bg-green-100 px-2 py-1 rounded-full text-green-800' : 'bg-red-100 px-2 py-1 rounded-full text-green-800'}>
-                                            {c.address && c.address.length > 0 ? c.address : 'Not'}
+                                            {c.address && c.address.length > 0 ? c.address : 'No'}
                                         </span>
                                     </td>
 

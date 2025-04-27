@@ -19,13 +19,15 @@ const supplierVerify = async (req, res) => {
             where: { id: supplierId },
 
             select: {
-                isApproved: true
+                isApproved: true,
+                isVerify: true
             }
         })
 
         const supplierVerifiy = isVerifiy.isApproved
+        const chekOnline = isVerifiy.isVerify
 
-        return res.status(200).json({ status: true, supplierVerifiy })
+        return res.status(200).json({ status: true, supplierVerifiy, chekOnline })
 
     } catch (err) {
         console.log(err)

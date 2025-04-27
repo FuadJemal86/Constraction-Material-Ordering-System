@@ -161,7 +161,7 @@ model supplier {
   address       String
   image         String?
   isActive      Boolean  @default(true)
-  isVerify      Boolean  @default(false)
+  isVerify      Boolean  @default(true)
   lat           Float
   lng           Float
   tinNumber     String   @unique(map: "Supplier_tinNumber_key") @db.VarChar(10)

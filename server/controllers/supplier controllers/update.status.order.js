@@ -2,9 +2,11 @@
 
 const prisma = require("../../prismaCliaynt")
 
-const updateOrderStatus =  async (req, res) => {
+const updateOrderStatus = async (req, res) => {
     const { id } = req.params
     const { status } = req.body
+
+
 
     try {
         await prisma.order.update({
@@ -22,4 +24,4 @@ const updateOrderStatus =  async (req, res) => {
 }
 
 
-module.exports = {updateOrderStatus}
+module.exports = { updateOrderStatus }

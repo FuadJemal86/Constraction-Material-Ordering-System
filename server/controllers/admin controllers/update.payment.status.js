@@ -15,7 +15,7 @@ const updatePaymentStatus = async (req, res) => {
             }
         })
 
-        return res.status(200).json({ status: true, message: `order updated in to ${status}` })
+        return res.status(200).json({ status: true, message: `Payment updated in to ${status}` })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ status: false, error: 'server error' })
