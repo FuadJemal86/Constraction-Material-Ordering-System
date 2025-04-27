@@ -1,8 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const { supplier } = require('./Route/supplier');
-const { customer } = require('./Route/customer');
 const adminRout = require('./Route/adminRout');
 const customerRout = require('./Route/customerRout');
 const supplierRout = require('./Route/supplierRout')
