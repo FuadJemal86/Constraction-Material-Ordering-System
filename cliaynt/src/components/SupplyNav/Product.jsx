@@ -86,7 +86,7 @@ function Product({ orders = [] }) {
             </span>
             <div className="p-4 mt-16 bg-white rounded-lg shadow " id='product-table'>
                 <h2 className="text-xl font-bold text-gray-800 mb-4">Product</h2>
-                {/* Desktop View */}
+
                 <div className="overflow-x-auto">
 
                     <div className='flex justify-end gap-2'>
@@ -128,7 +128,7 @@ function Product({ orders = [] }) {
                                         <td className="p-3 text-sm text-gray-800">{order.name}</td>
                                         <td className="p-3 text-sm text-gray-800">{order.category.category}</td>
                                         <td className="p-3 text-sm">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(order.status)}`}>
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 ${getStatusBadgeColor(order.status)}`}>
                                                 birr {order.price}/{order.unit}
                                             </span>
                                         </td>
