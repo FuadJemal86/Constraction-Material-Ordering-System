@@ -17,6 +17,7 @@ const { supplierVerify } = require('../controllers/supplier controllers/supplier
 const { uplodeSupplierVerification } = require('../controllers/supplier controllers/uploding.detail.verification')
 const { chekReviw } = require('../controllers/supplier controllers/is.reviw')
 const { supplierData } = require('../controllers/supplier controllers/supplier.detail')
+const { onlineStatus } = require('../controllers/supplier controllers/isSupplier.online')
 
 
 
@@ -34,6 +35,7 @@ router.post('/add-account', addAcount)
 router.delete('/delete-account/:id', deleteAccount)
 router.get('/get-order', getOrder)
 router.put('/update-order-status/:id', updateOrderStatus)
+router.put('/offline', onlineStatus)
 router.get('/get-payment', getPayment)
 router.get('/get-order-item/:id', getOrderItem)
 router.get('/get-product', getProduct)

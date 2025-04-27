@@ -28,13 +28,26 @@ function Nav() {
         { icon: <Package size={20} />, title: 'Orders', path: '/supplier-page/order' },
         { icon: <CreditCard size={20} />, title: 'Payments', path: '/supplier-page/payment' },
         { icon: <Box size={20} />, title: 'Products', path: '/supplier-page/product' },
-        isOnline ? (
-            { icon: <StopCircle size={20} />, title: 'Stop', path: '' }
-
-        ) : (
-            { icon: <PlayCircle size={20} />, title: 'Start', path: '' }
-        )
+        isOnline
+            ? { icon: <StopCircle size={20} />, title: 'Stop', path: '', onClick: () => stopSupplier() }
+            : { icon: <PlayCircle size={20} />, title: 'Start', path: '', onClick: () => stopSupplier() }
     ];
+
+
+    const stopSupplier = async () => {
+        try {
+            const reslut = await api.put('/supplier/offline')
+            if (reslut.data.status) {
+                toast.success(reslut.data.message)
+                setOnline(reslut.data.onlineStatus)
+            } else {
+                console.log(err)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
 
     useEffect(() => {
         const chekVerify = async () => {
