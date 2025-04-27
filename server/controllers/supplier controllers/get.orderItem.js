@@ -6,7 +6,6 @@ const getOrderItem = async (req, res) => {
 
     const id = parseInt(req.params.id)
 
-    console.log(id)
 
 
     try {

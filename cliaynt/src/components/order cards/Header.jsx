@@ -27,7 +27,7 @@ function Header() {
     const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "dark");
     const [cartOpen, setCartOpen] = useState(false);
     const [islogin, setIsLogin] = useState(true)
-    const [isBell , setIsBell] = useState(false)
+    const [isBell, setIsBell] = useState(false)
 
 
     const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);

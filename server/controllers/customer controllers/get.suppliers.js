@@ -1,12 +1,12 @@
-
-
-// get supplier
-
 const prisma = require("../../prismaCliaynt");
 
-const getSupplier =  async (req, res) => {
+const getSupplier = async (req, res) => {
     try {
         const supplier = await prisma.supplier.findMany({
+            where: {
+                isActive: true,
+                isApproved: true
+            },
             select: {
                 id: true,
                 companyName: true,
@@ -16,7 +16,7 @@ const getSupplier =  async (req, res) => {
         });
 
         if (!supplier || supplier.length === 0) {
-            return res.status(404).json({ status: false, message: "supplier not found" });
+            return res.status(404).json({ status: false, message: "No approved and active suppliers found" });
         }
 
         return res.status(200).json({ status: true, supplier });
@@ -24,6 +24,6 @@ const getSupplier =  async (req, res) => {
         console.error(err);
         res.status(500).json({ status: false, message: 'Server error' });
     }
-}
+};
 
-module.exports = {getSupplier}
+module.exports = { getSupplier };

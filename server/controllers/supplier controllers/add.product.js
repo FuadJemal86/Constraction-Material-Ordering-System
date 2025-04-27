@@ -20,7 +20,7 @@ const upload = multer({
     storage: storage
 })
 
-const addProduct =  [upload.single('image'), async (req, res) => {
+const addProduct = [upload.single('image'), async (req, res) => {
     try {
 
         const token = req.cookies["s-auth-token"];
@@ -35,6 +35,18 @@ const addProduct =  [upload.single('image'), async (req, res) => {
 
         if (!req.file) {
             return res.status(400).json({ status: false, message: 'Image is required' });
+        }
+
+        const chekSupplier = await prisma.supplier.findFirst({
+            where: { id: supplierId },
+            select: {
+                isActive: true,
+                isApproved: true
+            }
+        })
+
+        if (!chekSupplier.isActive || !chekSupplier.isApproved) {
+            return res.status(400).json({ status: false, message: 'Your account is restricted. Please contact admin.' });
         }
 
 
@@ -60,4 +72,4 @@ const addProduct =  [upload.single('image'), async (req, res) => {
     }
 }];
 
-module.exports = {addProduct}
+module.exports = { addProduct }

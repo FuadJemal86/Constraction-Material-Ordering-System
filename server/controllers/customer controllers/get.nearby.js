@@ -1,7 +1,7 @@
 const prisma = require("../../prismaCliaynt");
 
 
-const customerNearbt =  async (req, res) => {
+const customerNearbt = async (req, res) => {
     try {
         const { latitude, longitude, radius = 300 } = req.query;
 
@@ -17,6 +17,10 @@ const customerNearbt =  async (req, res) => {
         }
 
         const suppliers = await prisma.supplier.findMany({
+            where: {
+                isActive: true,
+                isApproved: true
+            },
             select: {
                 id: true,
                 companyName: true,
@@ -65,4 +69,4 @@ const customerNearbt =  async (req, res) => {
 }
 
 
-module.exports = {customerNearbt}
+module.exports = { customerNearbt }

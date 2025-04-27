@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../api';
 import toast, { Toaster } from 'react-hot-toast';
-import { Edit, Trash2, Eye } from "lucide-react";
+import { Eye, Printer, FileSpreadsheet } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+
 
 function SupplierOrders() {
     // Status badge colors
@@ -134,84 +135,86 @@ function SupplierOrders() {
             <h2 className="text-xl font-bold text-gray-800 mb-4">Orders</h2>
 
             {/* Desktop View */}
-            <div className="hidden md:block overflow-x-auto" id='order-table'>
+            <div className=" overflow-x-auto" id='order-table'>
                 <div className="flex justify-end mb-4 gap-2">
                     <button
                         onClick={handlePrint}
                         className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
                     >
-                        🖨️ Print
+                        <Printer />
                     </button>
                     <button
                         onClick={exportToExcel}
                         className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700"
                     >
-                        📥 Excel
+                        <FileSpreadsheet />
                     </button>
                 </div>
-                <table className="w-full border-collapse">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Id</th>
-                            <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                            <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">LOcation</th>
-                            <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                            <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Total Price</th>
-                            <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Order Item</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {order.map((c, index) => (
-                            <tr
-                                key={c.id || index}
-                                className={index % 2 === 0 ? "bg-white hover:bg-gray-100" : "bg-gray-100 hover:bg-gray-100"}
-                            >
-                                <td className="p-3 text-sm text-indigo-600 font-medium">{c.id}</td>
-                                <td className="p-3 text-sm text-gray-800">{c.customer.name}</td>
-                                <td className="p-3 text-sm text-gray-800">
-                                    <span className={` ${c.address && c.address.length > 0}` ? 'bg-green-100 px-2 py-1 rounded-full text-green-800' : 'bg-red-100 px-2 py-1 rounded-full text-green-800'}>
-                                        {c.address && c.address.length > 0 ? c.address : 'not delivery'}
-                                    </span>
-                                </td>
-
-                                <td className="p-3 text-sm text-gray-500">
-                                    {new Date(c.createdAt).toLocaleDateString('en-GB', {
-                                        day: 'numeric',
-                                        month: 'long',
-                                        year: 'numeric'
-                                    }).replace(' ', '.')}
-                                </td>
-
-                                <td className="p-3 text-sm text-gray-800 font-medium">birr {c.totalPrice}</td>
-                                <td className="p-3 text-sm">
-                                    <select
-                                        value={c.status || "PROCESSING"}
-                                        onChange={e => handleStatus(e.target.value, c.id)}
-                                        className={`px-2 py-1 rounded-full text-xs font-medium outline-none} ${getStatusBadgeColor(c.status)}`}
-                                    >
-                                        <option value="PENDING">PENDING</option>
-                                        <option value="PROCESSING">PROCESSING</option>
-                                        <option value="SHIPPED">SHIPPED</option>
-                                        <option value="DELIVERED">DELIVERED</option>
-                                        <option value="CANCELLED">CANCELLED</option>
-                                    </select>
-                                </td>
-                                <td className='p-3 text-sm'>
-                                    <span onClick={e => handleOrderItem(c.id)} className='text-blue-600 cursor-pointer'><Eye /></span>
-                                </td>
-                            </tr>
-                        ))}
-                        {order.length === 0 && (
+                <div className='w-full overflow-x-auto'>
+                    <table className="w-full border-collapse min-w-[1200px]">
+                        <thead className="bg-gray-100">
                             <tr>
-                                <td colSpan="6" className="p-4 text-center text-gray-500">
-                                    No orders found
-                                </td>
+                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Id</th>
+                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">LOcation</th>
+                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Total Price</th>
+                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Order Item</th>
                             </tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+
+                        <tbody>
+                            {order.map((c, index) => (
+                                <tr
+                                    key={c.id || index}
+                                    className={index % 2 === 0 ? "bg-white hover:bg-gray-100" : "bg-gray-100 hover:bg-gray-100"}
+                                >
+                                    <td className="p-3 text-sm text-indigo-600 font-medium">{c.id}</td>
+                                    <td className="p-3 text-sm text-gray-800">{c.customer.name}</td>
+                                    <td className="p-3 text-sm text-gray-800">
+                                        <span className={` ${c.address && c.address.length > 0}` ? 'bg-green-100 px-2 py-1 rounded-full text-green-800' : 'bg-red-100 px-2 py-1 rounded-full text-green-800'}>
+                                            {c.address && c.address.length > 0 ? c.address : 'Not'}
+                                        </span>
+                                    </td>
+
+                                    <td className="p-3 text-sm text-gray-500">
+                                        {new Date(c.createdAt).toLocaleDateString('en-GB', {
+                                            day: 'numeric',
+                                            month: 'long',
+                                            year: 'numeric'
+                                        }).replace(' ', '.')}
+                                    </td>
+
+                                    <td className="p-3 text-sm text-gray-800 font-medium">birr {c.totalPrice}</td>
+                                    <td className="p-3 text-sm">
+                                        <select
+                                            value={c.status || "PROCESSING"}
+                                            onChange={e => handleStatus(e.target.value, c.id)}
+                                            className={`px-2 py-1 rounded-full text-xs font-medium outline-none} ${getStatusBadgeColor(c.status)}`}
+                                        >
+                                            <option value="PENDING">PENDING</option>
+                                            <option value="PROCESSING">PROCESSING</option>
+                                            <option value="SHIPPED">SHIPPED</option>
+                                            <option value="DELIVERED">DELIVERED</option>
+                                            <option value="CANCELLED">CANCELLED</option>
+                                        </select>
+                                    </td>
+                                    <td className='p-3 text-sm'>
+                                        <span onClick={e => handleOrderItem(c.id)} className='text-blue-600 cursor-pointer'><Eye /></span>
+                                    </td>
+                                </tr>
+                            ))}
+                            {order.length === 0 && (
+                                <tr>
+                                    <td colSpan="6" className="p-4 text-center text-gray-500">
+                                        No orders found
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
                 <div className="flex justify-center items-center mt-6 space-x-2">
                     <button
                         disabled={page === 1}
@@ -279,54 +282,6 @@ function SupplierOrders() {
 
             {/* Mobile View */}
             <div className="md:hidden space-y-3">
-                {order.map((order, index) => (
-                    <div key={order.id || index} className="border rounded-lg overflow-hidden">
-                        <div className="p-3 border-b bg-gray-50 flex justify-between">
-                            <span className="font-medium text-indigo-600">{order.id}</span>
-                            <select
-                                value={order.status || "PROCESSING"}
-                                onChange={e => handleStatus(e.target.value, order.id)}
-                                className={`px-2 py-1 rounded-full text-xs font-medium outline-none} ${getStatusBadgeColor(order.status)}`}
-                            >
-                                <option value="PENDING">PENDING</option>
-                                <option value="PROCESSING">PROCESSING</option>
-                                <option value="SHIPPED">SHIPPED</option>
-                                <option value="DELIVERED">DELIVERED</option>
-                                <option value="CANCELLED">CANCELLED</option>
-                            </select>
-                        </div>
-                        <div className="p-3">
-                            <div className="grid grid-cols-3 gap-1 mb-2">
-                                <span className="text-xs text-gray-500">Customer:</span>
-                                <span className="text-sm col-span-2">{'order.customer'}</span>
-                            </div>
-                            <div className="grid grid-cols-3 gap-1 mb-2">
-                                <span className="text-xs text-gray-500">Location:</span>
-                                <span className='text-sm'>
-                                    {order.address && order.address.length > 0 ? order.address : 'not delivery'}
-                                </span>
-                            </div>
-                            <div className="grid grid-cols-3 gap-1 mb-2">
-                                <span className="text-xs text-gray-500">Date:</span>
-                                <span className="text-sm col-span-2">{'order.date'}</span>
-                            </div>
-                            <div className="grid grid-cols-3 gap-1">
-                                <span className="text-xs text-gray-500">Total:</span>
-                                <span className="text-sm col-span-2 font-medium">{order.totalPrice}</span>
-                            </div>
-                            <div className="grid grid-cols-3 gap-1">
-                                <span className="text-xs text-gray-500">Order Item:</span>
-                                <span onClick={e => handleOrderItem(order.id)} className='text-blue-600 cursor-pointer'><Eye /></span>
-                            </div>
-
-                        </div>
-                    </div>
-                ))}
-                {order.length === 0 && (
-                    <div className="text-center p-4 border rounded-lg text-gray-500">
-                        No orders found
-                    </div>
-                )}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50 px-4">
                         <div className="bg-white p-4 md:p-6 rounded-lg w-full max-w-2xl overflow-y-auto max-h-[90vh]">

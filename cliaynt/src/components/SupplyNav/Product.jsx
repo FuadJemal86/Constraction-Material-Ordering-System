@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import api from '../../api';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { Printer, FileSpreadsheet } from "lucide-react";
+
 
 function Product({ orders = [] }) {
 
@@ -44,7 +46,7 @@ function Product({ orders = [] }) {
 
     // print the customer table
     const handlePrint = () => {
-        const printContent = document.getElementById("order-table");
+        const printContent = document.getElementById("product-table");
         const WindowPrt = window.open('', '', 'width=900,height=650');
         WindowPrt.document.write(`
                     <html>
@@ -82,7 +84,7 @@ function Product({ orders = [] }) {
             <span className='flex justify-end mt-2'>
                 <Link to={'/supplier-page/add-product'} className='bg-blue-950 flex items-center rounded-lg text-gray-300 px-4 py-2'>Post Product</Link>
             </span>
-            <div className="p-4 mt-16 bg-white rounded-lg shadow ">
+            <div className="p-4 mt-16 bg-white rounded-lg shadow " id='product-table'>
                 <h2 className="text-xl font-bold text-gray-800 mb-4">Product</h2>
                 {/* Desktop View */}
                 <div className="overflow-x-auto">
@@ -93,13 +95,13 @@ function Product({ orders = [] }) {
                                 onClick={handlePrint}
                                 className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
                             >
-                                🖨️ Print
+                                <Printer />
                             </button>
                             <button
                                 onClick={exportToExcel}
                                 className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700"
                             >
-                                📥 Excel
+                                <FileSpreadsheet />
                             </button>
                         </div>
 
