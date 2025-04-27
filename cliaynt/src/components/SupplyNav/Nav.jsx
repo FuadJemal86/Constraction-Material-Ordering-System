@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import logo from '../../images/logo constraction.jpeg';
 import toast from 'react-hot-toast';
@@ -11,7 +11,7 @@ import api from '../../api';
 function Nav() {
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [isOnline, setOnline] = useState()
+    const [isOnline, setOnline] = useState(true);
     const [isVerifiy, setVerifay] = useState()
     const location = useLocation();
 
@@ -23,26 +23,16 @@ function Nav() {
         setMobileOpen(!mobileOpen);
     };
 
-    const menuItems = [
-        { icon: <Eye size={20} />, title: 'Overview', path: '/' },
-        { icon: <Package size={20} />, title: 'Orders', path: '/supplier-page/order' },
-        { icon: <CreditCard size={20} />, title: 'Payments', path: '/supplier-page/payment' },
-        { icon: <Box size={20} />, title: 'Products', path: '/supplier-page/product' },
-        isOnline
-            ? { icon: <StopCircle size={20} />, title: 'Stop', path: '', onClick: () => stopSupplier() }
-            : { icon: <PlayCircle size={20} />, title: 'Start', path: '', onClick: () => startSupplier() }
-    ];
 
 
 
     const stopSupplier = async () => {
         try {
-            const reslut = await api.put('/supplier/offline')
-            if (reslut.data.status) {
-                toast.success(reslut.data.message)
-                setOnline(reslut.data.onlineStatus)
+            const result = await api.put('/supplier/offline')
+            if (result.data.status) {
+                setOnline(result.data.onlineStatus)
             } else {
-                console.log(err)
+                console.log(result.data.message)
             }
         } catch (err) {
             console.log(err)
@@ -53,7 +43,6 @@ function Nav() {
         try {
             const result = await api.put('/supplier/online');
             if (result.data.status) {
-                toast.success(result.data.message);
                 setOnline(result.data.onlineStatus);
             } else {
                 console.log(result.data.message);
@@ -62,6 +51,18 @@ function Nav() {
             console.log(err);
         }
     };
+
+
+    const menuItems = useMemo(() => [
+        { icon: <Eye size={20} />, title: 'Overview', path: '/' },
+        { icon: <Package size={20} />, title: 'Orders', path: '/supplier-page/order' },
+        { icon: <CreditCard size={20} />, title: 'Payments', path: '/supplier-page/payment' },
+        { icon: <Box size={20} />, title: 'Products', path: '/supplier-page/product' },
+        isOnline
+            ? { icon: <StopCircle size={20} />, title: 'Stop', onClick: stopSupplier }
+            : { icon: <PlayCircle size={20} />, title: 'Start', onClick: startSupplier }
+    ], [isOnline]); // <== IMPORTANT: depend on isOnline
+
 
 
 
@@ -130,27 +131,29 @@ function Nav() {
                         text-gray-300 space-y-2 px-2
                         ${collapsed ? 'flex flex-col items-center' : ''}
                     `}>
-                        {menuItems.map((item) => {
-                            const isActive = location.pathname === item.path;
-                            return (
-                                <li key={item.path} className="w-full">
-                                    <Link
+                        {menuItems.map((item, index) => (
+                            <li key={index} className="w-full">
+                                {item.onClick ? (
+                                    <button
                                         onClick={item.onClick}
+                                        className="flex items-center py-3 px-3 w-full text-left rounded-lg transition-colors text-gray-300 hover:bg-gray-800 hover:text-white"
+                                    >
+                                        <span className="inline-flex">{item.icon}</span>
+                                        {!collapsed && <span className="ml-3 font-medium">{item.title}</span>}
+                                    </button>
+                                ) : (
+                                    <Link
                                         to={item.path}
-                                        className={`
-                                            flex items-center py-3 px-3 rounded-lg transition-colors
-                                            ${isActive
-                                                ? 'bg-blue-600 text-white'
-                                                : 'text-gray-300 hover:bg-gray-800 hover:text-white'}
-                                            ${collapsed ? 'justify-center' : ''}
-                                        `}
+                                        className="flex items-center py-3 px-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800 hover:text-white"
                                     >
                                         <span className="inline-flex">{item.icon}</span>
                                         {!collapsed && <span className="ml-3 font-medium">{item.title}</span>}
                                     </Link>
-                                </li>
-                            );
-                        })}
+                                )}
+                            </li>
+                        ))}
+
+
                     </ul>
                 </nav>
             </aside>

@@ -28,7 +28,7 @@ const offlineStatus = async (req, res) => {
             }
         })
 
-        let onlineStatus = isOnline.isActive
+        let onlineStatus = isOnline.isVerify
 
         return res.status(200).json({ status: true, onlineStatus })
     } catch (err) {
@@ -65,7 +65,7 @@ const onlineStatus = async (req, res) => {
             }
         })
 
-        let onlineStatus = isOnline.isActive
+        let onlineStatus = isOnline.isVerify
 
         return res.status(200).json({ status: true, onlineStatus })
     } catch (err) {

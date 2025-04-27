@@ -11,7 +11,8 @@ const getSupplier = async (req, res) => {
                 id: true,
                 companyName: true,
                 isApproved: true,
-                address: true
+                address: true,
+                isVerify: true
             }
         });
 

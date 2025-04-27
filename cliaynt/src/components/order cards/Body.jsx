@@ -236,11 +236,25 @@ function Body() {
                                             >
                                                 <span className='w-9'><StorefrontIcon /></span>
                                                 <div className='p-1 w-full'>
-                                                    <div className="flex items-center">
-                                                        {supplier.companyName}
-                                                        {supplier.isApproved && (
-                                                            <VerifiedIcon className="ml-2 text-blue-500" style={{ fontSize: '1rem' }} />
-                                                        )}
+                                                    <div className="flex items-center justify-between">
+                                                        <span>
+                                                            {supplier.companyName}
+                                                            {supplier.isApproved && (
+                                                                <VerifiedIcon className="ml-2 text-blue-500" style={{ fontSize: '1rem' }} />
+                                                            )}
+                                                        </span>
+                                                        <span className='flex text-right justify-end'>
+                                                            {supplier.isVerify ? (
+                                                                <span className="bg-green-600 text-green-100 px-2 py-1 rounded-md text-xs">
+                                                                    online
+                                                                </span>
+                                                            ) : (
+                                                                <span className="bg-red-600 text-red-100 px-2 py-1 rounded-md text-xs">
+                                                                    offline
+                                                                </span>
+                                                            )}
+
+                                                        </span>
                                                     </div>
                                                     <div className="text-sm text-gray-600 dark:text-gray-400">
                                                         {supplier.address}
