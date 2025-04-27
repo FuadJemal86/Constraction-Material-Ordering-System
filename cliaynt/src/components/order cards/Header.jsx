@@ -230,11 +230,6 @@ function Header() {
                             </div>
                         </div>
 
-                        {/* Cart Icon */}
-                        {/* <button className="h-8 w-8  border border-gray-500  rounded-full overflow-hidden">
-                            <img src={img} alt="Profile picture" className="w-full h-full object-cover p-[2px] rounded-full" />
-                        </button> */}
-
                         <HeaderProfile />
 
                         {
@@ -317,80 +312,10 @@ function Header() {
                                         <Link to="/contact" className="text-lg font-medium block">Contact</Link>
                                     </li>
 
-                                    {/* Payments Section */}
-                                    <li className="p-2 border-b border-gray-100 dark:border-gray-800">
-                                        <div className="flex justify-between items-center" onClick={() => setMobilePaymentsOpen(!mobilePaymentsOpen)}>
-                                            <span className="text-lg font-medium">Payments</span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${mobilePaymentsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </div>
 
-                                        {/* Mobile Payments Dropdown */}
-                                        {mobilePaymentsOpen && (
-                                            <div className="mt-3 pl-4 space-y-3">
-                                                {/* Pending Payments */}
-                                                <div>
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">PENDING PAYMENTS</h3>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        {
-                                                            paymentStatus.slice(0, 2).filter(c => c.status === 'PENDING').map(c => (
-                                                                <div className="bg-yellow-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow">
-                                                                    <div className="flex justify-between">
-                                                                        <span className="font-medium text-sm">payment {c.id}</span>
-                                                                        <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">{c.status}</span>
-                                                                    </div>
-                                                                    <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">Due in 3 days</div>
-                                                                </div>
-                                                            ))
-                                                        }
-
-                                                    </div>
-                                                    <div className="mt-2">
-                                                        <Link to="/payments/pending" className="text-sm text-yellow-500 hover:underline">View All Pending</Link>
-                                                    </div>
-                                                </div>
-
-                                                {/* Divider */}
-                                                <div className="border-t border-gray-100 dark:border-gray-800 my-3"></div>
-
-                                                {/* Completed Payments */}
-                                                <div>
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">COMPLETED PAYMENTS</h3>
-                                                    </div>
-                                                    {
-                                                        paymentStatus.slice(0, 2).filter(c => c.status === 'COMPLETED').map(c => (
-                                                            <div className="space-y-2">
-                                                                <div className="bg-green-50 dark:bg-gray-700 p-2 rounded-lg hover:shadow-md transition-shadow">
-                                                                    <div className="flex justify-between">
-                                                                        <span className="font-medium text-sm">Invoice #1078</span>
-                                                                        <span className="text-green-600 dark:text-green-400 text-sm font-medium">$2,350</span>
-                                                                    </div>
-                                                                    <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">{c.status}</div>
-                                                                </div>
-                                                            </div>
-                                                        ))
-                                                    }
-
-                                                    <div className="mt-2">
-                                                        <Link to="/payments/completed" className="text-sm text-yellow-500 hover:underline">View All Completed</Link>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </li>
 
                                     {/* Orders Section */}
                                     <li className="p-2 border-b border-gray-100 dark:border-gray-800">
-                                        <div className="flex justify-between items-center" onClick={() => setMobileOrdersOpen(!mobileOrdersOpen)}>
-                                            <span className="text-lg font-medium">Orders</span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${mobileOrdersOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </div>
 
                                         {/* Mobile Orders Dropdown */}
                                         {mobileOrdersOpen && (
@@ -407,72 +332,14 @@ function Header() {
                                                     ))
                                                 }
 
-                                                {/* Recent Orders */}
-                                                <div>
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400">RECENT ORDERS</h3>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        {
-                                                            orderStatus.slice(0, 2).map(c => (
-                                                                <div className="bg-blue-50 dark:bg-gray-700 p-2 rounded-lg">
-                                                                    <div className="flex justify-between items-center">
-                                                                        <div>
-                                                                            <div className="font-medium text-sm">Order {c.id}</div>
-                                                                            <div className="text-xs text-gray-500 dark:text-gray-400">{c.totalPrice}</div>
-                                                                        </div>
-                                                                        <div className="text-blue-600 dark:text-blue-400 text-xs font-medium">{c.status}</div>
-                                                                    </div>
-                                                                </div>
-
-                                                            ))
-                                                        }
-                                                    </div>
-                                                    <div className="mt-2">
-                                                        <Link to="/orders" className="text-sm text-yellow-500 hover:underline">View All Orders</Link>
-                                                    </div>
-                                                </div>
-
-                                                {/* Track Order Button */}
-                                                <button className="w-full mt-2 bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg text-sm font-medium transition-colors">
-                                                    Track Current Order
-                                                </button>
                                             </div>
                                         )}
                                     </li>
-
-                                    <div>
-                                        {count > 0 && (
-                                            <Link to="/orders" className="group flex items-center">
-                                                <span className="text-sm md:text-base font-medium mr-1.5 transition-colors group-hover:text-yellow-500">Orders</span>
-                                                <span className="flex items-center justify-center h-6 w-6 md:h-7 md:w-7 bg-yellow-500 text-white text-xs md:text-sm font-bold rounded-full transform transition-transform group-hover:scale-110">
-                                                    {count}
-                                                </span>
-                                            </Link>
-                                        )}
-                                    </div>
                                 </ul>
                             </nav>
 
                             {/* Mobile Bottom Actions */}
                             <div className="mt-auto relative pt-6">
-                                {/* Payment Stats for Mobile */}
-                                <div className="mb-4 border-b border-gray-100 dark:border-gray-800 pb-4">
-                                    <h3 className="font-semibold text-sm text-gray-500 dark:text-gray-400 mb-2">PAYMENT SUMMARY</h3>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {
-                                            paymentStatus.slice(0, 2).map(c => (
-                                                <div className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow">
-                                                    <div className="text-sm text-gray-500 dark:text-gray-400">{c.status}</div>
-                                                    <div className="flex items-end justify-between">
-                                                        <span className="text-lg font-bold">{c.totalPrice}</span>
-                                                        <span className="text-yellow-500 text-sm">{c.length}</span>
-                                                    </div>
-                                                </div>
-                                            ))
-                                        }
-                                    </div>
-                                </div>
 
                                 <div className="flex items-center space-x-2 p-2 border-b border-gray-100 dark:border-gray-800">
                                     <NotificationsNoneIcon className="text-2xl" />
