@@ -21,6 +21,7 @@ const { getPaymentDetali } = require('../controllers/admin controllers/get.detai
 const { deleteAccount } = require('../controllers/admin controllers/delete.account');
 const { updatePaymentStatus } = require('../controllers/admin controllers/update.payment.status');
 const { resubmit } = require('../controllers/admin controllers/askResubmit');
+const { deletedCustomer } = require('../controllers/admin controllers/deleted.customer');
 const router = express.Router();
 
 
@@ -28,6 +29,7 @@ router.post('/login', adminLogin);
 router.post('/add-account', addAccount)
 router.post('/add-bank-account', addCompanyAccount)
 router.post('/add-category', addCategory)
+
 router.get('/bank-accounts', getCompanyAccount)
 router.get('/get-supplier', getSupplier)
 router.get('/get-order', getOrder)
@@ -35,6 +37,8 @@ router.get('/get-order-item/:id', getOrderItem)
 router.get('/get-category', getCategory)
 router.get('/get-customer', getCustomer)
 router.get('/get-payment', getPayment)
+router.get('/get-deleted-customer', deletedCustomer)
+
 router.put('/delete-supplier/:id', deleteSupplier)
 router.put('/delete-customer/:id', deleteCustomer)
 router.delete('/delete-category/:id', deleteCategory)
@@ -46,5 +50,6 @@ router.put('/update-payment-status/:id', updatePaymentStatus)
 router.put('/update-supplier-status/:supplierId', updateCustomerApprove)
 router.get('/get-detil-paymen/:transactionId', getPaymentDetali)
 router.post('/resubmit/:id', resubmit)
+
 
 module.exports = router;
