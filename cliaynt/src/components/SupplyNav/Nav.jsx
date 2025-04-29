@@ -12,7 +12,7 @@ function Nav() {
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [isOnline, setOnline] = useState(true);
-    const [isVerifiy, setVerifay] = useState()
+    const [isVerifiy, setVerifay] = useState();
     const location = useLocation();
 
     const toggleSidebar = () => {
@@ -22,9 +22,6 @@ function Nav() {
     const toggleMobileSidebar = () => {
         setMobileOpen(!mobileOpen);
     };
-
-
-
 
     const stopSupplier = async () => {
         try {
@@ -52,19 +49,34 @@ function Nav() {
         }
     };
 
+    const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+            startSupplier();
+        } else {
+            stopSupplier();
+        }
+    };
 
-    const menuItems = useMemo(() => [
-        { icon: <Eye size={20} />, title: 'Overview', path: '/' },
-        { icon: <Package size={20} />, title: 'Orders', path: '/supplier-page/order' },
-        { icon: <CreditCard size={20} />, title: 'Payments', path: '/supplier-page/payment' },
-        { icon: <Box size={20} />, title: 'Products', path: '/supplier-page/product' },
-        isOnline
-            ? { icon: <StopCircle size={20} />, title: 'Stop', onClick: stopSupplier }
-            : { icon: <PlayCircle size={20} />, title: 'Start', onClick: startSupplier }
-    ], [isOnline]); // <== IMPORTANT: depend on isOnline
+    useEffect(() => {
 
+        startSupplier();
 
+        // Add visibility change event listener
+        document.addEventListener('visibilitychange', handleVisibilityChange);
 
+        const pingInterval = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+
+                api.put('/supplier/online').catch(err => console.log(err));
+            }
+        }, 30000);
+
+        return () => {
+            stopSupplier();
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            clearInterval(pingInterval);
+        };
+    }, []);
 
     useEffect(() => {
         const chekVerify = async () => {
@@ -74,7 +86,6 @@ function Nav() {
                 if (result.data.status) {
                     setVerifay(result.data.supplierVerifiy)
                     setOnline(result.data.chekOnline)
-
                 } else {
                     toast.error(result.data.message)
                 }
@@ -85,6 +96,15 @@ function Nav() {
         chekVerify()
     }, [])
 
+    const menuItems = useMemo(() => [
+        { icon: <Eye size={20} />, title: 'Overview', path: '/' },
+        { icon: <Package size={20} />, title: 'Orders', path: '/supplier-page/order' },
+        { icon: <CreditCard size={20} />, title: 'Payments', path: '/supplier-page/payment' },
+        { icon: <Box size={20} />, title: 'Products', path: '/supplier-page/product' },
+        isOnline
+            ? { icon: <StopCircle size={20} />, title: 'Stop', onClick: stopSupplier }
+            : { icon: <PlayCircle size={20} />, title: 'Start', onClick: startSupplier }
+    ], [isOnline]);
 
     return (
         <div className="flex flex-col h-screen lg:flex-row min-h-screen bg-gray-50">
@@ -182,6 +202,12 @@ function Nav() {
                             </div>
                         </div>
                         <div className="flex items-center space-x-3">
+                            {/* Status indicator */}
+                            <div className="px-2 py-1 rounded-full flex items-center space-x-1">
+                                <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                                <span className="text-sm font-medium">{isOnline ? 'Online' : 'Offline'}</span>
+                            </div>
+
                             {
                                 !isVerifiy ? (
                                     <Link to={'/supplier-verification'} className="px-2 py-1 bg-red-100 text-red-800 hover:text-gray-900 rounded-full hover:bg-gray-100">
@@ -213,7 +239,6 @@ function Nav() {
 
                 {/* Page content */}
                 <main className="flex-1 p-4 md:p-6 overflow-auto">
-
                     <Outlet />
                 </main>
             </div>
