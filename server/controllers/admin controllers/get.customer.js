@@ -4,13 +4,16 @@
 
 const prisma = require("../../prismaCliaynt")
 
-const getCustomer =  async (req, res) => {
+const getCustomer = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10
     const page = parseInt(req.query.page) || 1
     const skip = (page - 1) * limit
     try {
         const [supplier, totalCustomer] = await Promise.all([
             prisma.customer.findMany({
+                where: {
+                    isActive: true
+                },
                 skip,
                 take: limit,
                 orderBy: { createdAt: 'desc' }
@@ -35,4 +38,4 @@ const getCustomer =  async (req, res) => {
     }
 }
 
-module.exports = {getCustomer}
+module.exports = { getCustomer }

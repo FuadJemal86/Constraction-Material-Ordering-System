@@ -23,6 +23,10 @@ const { updatePaymentStatus } = require('../controllers/admin controllers/update
 const { resubmit } = require('../controllers/admin controllers/askResubmit');
 const { deletedCustomer } = require('../controllers/admin controllers/deleted.customer');
 const { getOnlineSupplier } = require('../controllers/admin controllers/get.online.supplier');
+const { removedSupplier } = require('../controllers/admin controllers/removed.supplier');
+const { recycleSupplier } = require('../controllers/admin controllers/recycle.supplier');
+const { removedCustomer } = require('../controllers/admin controllers/removed.customer');
+const { recycleCustomer } = require('../controllers/admin controllers/recycle.customer');
 const router = express.Router();
 
 
@@ -40,10 +44,15 @@ router.get('/get-customer', getCustomer)
 router.get('/get-payment', getPayment)
 router.get('/get-deleted-customer', deletedCustomer)
 router.get('/get-online-supplier', getOnlineSupplier)
+router.get('/removed-supplier', removedSupplier)
+router.get('/removed-customer', removedCustomer)
 
 
 router.put('/delete-supplier/:id', deleteSupplier)
 router.put('/delete-customer/:id', deleteCustomer)
+router.put('/recycle-supplier/:id', recycleSupplier)
+router.put('/recycle-customer/:id', recycleCustomer)
+
 router.delete('/delete-category/:id', deleteCategory)
 router.delete('/delete-order/:id', orderdelete)
 router.delete('/delete-bank-account/:id', deleteAccount)

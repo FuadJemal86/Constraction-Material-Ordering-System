@@ -1,8 +1,9 @@
+
 // get supplier 
 
 const prisma = require("../../prismaCliaynt");
 
-const getSupplier = async (req, res) => {
+const removedSupplier = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -10,7 +11,7 @@ const getSupplier = async (req, res) => {
     try {
         const [suppliers, totalSuppliers] = await Promise.all([
             prisma.supplier.findMany({
-                where: { isActive: true },
+                where: { isActive: false },
                 skip,
                 take: limit,
                 orderBy: { createdAt: 'desc' },
@@ -26,7 +27,7 @@ const getSupplier = async (req, res) => {
                     isApproved: true
                 }
             }),
-            prisma.supplier.count() // total count for pagination
+            prisma.supplier.count()
         ]);
 
         if (suppliers.length === 0) {
@@ -46,4 +47,4 @@ const getSupplier = async (req, res) => {
     }
 }
 
-module.exports = { getSupplier }
+module.exports = { removedSupplier }
