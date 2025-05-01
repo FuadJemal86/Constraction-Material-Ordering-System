@@ -20,7 +20,7 @@ const recycleCustomer = async (req, res) => {
             return res.status(404).json({ status: false, message: 'customer not found' });
         }
 
-        await prisma.supplier.update({
+        await prisma.customer.update({
             where: { id: id },
 
             data: {
