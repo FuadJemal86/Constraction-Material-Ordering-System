@@ -4,7 +4,7 @@ import logo from '../../images/logo constraction.jpeg';
 import toast from 'react-hot-toast';
 import {
     Menu, X, ChevronLeft, ChevronRight, Eye, Package, Box,
-    CreditCard, MessageCircle, MoreVertical, Bell, Search, User, PlayCircle, StopCircle
+    CreditCard, MessageCircle, MoreVertical, Bell, Search, User, PlayCircle, StopCircle, Globe, Trash2
 } from "lucide-react";
 import api from '../../api';
 
@@ -15,6 +15,7 @@ function Nav() {
     const [isOnline, setOnline] = useState(true);
     const [isVerifiy, setVerifay] = useState();
     const location = useLocation();
+
 
     const toggleSidebar = () => {
         setCollapsed(!collapsed);
@@ -104,8 +105,7 @@ function Nav() {
             icon: <CreditCard size={20} />, title: 'Payments', path: '/supplier-page/payment',
             Chevron: <ChevronRight size={20} />,
             subMenu: [
-                { icone: <Globe />, title: 'Online Suppliers', path: '/admin-page/online-suppliers' },
-                { icone: <Trash2 />, title: 'Removed Suppliers', path: '/admin-page/removed-supplier' }
+                { icone: <Globe />, title: 'Completed', path: '/admin-page/online-suppliers' },
             ]
         },
         { icon: <Box size={20} />, title: 'Products', path: '/supplier-page/product' },
@@ -164,28 +164,26 @@ function Nav() {
                 </div>
 
                 {/* Navigation */}
-                <nav className='mt-6'>
-                    <ul className={`
-                        text-gray-300 space-y-2 px-2
-                        ${collapsed ? 'flex flex-col items-center' : ''}
-                    `}>
-                        {menuItems.map((item, index) => (
-                            <li key={index} className="w-full">
-                                {item.onClick ? (
-                                    <button
-                                        onClick={item.onClick}
-                                        className="flex items-center py-3 px-3 w-full text-left rounded-lg transition-colors text-gray-300 hover:bg-gray-800 hover:text-white"
-                                    >
-                                        <span className="inline-flex">{item.icon}</span>
-                                        {!collapsed && <span className="ml-3 font-medium">{item.title}</span>}
-                                    </button>
-                                ) : (
+                <nav className="mt-6 ">
+                    <ul className="space-y-1 px-3">
+                        {menuItems.map((item) => {
+                            const isActive = location.pathname === item.path;
+                            const isSubMenuOpen = openSubMenus[item.title];
+
+                            return (
+                                <li key={item.path} className="w-full">
+
                                     <Link
                                         to={item.path}
-                                        className="flex items-center py-3 px-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800 hover:text-white"
+                                        className={`
+                                        flex items-center justify-between py-3 px-3 rounded-lg transition-colors
+                                        ${isActive ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}
+                                    `}
                                     >
-                                        <span className="inline-flex">{item.icon}</span>
-                                        {!collapsed && <span className="ml-3 font-medium">{item.title}</span>}
+                                        <div className="flex items-center">
+                                            <span className="inline-flex">{item.icon}</span>
+                                            {!collapsed && <span className="ml-3 font-medium">{item.title}</span>}
+                                        </div>
 
                                         {/* Arrow Icon */}
                                         {!collapsed && item.Chevron && (
@@ -193,40 +191,35 @@ function Nav() {
                                                 {item.Chevron}
                                             </span>
                                         )}
+                                    </Link>
 
-                                        {/* If item has subMenu */}
-                                        {item.subMenu && !collapsed && (
-                                            <ul className={`ml-8 mt-1 space-y-1 ${!isSubMenuOpen ? 'hidden' : ''}`}>
-                                                {item.subMenu.map((subItem) => {
-                                                    const isSubActive = location.pathname === subItem.path;
-                                                    return (
-                                                        <li key={subItem.path}>
-                                                            <Link
-                                                                to={subItem.path}
-                                                                className={`
+                                    {/* If item has subMenu */}
+                                    {item.subMenu && !collapsed && (
+                                        <ul className={`ml-8 mt-1 space-y-1 ${!isSubMenuOpen ? 'hidden' : ''}`}>
+                                            {item.subMenu.map((subItem) => {
+                                                const isSubActive = location.pathname === subItem.path;
+                                                return (
+                                                    <li key={subItem.path}>
+                                                        <Link
+                                                            to={subItem.path}
+                                                            className={`
                                                                     block py-2 px-3 rounded-lg text-sm transition-colors
                                                                 ${isSubActive ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}
                                                                 `}
-                                                            >
-                                                                <div className='flex items-center'>
-                                                                    <span className="inline-flex mr-2 h-5 w-5 items-center">{subItem.icone}</span>
-                                                                    <span>{subItem.title}</span>
-                                                                </div>
-                                                            </Link>
-                                                        </li>
-                                                    );
-                                                })}
-                                            </ul>
-                                        )}
-                                    </Link>
-
-
-                                )}
-
-                            </li>
-                        ))}
-
-
+                                                        >
+                                                            <div className='flex items-center'>
+                                                                <span className="inline-flex mr-2 h-5 w-5 items-center">{subItem.icone}</span>
+                                                                <span>{subItem.title}</span>
+                                                            </div>
+                                                        </Link>
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    )}
+                                </li>
+                            );
+                        })}
                     </ul>
                 </nav>
             </aside>

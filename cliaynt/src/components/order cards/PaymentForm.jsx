@@ -103,7 +103,6 @@ function PaymentForm() {
                 toast.success(result.data.message);
                 fetchPaymentStatus();
                 localStorage.removeItem('cart')
-                navigate('/my-account')
             } else {
                 toast.error(result.data.message);
             }
