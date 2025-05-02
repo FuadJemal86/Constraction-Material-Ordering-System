@@ -7,7 +7,7 @@ const donePayment = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10
     const skip = (page - 1) * 10
 
-    const token = req.cookies('s-auth-token')
+    const token = req.cookies['s-auth-token']
 
     if (!token) {
         return res.status(401).json({ status: false, message: 'token not provide' })

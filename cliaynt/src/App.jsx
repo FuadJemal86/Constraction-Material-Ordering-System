@@ -21,6 +21,7 @@ import MyAccount from './components/customerDetail/MyAccount';
 import ViewDetails from './components/customerDetail/ViewDetails';
 import PaymentTransaction from './components/customerDetail/PaymentTransaction';
 import SupplierVerification from './components/SupplyNav/SupplierVerification';
+import DonePayment from './components/SupplyNav/DonePayment';
 
 
 
@@ -50,6 +51,7 @@ function App() {
                     <Route path='add-product' element={<AddProduct />} />
                     <Route path='payment' element={<Payment />} />
                     <Route path='order-item' element={<OrderItem />} />
+                    <Route path='done-payment' element={<DonePayment />} />
                 </Route>
             </Routes>
         </Router>

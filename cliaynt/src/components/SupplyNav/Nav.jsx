@@ -105,7 +105,7 @@ function Nav() {
             icon: <CreditCard size={20} />, title: 'Payments', path: '/supplier-page/payment',
             Chevron: <ChevronRight size={20} />,
             subMenu: [
-                { icone: <Globe />, title: 'Completed', path: '/admin-page/online-suppliers' },
+                { icone: <Globe />, title: 'Completed', path: '/supplier-page/done-payment' },
             ]
         },
         { icon: <Box size={20} />, title: 'Products', path: '/supplier-page/product' },
