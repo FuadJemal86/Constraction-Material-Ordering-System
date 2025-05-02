@@ -27,17 +27,22 @@ const router = express.Router()
 router.post('/sign-up', supplierUp)
 router.post('/login', supplierLogin)
 router.post('/supplier-verifing', uplodeSupplierVerification)
-router.get('/get-category', getCategory)
 router.post('/add-product', addProduct)
-router.delete('/delete-product/:id', deleteProduct)
-router.put('/update-product/:id', updateProduct)
-router.get('/get-account', getAccount)
 router.post('/add-account', addAcount)
-router.delete('/delete-account/:id', deleteAccount)
-router.get('/get-order', getOrder)
+
+
 router.put('/update-order-status/:id', updateOrderStatus)
 router.put('/offline', offlineStatus)
+router.put('/update-product/:id', updateProduct)
 router.put('/online', onlineStatus)
+
+router.delete('/delete-product/:id', deleteProduct)
+router.delete('/delete-account/:id', deleteAccount)
+
+
+router.get('/get-account', getAccount)
+router.get('/get-order', getOrder)
+router.get('/get-category', getCategory)
 router.get('/get-payment', getPayment)
 router.get('/get-order-item/:id', getOrderItem)
 router.get('/get-product', getProduct)
