@@ -3,10 +3,11 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import logo from '../../images/logo constraction.jpeg';
 import toast from 'react-hot-toast';
 import {
-    Menu, X, ChevronLeft, Eye, Package, Box,
+    Menu, X, ChevronLeft, ChevronRight, Eye, Package, Box,
     CreditCard, MessageCircle, MoreVertical, Bell, Search, User, PlayCircle, StopCircle
 } from "lucide-react";
 import api from '../../api';
+
 
 function Nav() {
     const [collapsed, setCollapsed] = useState(false);
@@ -99,12 +100,29 @@ function Nav() {
     const menuItems = useMemo(() => [
         { icon: <Eye size={20} />, title: 'Overview', path: '/' },
         { icon: <Package size={20} />, title: 'Orders', path: '/supplier-page/order' },
-        { icon: <CreditCard size={20} />, title: 'Payments', path: '/supplier-page/payment' },
+        {
+            icon: <CreditCard size={20} />, title: 'Payments', path: '/supplier-page/payment',
+            Chevron: <ChevronRight size={20} />,
+            subMenu: [
+                { icone: <Globe />, title: 'Online Suppliers', path: '/admin-page/online-suppliers' },
+                { icone: <Trash2 />, title: 'Removed Suppliers', path: '/admin-page/removed-supplier' }
+            ]
+        },
         { icon: <Box size={20} />, title: 'Products', path: '/supplier-page/product' },
         isOnline
             ? { icon: <StopCircle size={20} />, title: 'Stop', onClick: stopSupplier }
-            : { icon: <PlayCircle size={20} />, title: 'Start', onClick: startSupplier }
+            : { icon: <PlayCircle size={20} />, title: 'Start', onClick: startSupplier },
+
     ], [isOnline]);
+
+    const [openSubMenus, setOpenSubMenus] = useState({});
+
+    const toggleSubMenu = (title) => {
+        setOpenSubMenus(prev => ({
+            ...prev,
+            [title]: !prev[title]
+        }));
+    };
 
     return (
         <div className="flex flex-col h-screen lg:flex-row min-h-screen bg-gray-50">
@@ -168,8 +186,43 @@ function Nav() {
                                     >
                                         <span className="inline-flex">{item.icon}</span>
                                         {!collapsed && <span className="ml-3 font-medium">{item.title}</span>}
+
+                                        {/* Arrow Icon */}
+                                        {!collapsed && item.Chevron && (
+                                            <span className={`ml-auto transform transition-transform ${isSubMenuOpen ? 'rotate-90' : ''}`} onClick={item.subMenu ? () => toggleSubMenu(item.title) : undefined} >
+                                                {item.Chevron}
+                                            </span>
+                                        )}
+
+                                        {/* If item has subMenu */}
+                                        {item.subMenu && !collapsed && (
+                                            <ul className={`ml-8 mt-1 space-y-1 ${!isSubMenuOpen ? 'hidden' : ''}`}>
+                                                {item.subMenu.map((subItem) => {
+                                                    const isSubActive = location.pathname === subItem.path;
+                                                    return (
+                                                        <li key={subItem.path}>
+                                                            <Link
+                                                                to={subItem.path}
+                                                                className={`
+                                                                    block py-2 px-3 rounded-lg text-sm transition-colors
+                                                                ${isSubActive ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}
+                                                                `}
+                                                            >
+                                                                <div className='flex items-center'>
+                                                                    <span className="inline-flex mr-2 h-5 w-5 items-center">{subItem.icone}</span>
+                                                                    <span>{subItem.title}</span>
+                                                                </div>
+                                                            </Link>
+                                                        </li>
+                                                    );
+                                                })}
+                                            </ul>
+                                        )}
                                     </Link>
+
+
                                 )}
+
                             </li>
                         ))}
 

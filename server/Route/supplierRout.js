@@ -18,6 +18,7 @@ const { uplodeSupplierVerification } = require('../controllers/supplier controll
 const { chekReviw } = require('../controllers/supplier controllers/is.reviw')
 const { supplierData } = require('../controllers/supplier controllers/supplier.detail')
 const { onlineStatus, offlineStatus } = require('../controllers/supplier controllers/isSupplier.online')
+const { donePayment } = require('../controllers/supplier controllers/get.done.payment')
 
 
 
@@ -49,5 +50,5 @@ router.get('/get-product', getProduct)
 router.get('/is-verify', supplierVerify)
 router.get('/chek-reviw', chekReviw)
 router.get('/supplier-data/:id', supplierData)
-
+router.get('/get-completed-payment', donePayment)
 module.exports = router
