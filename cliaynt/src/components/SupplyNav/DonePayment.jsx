@@ -1,14 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import api from '../../api'
-import { Printer, FileSpreadsheet } from "lucide-react";
+import { Printer, FileSpreadsheet, Eye } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
 function DonePayment() {
 
     const [donePayment, setDonePayment] = useState([])
+    const [orderItem, setOrderItem] = useState([])
     const [page, setPage] = useState(1);
+    const [isModalOpen, setIsModalOpen] = useState(false)
     const [totalPages, setTotalPages] = useState(1);
+
+    const getStatusBadgeColor = (status) => {
+        const statusColors = {
+            Completed: "bg-green-100 text-green-800",
+            Processing: "bg-blue-100 text-blue-800",
+            Pending: "bg-yellow-100 text-yellow-800",
+            Cancelled: "bg-red-100 text-red-800"
+        };
+
+        return statusColors[status] || "bg-gray-100 text-gray-800";
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -16,7 +29,7 @@ function DonePayment() {
                 const result = await api.get(`/supplier/get-completed-payment/?page=${page}&limit=10`)
 
                 if (result.data.status) {
-                    setDonePayment(result.data.completed)
+                    setDonePayment(result.data.donePayments)
                     setPage(result.data.currentPage);
                     setTotalPages(result.data.totalPages);
                 } else {
@@ -29,6 +42,28 @@ function DonePayment() {
         }
         fetchData()
     }, [])
+
+    const handleOrderItem = async (id) => {
+
+
+        if (!isModalOpen) {
+            setIsModalOpen(true)
+        } else {
+            setIsModalOpen(false)
+        }
+
+        try {
+            const result = await api.get(`/supplier/get-order-item/${id}`)
+
+            if (result.data.status) {
+                setOrderItem(result.data.orderItem)
+            } else {
+                console.log(err)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
 
     const handlePrint = () => {
         const printContent = document.getElementById("completed-payment-table");
@@ -89,33 +124,43 @@ function DonePayment() {
 
                     </div>
                     <div className='w-full overflow-x-auto border-collapse'>
-                        <table className="bg-gray-100 min-w-[1185px]">
+                        <table className={`bg-gray-100 min-w-[1200px]`}>
                             <thead>
                                 <tr>
                                     <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Id</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Customer Name</th>
+                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Customer Phone</th>
+                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">View Detail</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {donePayment.map((order, index) => (
+                                {donePayment.map((c, index) => (
                                     <tr
-                                        key={order.id || index}
+                                        key={c.id || index}
                                         className={index % 2 === 0 ? "bg-white hover:bg-gray-100" : "bg-gray-100 hover:bg-gray-100"}
                                     >
-                                        <td className="p-3 text-sm text-indigo-600 font-medium">{order.id}</td>
-                                        <td className="p-3 text-sm text-gray-800">{'order.name'}</td>
-                                        <td className="p-3 text-sm text-gray-800">{'order.category.category'}</td>
+                                        <td className="p-3 text-sm text-indigo-600 font-medium">{c.id}</td>
+                                        <td className="p-3 text-sm text-gray-800">{c.customer.name}</td>
+                                        <td className="p-3 text-sm text-gray-800">{c.customer.phone}</td>
                                         <td className="p-3 text-sm">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 ${getStatusBadgeColor(order.status)}`}>
-                                                birr {order.price}/{order.unit}
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 ${getStatusBadgeColor(c.status)}`}>
+                                                {c.status}
                                             </span>
                                         </td>
-                                        <td className="p-3 text-sm text-gray-500">{'order.stock'}</td>
-                                        <td className="p-3 text-sm text-gray-800"></td>
+                                        <td className="p-3 text-sm text-gray-800">{c.amount}</td>
+                                        <td className="p-3 text-sm text-gray-500">
+                                            {new Date(c.createdAt).toLocaleDateString('en-GB', {
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric'
+                                            }).replace(' ', '.')}
+                                        </td>
+                                        <td className='p-3 text-sm'>
+                                            <span onClick={e => handleOrderItem(c.id)} className='text-blue-600 cursor-pointer'><Eye /></span>
+                                        </td>
                                     </tr>
                                 ))}
                                 {donePayment.length === 0 && (
@@ -156,6 +201,86 @@ function DonePayment() {
                             Next
                         </button>
                     </div>
+                </div>
+                {isModalOpen && (
+                    <div className="hidden md:flex fixed inset-0 bg-gray-600 bg-opacity-50 justify-center items-center z-50">
+                        <div className="bg-white p-6 rounded-lg w-1/2">
+                            <h2 className="text-xl font-bold mb-4">Order Items for Order</h2>
+                            <table className="w-full">
+                                <thead>
+                                    <tr>
+                                        <th className="p-3 text-left text-xs font-medium text-gray-500">Customer</th>
+                                        <th className="p-3 text-left text-xs font-medium text-gray-500">Product Name</th>
+                                        <th className="p-3 text-left text-xs font-medium text-gray-500">Category</th>
+                                        <th className="p-3 text-left text-xs font-medium text-gray-500">Quantity</th>
+                                        <th className="p-3 text-left text-xs font-medium text-gray-500">Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {
+                                        orderItem.map(c => (
+                                            <tr >
+                                                <td className="p-3 text-sm">{c.order.customer.name}</td>
+                                                <td className="p-3 text-sm">{c.product.name}</td>
+                                                <td className="p-3 text-sm">{c.product.category.category}</td>
+                                                <td className="p-3 text-sm">{c.quantity}</td>
+                                                <td className="p-3 text-sm">{c.unitPrice}</td>
+                                            </tr>
+
+                                        ))
+                                    }
+                                </tbody>
+                            </table>
+                            <button onClick={() => setIsModalOpen(false)} className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                )}
+                {/* Mobile View */}
+                <div className="md:hidden space-y-3">
+                    {isModalOpen && (
+                        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50 px-4">
+                            <div className="bg-white p-4 md:p-6 rounded-lg w-full max-w-2xl overflow-y-auto max-h-[90vh]">
+                                <h2 className="text-lg md:text-xl font-bold mb-4 text-center">Order Items</h2>
+
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="bg-gray-100">
+                                                <th className="p-2 text-left font-medium text-gray-600">Customer</th>
+                                                <th className="p-2 text-left font-medium text-gray-600">Product</th>
+                                                <th className="p-2 text-left font-medium text-gray-600">Category</th>
+                                                <th className="p-2 text-left font-medium text-gray-600">Qty</th>
+                                                <th className="p-2 text-left font-medium text-gray-600">Price</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {orderItem.map((c, index) => (
+                                                <tr key={index} className="border-b">
+                                                    <td className="p-2">{c.order.customer.name}</td>
+                                                    <td className="p-2">{c.product.name}</td>
+                                                    <td className="p-2">{c.product.category.category}</td>
+                                                    <td className="p-2">{c.quantity}</td>
+                                                    <td className="p-2">birr {c.unitPrice}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div className="text-center mt-4">
+                                    <button
+                                        onClick={() => setIsModalOpen(false)}
+                                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                 </div>
             </div>
 

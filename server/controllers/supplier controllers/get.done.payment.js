@@ -75,7 +75,7 @@ const donePayment = async (req, res) => {
 
         return res.status(200).json({
             status: true,
-            payments: enrichedPayments,
+            donePayments: enrichedPayments,
             totalPages: Math.ceil(totalPayment / limit),
             currentPage: page,
         });

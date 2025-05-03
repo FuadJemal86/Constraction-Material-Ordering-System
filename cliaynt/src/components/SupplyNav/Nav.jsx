@@ -127,19 +127,14 @@ function Nav() {
     return (
         <div className="flex flex-col h-screen lg:flex-row min-h-screen bg-gray-50">
             {/* Mobile overlay */}
-            {mobileOpen && (
-                <div
-                    className=" fixed inset-0 z-20 lg:hidden"
-                    onClick={toggleMobileSidebar}
-                />
-            )}
+
 
 
             {/* Sidebar */}
             <aside className={`
                 fixed lg:static top-0 left-0
                 h-screen bg-gray-900 text-white transition-all duration-300 ease-in-out
-                ${collapsed ? 'w-20' : 'w-64'}
+                ${collapsed ? 'w-24' : 'w-64'}
                 ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             `}>
                 {/* Logo section */}
@@ -225,9 +220,9 @@ function Nav() {
             </aside>
 
             {/* Main content */}
-            <div className='flex flex-1 flex-col'>
+            <div className='flex-1 flex flex-col'>
                 {/* Header */}
-                <header className="bg-white shadow-sm sticky top-0  z-30">
+                <header className="bg-white shadow-sm z-10 sticky top-0">
                     <div className="flex items-center justify-between h-16 px-4">
                         <div className="flex items-center">
                             <button
