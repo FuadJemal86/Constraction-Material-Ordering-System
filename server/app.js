@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const supperAdmin = require('./Route/supperAdminRout')
 const adminRout = require('./Route/adminRout');
 const customerRout = require('./Route/customerRout');
 const supplierRout = require('./Route/supplierRout')
@@ -18,6 +19,7 @@ app.use(cors({
 }))
 
 app.use(express.static('public'));
+app.use('/supper-admin', supperAdmin)
 app.use('/supplier', supplierRout);
 app.use('/customer', customerRout);
 app.use('/admin', adminRout)

@@ -20,7 +20,7 @@ function ViewDetails() {
             }
         }
         feachOrderItem()
-    },[])
+    }, [])
     return (
         <div className='max-w-6xl mx-auto px-4 py-8 pt-24'>
             <div className='bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden'>
@@ -45,8 +45,7 @@ function ViewDetails() {
                                     <td className="px-6 py-4 whitespace-nowrap font-medium">{order.id}</td>
                                     <td className="px-6 py-4 whitespace-nowrap font-medium">{order.product.name}</td>
                                     <td className="px-6 py-4 whitespace-nowrap font-medium">{order.quantity}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap font-medium">{order.unitPrice}</td>
-
+                                    <td className="px-6 py-4 whitespace-nowrap font-medium">{order.unitPrice}/{order.product.unit}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{order.subtotal}</td>
                                 </tr>
                             ))}
