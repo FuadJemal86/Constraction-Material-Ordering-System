@@ -34,6 +34,8 @@ router.post('/login', adminLogin);
 router.post('/add-account', addAccount)
 router.post('/add-bank-account', addCompanyAccount)
 router.post('/add-category', addCategory)
+router.post('/resubmit/:id', resubmit)
+
 
 router.get('/bank-accounts', getCompanyAccount)
 router.get('/get-supplier', getSupplier)
@@ -46,22 +48,25 @@ router.get('/get-deleted-customer', deletedCustomer)
 router.get('/get-online-supplier', getOnlineSupplier)
 router.get('/removed-supplier', removedSupplier)
 router.get('/removed-customer', removedCustomer)
+router.get('/get-detil-paymen/:transactionId', getPaymentDetali)
 
 
 router.put('/delete-supplier/:id', deleteSupplier)
 router.put('/delete-customer/:id', deleteCustomer)
 router.put('/recycle-supplier/:id', recycleSupplier)
 router.put('/recycle-customer/:id', recycleCustomer)
+router.put('/update-supplier/:id', updatedSupplier)
+router.put('/update-payment-status/:id', updatePaymentStatus)
+router.put('/update-supplier-status/:supplierId', updateCustomerApprove)
+router.put('/update-order-status/:id', updateOrderStatus)
+
+
+
+
 
 router.delete('/delete-category/:id', deleteCategory)
 router.delete('/delete-order/:id', orderdelete)
 router.delete('/delete-bank-account/:id', deleteAccount)
-router.put('/update-supplier/:id', updatedSupplier)
-router.put('/update-order-status/:id', updateOrderStatus)
-router.put('/update-payment-status/:id', updatePaymentStatus)
-router.put('/update-supplier-status/:supplierId', updateCustomerApprove)
-router.get('/get-detil-paymen/:transactionId', getPaymentDetali)
-router.post('/resubmit/:id', resubmit)
 
 
 module.exports = router;

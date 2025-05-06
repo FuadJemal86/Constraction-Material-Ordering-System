@@ -10,7 +10,7 @@ const addSupperAdminAccount = async (req, res) => {
 
     try {
 
-        const existhingUsr = await prisma.supperadmin.findUnique({ where: { email } })
+        const existhingUsr = await prisma.supperAdmin.findUnique({ where: { email } })
 
         if (existhingUsr) {
             return res.status(400).json({ status: false, message: 'Account Already Exists' })
@@ -18,7 +18,7 @@ const addSupperAdminAccount = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const account = await prisma.supperadmin.create({
+        const account = await prisma.supperAdmin.create({
             data: {
                 name: name,
                 email: email,

@@ -24,7 +24,7 @@ const Login = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { admin: true, email: admin.email, id: admin.id },
+            { supperAdmin: true, email: supperAdmin.email, id: supperAdmin.id },
             process.env.SUPPER_ADMIN_KEY,
             { expiresIn: '30d' }
         );

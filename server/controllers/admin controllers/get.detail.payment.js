@@ -1,9 +1,8 @@
 const prisma = require("../../prismaCliaynt");
 
 const getPaymentDetali = async (req, res) => {
-    const transactionId = req.params.transactionId; 
+    const transactionId = req.params.transactionId;
 
-    console.log(transactionId)
 
     try {
         const orderDetails = await prisma.order.findMany({
