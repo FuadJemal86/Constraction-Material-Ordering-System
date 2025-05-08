@@ -3,7 +3,7 @@ const prisma = require("../../prismaCliaynt")
 
 const getAllAdmins = async (req, res) => {
     try {
-        const admis = await prisma.admin.findMany({
+        const admins = await prisma.admin.findMany({
             select: {
                 name: true,
                 email: true,
@@ -11,11 +11,11 @@ const getAllAdmins = async (req, res) => {
             }
         })
 
-        if (!admis) {
+        if (!admins) {
             return res.status(400).json({ status: false, message: 'admin not found' })
         }
 
-        return res.status(200).json({ status: true, admis })
+        return res.status(200).json({ status: true, admins })
     } catch (err) {
         console.log(err)
         return res.status(500).json({ status: false, message: 'server error' })

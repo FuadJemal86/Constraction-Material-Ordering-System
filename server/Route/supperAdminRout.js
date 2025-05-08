@@ -7,7 +7,7 @@ const router = express.Router()
 
 
 router.post('/login', Login)
-router.get('/get-admis', getAllAdmins)
+router.get('/get-admins', getAllAdmins)
 router.post('/add-supper-admin', addSupperAdminAccount)
 
 
