@@ -38,7 +38,7 @@ function PaymentTransaction() {
 
     return (
         <div className="bg-gray-100 min-h-screen pt-20 pb-8 px-4">
-            <div className="max-w-md mx-auto bg-white shadow-md print:shadow-none">
+            <div className="max-w-md mx-auto bg-white shadow-md print:shadow-none dark:text-black">
 
                 <div className="flex justify-end mb-4 print:hidden">
                     <button
