@@ -5,6 +5,7 @@ const getAllAdmins = async (req, res) => {
     try {
         const admins = await prisma.admin.findMany({
             select: {
+                id: true,
                 name: true,
                 email: true,
                 image: true
