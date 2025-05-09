@@ -26,6 +26,7 @@ const { removedSupplier } = require('../controllers/admin controllers/removed.su
 const { recycleSupplier } = require('../controllers/admin controllers/recycle.supplier');
 const { removedCustomer } = require('../controllers/admin controllers/removed.customer');
 const { recycleCustomer } = require('../controllers/admin controllers/recycle.customer');
+const { adminGetAccount } = require('../controllers/admin controllers/admin.get.account');
 const router = express.Router();
 
 
@@ -47,6 +48,7 @@ router.get('/get-online-supplier', getOnlineSupplier)
 router.get('/removed-supplier', removedSupplier)
 router.get('/removed-customer', removedCustomer)
 router.get('/get-detil-paymen/:transactionId', getPaymentDetali)
+router.get('/get-account', adminGetAccount)
 
 
 router.put('/delete-supplier/:id', deleteSupplier)
