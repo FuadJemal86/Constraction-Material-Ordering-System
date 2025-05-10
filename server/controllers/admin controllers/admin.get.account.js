@@ -23,6 +23,7 @@ const adminGetAccount = async (req, res) => {
             select: {
                 name: true,
                 email: true,
+                password: true,
                 image: true,
                 id: true,
                 createdAt: true

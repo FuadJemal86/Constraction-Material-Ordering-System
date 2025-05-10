@@ -27,7 +27,7 @@ const { recycleSupplier } = require('../controllers/admin controllers/recycle.su
 const { removedCustomer } = require('../controllers/admin controllers/removed.customer');
 const { recycleCustomer } = require('../controllers/admin controllers/recycle.customer');
 const { adminGetAccount } = require('../controllers/admin controllers/admin.get.account');
-const { updateAdmin } = require('../controllers/supperAdmin/update.admin');
+const { editAdminProfile } = require('../controllers/admin controllers/editProfile');
 const router = express.Router();
 
 
@@ -59,8 +59,8 @@ router.put('/recycle-customer/:id', recycleCustomer)
 router.put('/update-supplier/:id', updatedSupplier)
 router.put('/update-payment-status/:id', updatePaymentStatus)
 router.put('/update-supplier-status/:supplierId', updateCustomerApprove)
-router.put('/edit-profile', updateAdmin)
 router.put('/update-order-status/:id', updateOrderStatus)
+router.put('/edit-profile', editAdminProfile)
 
 
 
