@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomeParent from './components/homeComponents/HomeParent';
 import Cards from './components/order cards/Cards';
 import OrderParent from './components/order cards/OrderParent';
-import Login from './components/login page/Login';
 import Nav from './components/SupplyNav/Nav';
 import SupplierOrders from './components/SupplyNav/SupplierOrders';
 import Product from './components/SupplyNav/Product';
@@ -22,6 +21,7 @@ import ViewDetails from './components/customerDetail/ViewDetails';
 import PaymentTransaction from './components/customerDetail/PaymentTransaction';
 import SupplierVerification from './components/SupplyNav/SupplierVerification';
 import DonePayment from './components/SupplyNav/DonePayment';
+import SupplierSignUp from './components/login page/SupplierSignUp';
 
 
 
@@ -30,7 +30,7 @@ function App() {
         <Router>
             <Routes>
                 <Route path='/' element={<HomeParent />} />
-                <Route path='/sign-up' element={<Login />} />
+                <Route path='/sign-up' element={<SupplierSignUp />} />
                 <Route path='/sign-in' element={<SignIn />} />
                 <Route path='/order-items/:id' element={<ViewDetails />} />
                 <Route path='/customer-sign-in' element={<CustomerSignIn />} />

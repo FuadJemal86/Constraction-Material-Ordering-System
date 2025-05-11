@@ -28,6 +28,7 @@ const { removedCustomer } = require('../controllers/admin controllers/removed.cu
 const { recycleCustomer } = require('../controllers/admin controllers/recycle.customer');
 const { adminGetAccount } = require('../controllers/admin controllers/admin.get.account');
 const { editAdminProfile } = require('../controllers/admin controllers/editProfile');
+const { getAdminProfileImage } = require('../controllers/admin controllers/getAdminProfileImage');
 const router = express.Router();
 
 
@@ -50,6 +51,7 @@ router.get('/removed-supplier', removedSupplier)
 router.get('/removed-customer', removedCustomer)
 router.get('/get-detil-paymen/:transactionId', getPaymentDetali)
 router.get('/get-account', adminGetAccount)
+router.get('/admin-profile', getAdminProfileImage)
 
 
 router.put('/delete-supplier/:id', deleteSupplier)
