@@ -26,7 +26,6 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
             script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
             script.async = true;
             script.defer = true;
-
             script.onload = resolve;
             script.onerror = () => reject(new Error('Failed to load Google Maps API'));
 
@@ -37,7 +36,7 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
     // Initialize map
     useEffect(() => {
         let isMounted = true;
-        
+
         async function initializeMap() {
             try {
                 setIsLoading(true);
@@ -67,17 +66,17 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
                 locationButton.classList.add("custom-map-control-button");
                 locationButton.setAttribute("title", "Find my location");
                 locationButton.type = "button";
-                
+
                 mapInstance.controls[window.google.maps.ControlPosition.RIGHT_BOTTOM].push(locationButton);
-                
+
                 locationButton.addEventListener("click", () => {
                     getUserLocation();
                 });
-                
+
                 if (isMounted) {
                     setMap(mapInstance);
                     setIsLoading(false);
-                    
+
                     // Try to get user location automatically on map init
                     if (!userLocation) {
                         getUserLocation(true); // true = silent mode (no toast)
@@ -141,12 +140,12 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
                 map.setCenter(userPos);
                 map.setZoom(12);
             }
-            
+
             // Draw radius circle
             updateRadiusCircle(userPos);
         }
     }, [map, userLocation]);
-    
+
     // Update radius circle when filter changes
     useEffect(() => {
         if (map && userLocation && radiusFilter) {
@@ -157,14 +156,14 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
             updateRadiusCircle(userPos);
         }
     }, [radiusFilter, map, userLocation]);
-    
+
     // Function to update the radius circle
     const updateRadiusCircle = (center) => {
         // Remove existing circle
         if (radiusCircle) {
             radiusCircle.setMap(null);
         }
-        
+
         // Create new circle if we have a radius filter
         if (radiusFilter) {
             const newCircle = new window.google.maps.Circle({
@@ -178,9 +177,9 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
                 radius: radiusFilter * 1000, // Convert km to meters
                 zIndex: 1
             });
-            
+
             setRadiusCircle(newCircle);
-            
+
             // Fit map to circle bounds
             map.fitBounds(newCircle.getBounds());
         }
@@ -193,7 +192,7 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
             if (markers.length > 0) {
                 markers.forEach(marker => marker.setMap(null));
             }
-            
+
             // Add new suppliers
             addSuppliersToMap(suppliers, map);
         }
@@ -252,10 +251,10 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
                 );
 
                 // Create enhanced info window with distance if available
-                const distanceInfo = supplier.distance 
-                    ? `<p style="color: #3182ce; font-weight: bold; margin-bottom: 5px;">${supplier.distance.toFixed(1)} km away</p>` 
+                const distanceInfo = supplier.distance
+                    ? `<p style="color: #3182ce; font-weight: bold; margin-bottom: 5px;">${supplier.distance.toFixed(1)} km away</p>`
                     : '';
-                
+
                 const infoWindow = new window.google.maps.InfoWindow({
                     content: `
                         <div style="max-width: 250px; padding: 8px;">
@@ -279,14 +278,14 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
                     map: mapInstance,
                     title: supplier.companyName,
                     icon: {
-                        url: selectedSupplier && selectedSupplier.id === supplier.id 
+                        url: selectedSupplier && selectedSupplier.id === supplier.id
                             ? "https://maps.google.com/mapfiles/ms/icons/green-dot.png"  // Green for selected
                             : "https://maps.google.com/mapfiles/ms/icons/red-dot.png",   // Red for regular
                         scaledSize: new window.google.maps.Size(32, 32)
                     },
                     supplierId: supplier.id,
-                    animation: selectedSupplier && selectedSupplier.id === supplier.id 
-                        ? window.google.maps.Animation.BOUNCE 
+                    animation: selectedSupplier && selectedSupplier.id === supplier.id
+                        ? window.google.maps.Animation.BOUNCE
                         : null
                 });
 
@@ -354,7 +353,7 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
         };
 
         document.addEventListener('selectSupplier', handleSelectSupplier);
-        
+
         return () => {
             document.removeEventListener('selectSupplier', handleSelectSupplier);
         };
@@ -395,10 +394,10 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
                     // Center map on user's location
                     map.setCenter(userPos);
                     map.setZoom(13);
-                    
+
                     // Draw radius circle around user location
                     updateRadiusCircle(userPos);
-                    
+
                     resolve(position);
                 },
                 (error) => {
@@ -412,7 +411,7 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
                 }
             );
         });
-        
+
         if (!silent) {
             toast.promise(locationPromise, {
                 loading: 'Getting your location...',
@@ -420,7 +419,7 @@ function SupplierMap({ suppliers, selectedSupplier, onSelectSupplier, userLocati
                 error: 'Could not get your location'
             });
         }
-        
+
         return locationPromise;
     };
 
