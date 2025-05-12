@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const prisma = require('../../prismaCliaynt')
 
-const getAdminProfileImage = async (req, res) => {
+const getSupplierProfileImage = async (req, res) => {
     const token = req.cookies['s-auth-token']
 
     if (!token) {
@@ -17,7 +17,7 @@ const getAdminProfileImage = async (req, res) => {
         return res.status(401).json({ status: false, message: 'invalid token' })
     }
     try {
-        const supplierImage = await prisma.admin.findFirst({
+        const supplierImage = await prisma.supplier.findFirst({
             where: { id: Number(supplierId) },
             select: {
                 image: true
@@ -32,4 +32,4 @@ const getAdminProfileImage = async (req, res) => {
     }
 }
 
-module.exports = { getAdminProfileImage }
+module.exports = { getSupplierProfileImage }

@@ -2,11 +2,11 @@
 
 const prisma = require("../../prismaCliaynt")
 
-const deleteProduct = async (req, res) => {
 
+const deleteProduct = async (req, res) => {
+    const id = req.params.id
 
     try {
-        const { id } = req.params
 
         await prisma.product.delete({ where: { id: Number(id) } })
 
@@ -18,4 +18,4 @@ const deleteProduct = async (req, res) => {
     }
 }
 
-module.exports = {deleteProduct}
+module.exports = { deleteProduct }

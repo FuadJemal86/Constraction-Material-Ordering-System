@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../../api';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { Printer, FileSpreadsheet } from "lucide-react";
+import { Printer, FileSpreadsheet, Trash2 } from "lucide-react";
 
 
 function Product({ orders = [] }) {
@@ -79,6 +79,19 @@ function Product({ orders = [] }) {
         saveAs(data, "Customers.xlsx");
     };
 
+    const handleDelete = async (id) => {
+
+        try {
+            const result = await api.delete(`/supplier/delete-product/${id}`)
+
+            if (result.data.status) {
+                fetchData()
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
     return (
         <div>
             <span className='flex justify-end mt-2'>
@@ -133,7 +146,11 @@ function Product({ orders = [] }) {
                                             </span>
                                         </td>
                                         <td className="p-3 text-sm text-gray-500">{order.stock}</td>
-                                        <td className="p-3 text-sm text-gray-800"></td>
+                                        <td className="p-3 text-sm text-gray-800">
+                                            <button onClick={e => handleDelete(order.id)}>
+                                                <Trash2 className='text-red-700' size={20} />
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))}
                                 {product.length === 0 && (

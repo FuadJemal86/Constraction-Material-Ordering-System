@@ -21,7 +21,7 @@ const { onlineStatus, offlineStatus } = require('../controllers/supplier control
 const { donePayment } = require('../controllers/supplier controllers/get.done.payment')
 const { supplierProfile } = require('../controllers/supplier controllers/get.supplier.account')
 const { editSupplierProfile } = require('../controllers/supplier controllers/edit.Supplier.profile')
-const { getAdminProfileImage } = require('../controllers/admin controllers/getAdminProfileImage')
+const { getSupplierProfileImage } = require('../controllers/supplier controllers/get.supplier.image')
 
 
 
@@ -56,5 +56,5 @@ router.get('/chek-reviw', chekReviw)
 router.get('/supplier-data/:id', supplierData)
 router.get('/get-completed-payment', donePayment)
 router.get('/get-supplier-profile', supplierProfile)
-router.get('/supplier-profile', getAdminProfileImage)
+router.get('/supplier-profile', getSupplierProfileImage)
 module.exports = router
