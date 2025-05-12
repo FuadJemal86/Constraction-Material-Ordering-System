@@ -110,7 +110,7 @@ function CustomerSignIn() {
 
             {/* Right section - Banner Image */}
             <div className="hidden md:block md:w-1/2 bg-cover bg-center" style={{ backgroundImage: `url(${banner})` }}>
-                <div className="w-full h-full flex items-end p-10 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
+                <div className="w-full h-full flex items-end p-10  bg-gradient-to-br from-blue-600/80 to-indigo-900/60">
                     <div className="text-white max-w-lg">
                         <h2 className="text-3xl md:text-4xl font-bold mb-3">Quality Materials, <br /><span className="text-blue-300">Solid Results</span></h2>
                         <p className="text-gray-200 text-base">Find quality construction products from trusted suppliers in our marketplace.</p>

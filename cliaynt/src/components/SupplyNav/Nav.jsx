@@ -4,7 +4,8 @@ import logo from '../../images/logo constraction.jpeg';
 import toast from 'react-hot-toast';
 import {
     Menu, X, ChevronLeft, ChevronRight, Eye, Package, Box,
-    CreditCard, MessageCircle, MoreVertical, Bell, Search, User, PlayCircle, StopCircle, Globe, Trash2
+    CreditCard, MessageCircle, MoreVertical, Bell, Search, User, PlayCircle, StopCircle, Globe, Trash2,
+    Settings
 } from "lucide-react";
 import api from '../../api';
 
@@ -14,6 +15,7 @@ function Nav() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [isOnline, setOnline] = useState(true);
     const [isVerifiy, setVerifay] = useState();
+    const [supplierImage, setSupplierImage] = useState({})
     const location = useLocation();
 
 
@@ -96,6 +98,23 @@ function Nav() {
             }
         }
         chekVerify()
+    }, [])
+
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const result = await api.get('/supplier/supplier-profile')
+                if (result.data.status) {
+                    setSupplierImage(result.data.supplierImage)
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+        fetchProfile()
     }, [])
 
     const menuItems = useMemo(() => [
@@ -264,14 +283,24 @@ function Nav() {
                             <button className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100">
                                 <MessageCircle size={20} />
                             </button>
-                            <div className="relative">
-                                <button className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100">
-                                    <MoreVertical size={20} />
-                                </button>
-                            </div>
+                            <button className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100">
+                                <Link to={'/setting'}>
+                                    <Settings size={20} />
+                                </Link>
+                            </button>
                             <div className="ml-2 hidden sm:block">
                                 <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
-                                    <User size={16} />
+                                    {
+                                        supplierImage?.image ? (
+                                            <div className="h-8 w-8 rounded-full  flex items-center justify-center text-white">
+                                                <span className="font-medium text-sm "><img className='rounded-full h-8 w-8' src={`http://localhost:3032/images/${supplierImage.image}`} alt="" srcset="" /></span>
+                                            </div>
+                                        ) : (
+                                            <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                                <span className="font-medium text-sm">S</span>
+                                            </div>
+                                        )
+                                    }
                                 </div>
                             </div>
                         </div>

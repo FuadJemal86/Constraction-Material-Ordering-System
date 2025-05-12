@@ -22,6 +22,7 @@ import PaymentTransaction from './components/customerDetail/PaymentTransaction';
 import SupplierVerification from './components/SupplyNav/SupplierVerification';
 import DonePayment from './components/SupplyNav/DonePayment';
 import SupplierSignUp from './components/login page/SupplierSignUp';
+import SupplierSetting from './components/SupplyNav/Settings';
 
 
 
@@ -35,6 +36,7 @@ function App() {
                 <Route path='/order-items/:id' element={<ViewDetails />} />
                 <Route path='/customer-sign-in' element={<CustomerSignIn />} />
                 <Route path='/customer-sign-up' element={<SignUp />} />
+                <Route path='/setting' element={<SupplierSetting />} />
                 <Route path='/payment-form/:transactionId' element={<PaymentForm />} />
                 <Route path='/payment-transaction/:transactionId' element={<PaymentTransaction />} />
                 <Route path="/products" element={<OrderParent />}>
