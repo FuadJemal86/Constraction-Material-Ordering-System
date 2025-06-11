@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams , useLocation  } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useCart } from '../CartContext';
 import image1 from '../../images/image1_0.jpg';
 // import { Notyf } from "notyf";
@@ -37,7 +37,7 @@ function Cards() {
         }
 
         fetchData()
-    }, [category , id]);
+    }, [category, id]);
 
 
 
@@ -84,10 +84,7 @@ function Cards() {
                                 <p className="text-blue-600 dark:text-blue-400 font-bold text-xl">{`birr ${product.price}`}</p>
                                 {/* Optional rating component */}
                                 <div className="flex items-center">
-                                    <svg className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                                    </svg>
-                                    <span className="text-xs ml-1 text-gray-600 dark:text-gray-400">4.5</span>
+                                    <span className="text-xs ml-1 text-gray-600 dark:text-gray-400">stock {product.stock}/{product.unit}</span>
                                 </div>
                             </div>
 

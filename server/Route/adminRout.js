@@ -37,7 +37,6 @@ router.post('/add-bank-account', addCompanyAccount)
 router.post('/add-category', addCategory)
 router.post('/resubmit/:id', resubmit)
 
-
 router.get('/bank-accounts', getCompanyAccount)
 router.get('/get-supplier', getSupplier)
 router.get('/get-order', getOrder)

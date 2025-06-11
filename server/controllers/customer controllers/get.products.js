@@ -25,10 +25,15 @@ const getProduct = async (req, res) => {
             return res.status(400).json({ status: false, message: 'No supplier founded' });
         }
 
-        const product = await prisma.product.findMany(
-            {
-                where: { supplierId: id, categoryId: categoryId, }
-            })
+        const product = await prisma.product.findMany({
+            where: {
+                supplierId: id,
+                categoryId: categoryId,
+                stock: {
+                    gt: 0, // gt means "greater than"
+                },
+            },
+        });
 
         if (product.length == 0) {
             return res.status(401).json({ status: false, message: "No product found" })
