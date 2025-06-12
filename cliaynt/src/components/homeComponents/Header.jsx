@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, Wrench, ChevronDown } from 'lucide-react';
-import logo from '../../images/logo constraction.jpeg';
+import logo from '../../images/jejan.svg';
 import '@fontsource/roboto';
 
 function Header() {
@@ -57,8 +57,7 @@ function Header() {
                     {/* Logo */}
                     <div className="flex items-center">
                         <Link to="/" className="flex items-center">
-                            <img className='w-12 h-12 dark:bg-white rounded-full m-1' src={logo} alt="" srcset="" />
-                            <span className="font-bold text-lg sm:text-xl">ConstructEase</span>
+                            <img className='w-32 h-14 m-1' src={logo} alt="" srcset="" />
                         </Link>
                     </div>
 
@@ -139,8 +138,8 @@ function Header() {
             {/* Mobile Menu - Animated Slide Down */}
             <div
                 className={`md:hidden bg-white border-t dark:bg-gray-900 overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen
-                        ? 'max-h-screen opacity-100'
-                        : 'max-h-0 opacity-0'
+                    ? 'max-h-screen opacity-100'
+                    : 'max-h-0 opacity-0'
                     }`}
             >
                 <ul className="flex flex-col py-4 px-6 space-y-4">

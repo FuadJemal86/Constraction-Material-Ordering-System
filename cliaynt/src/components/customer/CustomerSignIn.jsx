@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import logo from '../../images/logo constraction.jpeg';
+import logo from '../../images/jejan.svg';
 import banner from '../../images/login banner.jpg';
 import { Toaster, toast } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
@@ -53,9 +53,6 @@ function CustomerSignIn() {
                                 alt="ConstructEasy Logo"
                             />
                         </div>
-                        <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            ConstructEasy
-                        </span>
                     </div>
 
                     {/* Heading */}

@@ -3,10 +3,10 @@ import { FaSearch } from "react-icons/fa";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import { LightMode, DarkMode } from "@mui/icons-material";
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User, LogIn } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCart } from "../CartContext";
-import logo from '../../images/logo constraction.jpeg';
+import logo from '../../images/jejan.svg';
 import bannerImage from '../../images/banner2 page2.jpg';
 import ShoppingCart from './ShoppingCart';
 import api from '../../api';
@@ -119,11 +119,10 @@ function Header() {
             <header className="relative">
                 <div className='flex items-center justify-between md:p-2 p-1 fixed right-0 left-0 top-0 bg-white dark:bg-gray-900 z-20 shadow-md'>
 
-                    <div className='flex items-center'>
-                        <img className='w-11 h-11 md:w-16 md:h-16 dark:bg-white rounded-full' src={logo} alt="ConstracEase Logo" />
-                        <div className='font-bold text-lg md:text-2xl md:px-2'>
-                            <p>ConstracEase</p>
-                        </div>
+                    <div className="flex items-center">
+                        <Link to="/" className="flex items-center">
+                            <img className='w-40 h-14 m-1' src={logo} alt="" srcset="" />
+                        </Link>
                     </div>
 
                     <div className='hidden md:flex justify-center w-full'>
@@ -229,17 +228,30 @@ function Header() {
 
                         <HeaderProfile />
 
-                        {
-                            islogin && (
-                                <span className='bg-blue-900 px-2 py-1 rounded-md'>
-                                    <Link to={'/customer-sign-in'} className='px-2 py-1 text-white'>
-                                        Login
-                                    </Link>
+                        {/* Updated Login Button - Now matches header style */}
+                        {islogin && (
+                            <Link
+                                to="/customer-sign-in"
+                                className="group relative flex items-center gap-2 px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-yellow-500 transition-all duration-300 font-medium"
+                            >
+                                {/* Subtle background on hover */}
+                                <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                                {/* Icon with subtle animation */}
+                                <div className="relative z-10">
+                                    <User className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                                </div>
+
+                                {/* Text with underline effect */}
+                                <span className="relative z-10">
+                                    Login
+                                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-yellow-500 group-hover:w-full transition-all duration-300"></span>
                                 </span>
-                            )
-                        }
 
-
+                                {/* Arrow that slides in */}
+                                <LogIn className="w-4 h-4 relative z-10 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                            </Link>
+                        )}
 
                         <button
                             className="relative hidden md:block"
@@ -292,7 +304,6 @@ function Header() {
                     <div className="fixed top-0 inset-0 bg-white dark:bg-gray-900 z-10 pt-16">
                         <div className="flex flex-col p-5">
 
-
                             {/* Mobile Navigation */}
                             <nav>
                                 <ul className="flex flex-col space-y-4">
@@ -309,7 +320,20 @@ function Header() {
                                         <Link to="/contact" className="text-lg font-medium block">Contact</Link>
                                     </li>
 
-
+                                    {/* Mobile Login - Updated to match desktop style */}
+                                    <li className="p-2 border-b border-gray-100 dark:border-gray-800">
+                                        <Link
+                                            to="/customer-sign-in"
+                                            className="flex items-center gap-3 text-lg font-medium hover:text-yellow-500 transition-colors group"
+                                        >
+                                            <User className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                                            <span className="relative">
+                                                Login
+                                                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-yellow-500 group-hover:w-full transition-all duration-300"></span>
+                                            </span>
+                                            <LogIn className="w-4 h-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                                        </Link>
+                                    </li>
 
                                     {/* Orders Section */}
                                     <li className="p-2 border-b border-gray-100 dark:border-gray-800">
