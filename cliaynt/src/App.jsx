@@ -23,6 +23,7 @@ import SupplierVerification from './components/SupplyNav/SupplierVerification';
 import DonePayment from './components/SupplyNav/DonePayment';
 import SupplierSignUp from './components/login page/SupplierSignUp';
 import SupplierSetting from './components/SupplyNav/Settings';
+import Chat from './components/Chat';
 
 
 
@@ -44,6 +45,7 @@ function App() {
                     <Route path='nearby' element={<Nearby />} />
                 </Route>
                 <Route path='/my-account' element={<MyAccount />} />
+                <Route path='/chat' element={<Chat />} />
 
 
                 <Route path='/supplier-verification' element={<SupplierVerification />} />

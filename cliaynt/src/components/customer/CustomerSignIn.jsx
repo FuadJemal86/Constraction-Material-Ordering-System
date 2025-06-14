@@ -25,6 +25,10 @@ function CustomerSignIn() {
             const result = await api.post('/customer/login', customer);
 
             if (result.data.loginStatus) {
+                // Store userId and userType in localStorage
+                localStorage.setItem('userId', result.data.userId);
+                localStorage.setItem('userType', result.data.userType);
+
                 toast.success(result.data.message);
                 navigate('/products');
             } else {

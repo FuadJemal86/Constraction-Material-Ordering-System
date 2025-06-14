@@ -2,7 +2,7 @@ const prisma = require("../../prismaCliaynt");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 
-const supplierLogin =  async (req, res) => {
+const supplierLogin = async (req, res) => {
     try {
         const { email, password } = req.body
 
@@ -29,6 +29,13 @@ const supplierLogin =  async (req, res) => {
             sameSite: "lax",
         });
 
+        return res.status(200).json({
+            loginStatus: true,
+            message: "Login successful",
+            userId: supplier.id,
+            userType: 'supplier'
+        });
+
 
         res.status(200).json({ loginStatus: true, message: "Login successful" });
     } catch (err) {
@@ -37,4 +44,4 @@ const supplierLogin =  async (req, res) => {
     }
 }
 
-module.exports = {supplierLogin}
+module.exports = { supplierLogin }

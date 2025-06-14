@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 const prisma = require('../../prismaCliaynt')
 
-const customerLogin =  async (req, res) => {
+const customerLogin = async (req, res) => {
     try {
         const { email, password } = req.body
 
@@ -29,13 +29,17 @@ const customerLogin =  async (req, res) => {
             sameSite: "lax",
         });
 
-
-        return res.status(200).json({ loginStatus: true, message: "Login successful" });
+        // Include userId and userType in the response
+        return res.status(200).json({
+            loginStatus: true,
+            message: "Login successful",
+            userId: customer.id,
+            userType: 'customer'
+        });
     } catch (err) {
         console.log(err)
         return res.status(500).json({ status: false, error: 'server error!' })
     }
 }
 
-
-module.exports = {customerLogin}
+module.exports = { customerLogin }
