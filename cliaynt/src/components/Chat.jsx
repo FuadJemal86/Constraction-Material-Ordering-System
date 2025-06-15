@@ -1,48 +1,54 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, User, Building2, MessageCircle, AlertCircle, Loader2, ArrowLeft, Wifi, WifiOff, RefreshCw, Phone, Video, MoreVertical, Paperclip, Smile, Search, Archive, Trash2 } from 'lucide-react';
+import {
+    Send, User, Building2, MessageCircle, AlertCircle, Loader2,
+    ArrowLeft, Wifi, WifiOff, RefreshCw, Phone, Video,
+    MoreVertical, Paperclip, Smile, Search, Archive, Trash2,
+    Moon, Sun, Check, CheckCheck, Reply, Edit3
+} from 'lucide-react';
 import useSocket from './chatHook/useSocket';
 
 const Chat = ({ userId: propUserId, userType: propUserType }) => {
+    // State
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [messageInput, setMessageInput] = useState('');
     const [showConversationsList, setShowConversationsList] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
-    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const [showAttachments, setShowAttachments] = useState(false);
-    const [showMoreOptions, setShowMoreOptions] = useState(false);
+    const [focusedInput, setFocusedInput] = useState(null);
+    const [darkMode, setDarkMode] = useState(true);
+    const [holdingMessage, setHoldingMessage] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [messageToDelete, setMessageToDelete] = useState(null);
+    const [longPressTimer, setLongPressTimer] = useState(null);
 
-    // Get userId and userType from localStorage if not provided as props
+    // Refs
+    const messagesEndRef = useRef(null);
+    const messagesContainerRef = useRef(null);
+
+    // Get user info
     const userId = propUserId || localStorage.getItem('userId');
     const userType = propUserType || localStorage.getItem('userType');
 
-    const messagesEndRef = useRef(null);
-    const fileInputRef = useRef(null);
-
+    // Socket hook - NOW INCLUDES deleteMessage function
     const {
         isConnected,
-        connectionStatus,
         messages,
         conversations,
-        suppliers,
-        currentUser,
         onlineUsers,
         typingUsers,
         error,
         isLoading,
         sendMessage,
-        sendTyping,
-        sendStopTyping,
+        deleteMessage, // NEW: Get delete function from hook
         loadConversation,
         loadConversations,
         markConversationAsRead,
         reconnect,
         clearError,
         isUserOnline,
-        getUnreadCount,
-        fetchSuppliers
+        getUnreadCount
     } = useSocket(userId, userType);
 
-    // Auto scroll to bottom when new messages arrive
+    // Auto-scroll to bottom when messages change
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
@@ -54,17 +60,7 @@ const Chat = ({ userId: propUserId, userType: propUserType }) => {
         }
     }, [isConnected, loadConversations]);
 
-    // Handle typing indicators
-    const handleInputChange = (e) => {
-        setMessageInput(e.target.value);
-
-        if (selectedConversation && e.target.value.trim()) {
-            sendTyping(selectedConversation.id, selectedConversation.type);
-        } else if (selectedConversation) {
-            sendStopTyping(selectedConversation.id, selectedConversation.type);
-        }
-    };
-
+    // Message handling
     const handleSendMessage = () => {
         if (!messageInput.trim() || !selectedConversation) return;
 
@@ -76,53 +72,135 @@ const Chat = ({ userId: propUserId, userType: propUserType }) => {
 
         if (success) {
             setMessageInput('');
-            sendStopTyping(selectedConversation.id, selectedConversation.type);
+            setFocusedInput('message');
         }
     };
 
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+    const handleKeyPress = (e, type) => {
+        if (e.key === 'Enter' && !e.shiftKey && type === 'message') {
             e.preventDefault();
             handleSendMessage();
         }
     };
 
-    const handleFileUpload = (e) => {
-        const file = e.target.files[0];
-        if (file && selectedConversation) {
-            // Handle file upload logic here
-            console.log('File selected:', file);
-            // You would implement file upload to your backend here
+    // Long press handlers for message deletion
+    const handleMouseDown = (message, e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Only allow deletion of own messages
+        if (message.senderId !== parseInt(userId)) return;
+
+        // Prevent scrolling during long press
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.style.overflowY = 'hidden';
         }
+
+        const timer = setTimeout(() => {
+            setMessageToDelete(message);
+            setShowDeleteModal(true);
+            setHoldingMessage(null);
+        }, 800);
+        setLongPressTimer(timer);
+        setHoldingMessage(message.id);
     };
 
-    const handleConversationSelect = (conversation) => {
+    const handleMouseUp = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Restore scrolling
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.style.overflowY = 'auto';
+        }
+
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            setLongPressTimer(null);
+        }
+        setHoldingMessage(null);
+    };
+
+    const handleTouchStart = (message, e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Only allow deletion of own messages
+        if (message.senderId !== parseInt(userId)) return;
+
+        // Prevent scrolling during long press
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.style.overflowY = 'hidden';
+        }
+
+        const timer = setTimeout(() => {
+            setMessageToDelete(message);
+            setShowDeleteModal(true);
+            setHoldingMessage(null);
+        }, 800);
+        setLongPressTimer(timer);
+        setHoldingMessage(message.id);
+    };
+
+    const handleTouchEnd = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Restore scrolling
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.style.overflowY = 'auto';
+        }
+
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            setLongPressTimer(null);
+        }
+        setHoldingMessage(null);
+    };
+
+    // UPDATED: Use socket delete instead of API call
+    const handleDeleteMessage = async () => {
+        if (!messageToDelete) return;
+
+        try {
+            const success = deleteMessage(messageToDelete.id);
+
+            if (success) {
+                console.log('Delete message request sent via socket');
+            } else {
+                console.error('Failed to send delete message request');
+                setError('Failed to delete message - not connected');
+            }
+        } catch (error) {
+            console.error('Failed to delete message:', error);
+            setError('Failed to delete message');
+        }
+
+        setShowDeleteModal(false);
+        setMessageToDelete(null);
+    };
+
+    // Conversation selection
+    const handleSelectConversation = (conversation) => {
         setSelectedConversation(conversation);
         setShowConversationsList(false);
+        setFocusedInput('message');
 
-        // Only load conversation if it has previous messages
         if (conversation.lastMessage) {
             loadConversation(conversation.id, conversation.type);
             markConversationAsRead(conversation.id, conversation.type);
         }
     };
 
+    // Helpers
     const formatTime = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
-        const now = new Date();
-        const isToday = date.toDateString() === now.toDateString();
-
-        if (isToday) {
-            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        } else {
-            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-        }
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
 
     const formatRelativeTime = (dateString) => {
         if (!dateString) return 'No messages';
-
         const date = new Date(dateString);
         const now = new Date();
         const diffInMinutes = Math.floor((now - date) / (1000 * 60));
@@ -130,479 +208,378 @@ const Chat = ({ userId: propUserId, userType: propUserType }) => {
         if (diffInMinutes < 1) return 'just now';
         if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
         if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-        return formatTime(dateString);
+        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
     };
 
-    const getTypingIndicator = () => {
-        if (!selectedConversation) return null;
-
-        const typingInThisConversation = typingUsers.filter(user =>
-            user.id === selectedConversation.id && user.type === selectedConversation.type
+    // Filter conversations based on user type
+    const filteredConversations = conversations
+        .filter(conv => {
+            // If user is supplier, only show customers who have messaged them
+            if (userType === 'supplier') {
+                return conv.type === 'customer' && conv.lastMessage;
+            }
+            // If user is customer, show all suppliers
+            return true;
+        })
+        .filter(conv =>
+            conv.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
 
-        if (typingInThisConversation.length === 0) return null;
+    // Theme classes
+    const themeClasses = {
+        bg: darkMode ? 'bg-gray-900' : 'bg-gray-100',
+        cardBg: darkMode ? 'bg-gray-800' : 'bg-white',
+        border: darkMode ? 'border-gray-700' : 'border-gray-200',
+        text: darkMode ? 'text-gray-100' : 'text-gray-900',
+        textSecondary: darkMode ? 'text-gray-400' : 'text-gray-600',
+        textMuted: darkMode ? 'text-gray-500' : 'text-gray-500',
+        hover: darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50',
+        selected: darkMode ? 'bg-blue-900/50' : 'bg-blue-50',
+        input: darkMode ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900',
+        messagesBg: darkMode ? 'bg-gray-900' : 'bg-gray-50'
+    };
+
+    // Message Bubble Component - WhatsApp-style positioning
+    const MessageBubble = ({ message }) => {
+        const isOwnMessage = message.senderId === parseInt(userId);
 
         return (
-            <div className="px-4 py-2 text-sm text-gray-500 italic">
-                {typingInThisConversation[0].name} is typing...
+            <div className={`flex mb-3 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                <div
+                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl relative select-none cursor-pointer transition-all duration-200 ${holdingMessage === message.id ? 'scale-95 opacity-80' : ''
+                        } ${isOwnMessage
+                            ? 'bg-blue-500 text-white rounded-br-none'
+                            : `${darkMode ? 'bg-gray-700 text-gray-100' : 'bg-gray-200 text-gray-800'} rounded-bl-none`
+                        }`}
+                    onMouseDown={(e) => handleMouseDown(message, e)}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                    onTouchStart={(e) => handleTouchStart(message, e)}
+                    onTouchEnd={handleTouchEnd}
+                    onTouchCancel={handleTouchEnd}
+                    style={{
+                        WebkitUserSelect: 'none',
+                        MozUserSelect: 'none',
+                        msUserSelect: 'none',
+                        userSelect: 'none',
+                        WebkitTouchCallout: 'none'
+                    }}
+                >
+                    {/* Sender name inside bubble for received messages */}
+                    {!isOwnMessage && (
+                        <p className={`text-xs font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            {message.senderName}
+                        </p>
+                    )}
+
+                    <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+
+                    <div className={`flex items-center gap-1 mt-1 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                        <p className={`text-xs ${isOwnMessage
+                            ? 'text-white/70'
+                            : darkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                            {formatTime(message.createdAt || message.timestamp)}
+                        </p>
+                        {isOwnMessage && (
+                            <div className="flex ml-1">
+                                {message.delivered ? (
+                                    <CheckCheck className="w-3 h-3 text-white/70" />
+                                ) : (
+                                    <Check className="w-3 h-3 text-white/70" />
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Show delete indicator for own messages */}
+                    {isOwnMessage && (
+                        <div className="absolute -top-1 -left-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                        </div>
+                    )}
+                </div>
             </div>
         );
     };
 
-    const filteredConversations = conversations.filter(conv =>
-        conv.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    const ConversationsList = () => (
-        <div className="w-full md:w-80 bg-white border-r border-gray-200 flex flex-col">
-            <div className="p-4 border-b border-gray-200 bg-gray-50">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                        <MessageCircle className="w-5 h-5" />
-                        {userType === 'customer' ? 'Suppliers' : 'Conversations'}
-                        {getUnreadCount() > 0 && (
-                            <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
-                                {getUnreadCount()}
-                            </span>
-                        )}
-                    </h2>
-                    <div className="flex items-center gap-2">
-                        {userType === 'customer' && (
-                            <button
-                                onClick={fetchSuppliers}
-                                className="p-1 hover:bg-gray-200 rounded transition-colors"
-                                title="Refresh suppliers"
-                            >
-                                <RefreshCw className="w-4 h-4 text-gray-500" />
-                            </button>
-                        )}
-                        {isConnected ? (
-                            <Wifi className="w-4 h-4 text-green-500" />
-                        ) : (
-                            <WifiOff className="w-4 h-4 text-red-500" />
-                        )}
+    // Delete Modal Component
+    const DeleteModal = () => (
+        showDeleteModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className={`${themeClasses.cardBg} rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl`}>
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                            <Trash2 className="w-5 h-5 text-red-600" />
+                        </div>
+                        <div>
+                            <h3 className={`font-semibold ${themeClasses.text}`}>Delete Message</h3>
+                            <p className={`text-sm ${themeClasses.textSecondary}`}>This action cannot be undone</p>
+                        </div>
+                    </div>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={() => setShowDeleteModal(false)}
+                            className={`flex-1 py-2 px-4 rounded-xl ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} ${themeClasses.text} transition-colors`}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleDeleteMessage}
+                            className="flex-1 py-2 px-4 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors"
+                        >
+                            Delete
+                        </button>
                     </div>
                 </div>
-                {currentUser && (
-                    <p className="text-sm text-gray-600 mt-1">
-                        {currentUser.name} ({currentUser.type})
-                    </p>
-                )}
             </div>
+        )
+    );
 
-            {/* Search Bar */}
-            <div className="p-4 border-b border-gray-200">
-                <div className="relative">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Search conversations..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto">
-                {filteredConversations.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500">
-                        <MessageCircle className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                        <p>
-                            {searchQuery
-                                ? 'No conversations found'
-                                : userType === 'customer'
-                                    ? 'No suppliers available'
-                                    : 'No conversations yet'
-                            }
-                        </p>
+    // Conversation List Component
+    const ConversationList = () => (
+        <div className={`w-full md:w-80 ${themeClasses.cardBg} ${themeClasses.border} border-r flex flex-col h-full`}>
+            <div className={`p-4 ${themeClasses.border} border-b ${darkMode ? 'bg-gray-800/50' : 'bg-gray-50'} flex-shrink-0`}>
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className={`text-lg font-bold ${themeClasses.text}`}>
+                        {userType === 'customer' ? 'Suppliers' : 'Customers'}
+                    </h2>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setDarkMode(!darkMode)}
+                            className={`p-2 rounded-xl ${themeClasses.hover} transition-colors`}
+                        >
+                            {darkMode ? (
+                                <Sun className="w-5 h-5 text-yellow-500" />
+                            ) : (
+                                <Moon className="w-5 h-5 text-gray-600" />
+                            )}
+                        </button>
                         {!isConnected && (
                             <button
                                 onClick={reconnect}
-                                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm"
+                                className="flex items-center gap-1 text-sm text-blue-500 hover:text-blue-600"
                             >
+                                <RefreshCw className="w-4 h-4" />
                                 Reconnect
                             </button>
                         )}
                     </div>
-                ) : (
-                    <>
-                        {/* Show conversations with messages first */}
-                        {filteredConversations
-                            .filter(conv => conv.lastMessage)
-                            .map((conversation) => {
-                                const isOnline = isUserOnline(conversation.id, conversation.type);
-                                const unreadCount = conversation.unreadCount || 0;
+                </div>
 
-                                return (
-                                    <ConversationItem
-                                        key={`${conversation.type}_${conversation.id}`}
-                                        conversation={conversation}
-                                        isOnline={isOnline}
-                                        unreadCount={unreadCount}
-                                        isSelected={selectedConversation?.id === conversation.id &&
-                                            selectedConversation?.type === conversation.type}
-                                        onClick={() => handleConversationSelect(conversation)}
-                                        formatRelativeTime={formatRelativeTime}
-                                    />
-                                );
-                            })}
+                <div className="flex items-center gap-2 text-sm">
+                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
+                    <span className={themeClasses.textSecondary}>
+                        {isConnected ? 'Connected' : 'Disconnected'}
+                    </span>
+                </div>
+            </div>
 
-                        {/* Show available suppliers for customers (without existing conversations) */}
-                        {userType === 'customer' && filteredConversations.filter(conv => !conv.lastMessage).length > 0 && (
-                            <>
-                                <div className="px-4 py-2 bg-gray-100 border-t border-gray-200">
-                                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">
-                                        Available Suppliers
-                                    </p>
-                                </div>
-                                {filteredConversations
-                                    .filter(conv => !conv.lastMessage)
-                                    .map((supplier) => {
-                                        const isOnline = isUserOnline(supplier.id, supplier.type);
+            <div className={`p-4 ${themeClasses.border} border-b flex-shrink-0`}>
+                <div className="relative">
+                    <Search className={`w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 ${themeClasses.textMuted}`} />
+                    <input
+                        type="text"
+                        placeholder="Search conversations..."
+                        value={searchQuery}
+                        onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                            setFocusedInput('search');
+                        }}
+                        onKeyPress={(e) => handleKeyPress(e, 'search')}
+                        className={`w-full pl-10 pr-4 py-3 ${themeClasses.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+                        autoFocus={focusedInput === 'search'}
+                    />
+                </div>
+            </div>
 
-                                        return (
-                                            <ConversationItem
-                                                key={`supplier_${supplier.id}`}
-                                                conversation={supplier}
-                                                isOnline={isOnline}
-                                                unreadCount={0}
-                                                isSelected={selectedConversation?.id === supplier.id &&
-                                                    selectedConversation?.type === supplier.type}
-                                                onClick={() => handleConversationSelect(supplier)}
-                                                formatRelativeTime={formatRelativeTime}
-                                                isAvailable={true}
+            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
+                {filteredConversations.map(conv => (
+                    <div
+                        key={`${conv.type}_${conv.id}`}
+                        className={`p-4 ${themeClasses.border} border-b ${themeClasses.hover} cursor-pointer transition-all duration-200 ${selectedConversation?.id === conv.id ? themeClasses.selected : ''
+                            }`}
+                        onClick={() => handleSelectConversation(conv)}
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="relative">
+                                <div className={`w-12 h-12 rounded-2xl ${darkMode ? 'bg-gray-700' : 'bg-gray-200'} flex items-center justify-center overflow-hidden`}>
+                                    {conv.type === 'customer' ? (
+                                        conv.image == null ? (
+                                            <User className={`w-6 h-6 ${themeClasses.textMuted}`} />
+                                        ) : (
+                                            <img
+                                                className='w-full h-full object-cover'
+                                                src={`http://localhost:3032/images/${conv.image}`}
+                                                alt={conv.name}
                                             />
-                                        );
-                                    })}
-                            </>
-                        )}
-                    </>
+                                        )
+                                    ) : (
+                                        <Building2 className={`w-6 h-6 ${themeClasses.textMuted}`} />
+                                    )}
+                                </div>
+                                {isUserOnline(conv.id, conv.type) && (
+                                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800" />
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex justify-between items-center mb-1">
+                                    <h3 className={`font-semibold truncate ${themeClasses.text}`}>{conv.name}</h3>
+                                    <span className={`text-xs ${themeClasses.textMuted} flex-shrink-0 ml-2`}>
+                                        {formatRelativeTime(conv.lastMessageTime)}
+                                    </span>
+                                </div>
+                                <p className={`text-sm ${themeClasses.textSecondary} truncate`}>
+                                    {conv.lastMessage || 'No messages yet'}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+
+                {filteredConversations.length === 0 && (
+                    <div className="flex flex-col items-center justify-center p-8 text-center">
+                        <MessageCircle className={`w-12 h-12 mb-3 ${themeClasses.textMuted}`} />
+                        <p className={`${themeClasses.textMuted}`}>
+                            {userType === 'supplier' ? 'No customer messages yet' : 'No conversations found'}
+                        </p>
+                    </div>
                 )}
             </div>
         </div>
     );
 
-    const ConversationItem = ({
-        conversation,
-        isOnline,
-        unreadCount,
-        isSelected,
-        onClick,
-        formatRelativeTime,
-        isAvailable = false
-    }) => (
-        <div
-            className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${isSelected ? 'bg-blue-50 border-blue-200' : ''
-                }`}
-            onClick={onClick}
-        >
-            <div className="flex items-start gap-3">
-                <div className="relative flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                        {conversation.image ? (
-                            <img
-                                src={conversation.image}
-                                alt={conversation.name}
-                                className="w-full h-full rounded-full object-cover"
-                            />
-                        ) : (
-                            conversation.type === 'customer' ?
-                                <User className="w-5 h-5 text-gray-500" /> :
-                                <Building2 className="w-5 h-5 text-gray-500" />
-                        )}
-                    </div>
-                    {isOnline && (
-                        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                    )}
-                </div>
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                        <h3 className={`font-medium truncate ${unreadCount > 0 ? 'text-gray-900 font-semibold' : 'text-gray-900'
-                            }`}>
-                            {conversation.name}
-                        </h3>
-                        <div className="flex items-center gap-2">
-                            {!isAvailable && (
-                                <span className="text-xs text-gray-500">
-                                    {formatRelativeTime(conversation.lastMessageTime)}
-                                </span>
-                            )}
-                            {unreadCount > 0 && (
-                                <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1 min-w-[18px] text-center">
-                                    {unreadCount}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                    <p className={`text-sm truncate mt-1 ${unreadCount > 0 ? 'text-gray-800 font-medium' : 'text-gray-600'
-                        }`}>
-                        {conversation.lastMessage || (isAvailable ? 'Start a conversation' : 'No messages yet')}
-                    </p>
-                    <div className="flex items-center justify-between mt-1">
-                        <span className={`inline-block px-2 py-1 text-xs rounded-full ${conversation.type === 'customer'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-blue-100 text-blue-800'
-                            }`}>
-                            {conversation.type}
-                        </span>
-                        {isOnline && (
-                            <span className="text-xs text-green-600 font-medium">
-                                Online
-                            </span>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-
-    const MessageBubble = ({ message }) => {
-        const isOwnMessage = message.senderId === userId;
-
-        return (
-            <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-4`}>
-                <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${isOwnMessage
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-800'
-                    }`}>
-                    {!isOwnMessage && (
-                        <p className="text-xs font-medium mb-1 text-gray-600">
-                            {message.senderName}
-                        </p>
-                    )}
-                    <p className="text-sm">{message.content}</p>
-                    <p className={`text-xs mt-1 ${isOwnMessage ? 'text-blue-100' : 'text-gray-500'
-                        }`}>
-                        {formatTime(message.timestamp)}
-                        {isOwnMessage && message.status && (
-                            <span className="ml-2">
-                                {message.status === 'delivered' ? '✓' :
-                                    message.status === 'read' ? '✓✓' : '⏱'}
-                            </span>
-                        )}
-                    </p>
-                </div>
-            </div>
-        );
-    };
-
+    // Chat Window Component
     const ChatWindow = () => (
-        <div className="flex-1 flex flex-col bg-gray-50">
+        <div className={`flex-1 flex flex-col ${themeClasses.messagesBg} h-full`}>
             {selectedConversation ? (
                 <>
-                    {/* Chat Header */}
-                    <div className="p-4 bg-white border-b border-gray-200 flex items-center gap-3">
+                    <div className={`p-4 ${themeClasses.cardBg} ${themeClasses.border} border-b flex items-center gap-3 shadow-sm flex-shrink-0`}>
                         <button
-                            onClick={() => setShowConversationsList(true)}
-                            className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            onClick={() => {
+                                setShowConversationsList(true);
+                                setFocusedInput('search');
+                            }}
+                            className={`md:hidden p-2 ${themeClasses.hover} rounded-xl transition-colors`}
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </button>
-                        <div className="relative flex-shrink-0">
-                            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                                {selectedConversation.image ? (
-                                    <img
-                                        src={selectedConversation.image}
-                                        alt={selectedConversation.name}
-                                        className="w-full h-full rounded-full object-cover"
-                                    />
-                                ) : (
-                                    selectedConversation.type === 'customer' ?
-                                        <User className="w-4 h-4 text-gray-500" /> :
-                                        <Building2 className="w-4 h-4 text-gray-500" />
-                                )}
-                            </div>
-                            {isUserOnline(selectedConversation.id, selectedConversation.type) && (
-                                <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-green-500 rounded-full border border-white"></div>
-                            )}
-                        </div>
                         <div className="flex-1">
-                            <h3 className="font-medium text-gray-900">
-                                {selectedConversation.name}
-                            </h3>
+                            <h3 className={`font-semibold ${themeClasses.text}`}>{selectedConversation.name}</h3>
                             <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500 capitalize">
+                                <span className={`text-xs ${themeClasses.textSecondary} capitalize`}>
                                     {selectedConversation.type}
                                 </span>
                                 {isUserOnline(selectedConversation.id, selectedConversation.type) && (
-                                    <span className="text-xs text-green-600 font-medium">
-                                        • Online
+                                    <span className="text-xs text-green-500 flex items-center gap-1">
+                                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                                        Online
                                     </span>
                                 )}
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
-                            {connectionStatus === 'reconnecting' && (
-                                <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-                            )}
-                            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                                <Phone className="w-4 h-4 text-gray-500" />
+                            <button className={`p-2 ${themeClasses.hover} rounded-xl transition-colors`}>
+                                <Phone className="w-5 h-5" />
                             </button>
-                            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                                <Video className="w-4 h-4 text-gray-500" />
+                            <button className={`p-2 ${themeClasses.hover} rounded-xl transition-colors`}>
+                                <Video className="w-5 h-5" />
                             </button>
-                            <div className="relative">
-                                <button
-                                    onClick={() => setShowMoreOptions(!showMoreOptions)}
-                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                >
-                                    <MoreVertical className="w-4 h-4 text-gray-500" />
-                                </button>
-                                {showMoreOptions && (
-                                    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                                        <button className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            <Archive className="w-4 h-4" />
-                                            Archive Chat
-                                        </button>
-                                        <button className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-50">
-                                            <Trash2 className="w-4 h-4" />
-                                            Delete Chat
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                            {!isConnected && (
-                                <button
-                                    onClick={reconnect}
-                                    className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
-                                >
-                                    Reconnect
-                                </button>
-                            )}
                         </div>
                     </div>
 
-                    {/* Messages Area */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                    <div
+                        ref={messagesContainerRef}
+                        className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
+                        style={{
+                            touchAction: 'pan-y',
+                            overscrollBehavior: 'contain'
+                        }}
+                    >
                         {isLoading ? (
                             <div className="flex justify-center items-center h-32">
-                                <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+                                <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
                             </div>
                         ) : messages.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center h-32 text-gray-500">
-                                <MessageCircle className="w-12 h-12 mb-2 text-gray-300" />
-                                <p>No messages yet. Start the conversation!</p>
+                            <div className="flex flex-col items-center justify-center h-32">
+                                <MessageCircle className={`w-16 h-16 mb-4 ${themeClasses.textMuted}`} />
+                                <h3 className={`text-lg font-medium mb-2 ${themeClasses.text}`}>Start the conversation</h3>
+                                <p className={themeClasses.textSecondary}>Send your first message to get started</p>
                             </div>
                         ) : (
-                            messages.map((message) => (
-                                <MessageBubble key={message.id} message={message} />
-                            ))
+                            <div className="space-y-1">
+                                {messages.map(message => (
+                                    <MessageBubble key={message.id} message={message} />
+                                ))}
+                                <div ref={messagesEndRef} />
+                            </div>
                         )}
-                        {getTypingIndicator()}
-                        <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Error Display */}
-                    {error && (
-                        <div className="p-4 bg-red-50 border-t border-red-200 flex items-center gap-2 text-red-700">
-                            <AlertCircle className="w-4 h-4" />
-                            <span className="text-sm">{error}</span>
-                            <button
-                                onClick={clearError}
-                                className="ml-auto text-sm hover:underline"
-                            >
-                                Dismiss
+                    <div className={`p-4 ${themeClasses.cardBg} ${themeClasses.border} border-t flex-shrink-0`}>
+                        <div className="flex items-end gap-3">
+                            <button className={`p-3 ${themeClasses.hover} rounded-xl transition-colors`}>
+                                <Paperclip className="w-5 h-5" />
                             </button>
-                        </div>
-                    )}
-
-                    {/* Message Input */}
-                    <div className="p-4 bg-white border-t border-gray-200">
-                        <div className="flex items-end gap-2">
-                            <div className="relative">
-                                <button
-                                    onClick={() => setShowAttachments(!showAttachments)}
-                                    className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                                >
-                                    <Paperclip className="w-5 h-5" />
-                                </button>
-                                {showAttachments && (
-                                    <div className="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                                        <button
-                                            onClick={() => fileInputRef.current?.click()}
-                                            className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                        >
-                                            <Paperclip className="w-4 h-4" />
-                                            Attach File
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="flex-1 relative">
-                                <textarea
+                            <div className="flex-1">
+                                <input
                                     value={messageInput}
-                                    onChange={handleInputChange}
-                                    onKeyPress={handleKeyPress}
-                                    placeholder="Type a message..."
-                                    className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                    onChange={(e) => {
+                                        setMessageInput(e.target.value);
+                                        setFocusedInput('message');
+                                    }}
+                                    onKeyPress={(e) => handleKeyPress(e, 'message')}
+                                    placeholder="Type your message..."
+                                    className={`w-full p-3 ${themeClasses.input} rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-all max-h-32`}
                                     rows="1"
-                                    style={{ minHeight: '44px', maxHeight: '120px' }}
+                                    autoFocus={focusedInput === 'message'}
                                 />
-                                <button
-                                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                                >
-                                    <Smile className="w-5 h-5" />
-                                </button>
                             </div>
+                            <button className={`p-3 ${themeClasses.hover} rounded-xl transition-colors`}>
+                                <Smile className="w-5 h-5" />
+                            </button>
                             <button
                                 onClick={handleSendMessage}
                                 disabled={!messageInput.trim() || !isConnected}
-                                className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-95"
                             >
                                 <Send className="w-5 h-5" />
                             </button>
                         </div>
-                    </div>
 
-                    {/* Hidden file input */}
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        onChange={handleFileUpload}
-                        className="hidden"
-                        accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
-                    />
+                        {typingUsers.length > 0 && (
+                            <div className={`mt-2 text-sm ${themeClasses.textSecondary}`}>
+                                {typingUsers.join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
+                            </div>
+                        )}
+                    </div>
                 </>
             ) : (
-                <div className="flex-1 flex items-center justify-center bg-gray-50">
-                    <div className="text-center text-gray-500">
-                        <MessageCircle className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                        <h3 className="text-lg font-medium mb-2">Select a conversation</h3>
-                        <p>Choose a conversation from the sidebar to start messaging</p>
+                <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center">
+                        <MessageCircle className={`w-20 h-20 mx-auto mb-6 ${themeClasses.textMuted}`} />
+                        <h3 className={`text-xl font-semibold mb-2 ${themeClasses.text}`}>Select a conversation</h3>
+                        <p className={themeClasses.textSecondary}>Choose a conversation from the sidebar to start messaging</p>
                     </div>
                 </div>
             )}
         </div>
     );
 
-    // Handle click outside to close dropdowns
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (!event.target.closest('.dropdown-container')) {
-                setShowMoreOptions(false);
-                setShowAttachments(false);
-                setShowEmojiPicker(false);
-            }
-        };
-
-        document.addEventListener('click', handleClickOutside);
-        return () => document.removeEventListener('click', handleClickOutside);
-    }, []);
-
     return (
-        <div className="h-screen flex bg-gray-100">
-            {/* Mobile: Show conversations list or chat window */}
-            <div className="md:hidden w-full flex">
-                {showConversationsList ? <ConversationsList /> : <ChatWindow />}
+        <div className={`h-screen flex ${themeClasses.bg}`}>
+            {/* Mobile view */}
+            <div className="md:hidden w-full flex h-full">
+                {showConversationsList ? <ConversationList /> : <ChatWindow />}
             </div>
 
-            {/* Desktop: Show both side by side */}
-            <div className="hidden md:flex w-full">
-                <ConversationsList />
+            {/* Desktop view */}
+            <div className="hidden md:flex w-full h-full">
+                <ConversationList />
                 <ChatWindow />
             </div>
+
+            <DeleteModal />
         </div>
     );
 };

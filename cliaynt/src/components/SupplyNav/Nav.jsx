@@ -280,9 +280,9 @@ function Nav() {
                                 )
                             }
 
-                            <button className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100">
+                            <Link to={'/chat'} className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100">
                                 <MessageCircle size={20} />
-                            </button>
+                            </Link>
                             <button className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100">
                                 <Link to={'/setting'}>
                                     <Settings size={20} />

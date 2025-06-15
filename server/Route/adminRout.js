@@ -29,6 +29,7 @@ const { recycleCustomer } = require('../controllers/admin controllers/recycle.cu
 const { adminGetAccount } = require('../controllers/admin controllers/admin.get.account');
 const { editAdminProfile } = require('../controllers/admin controllers/editProfile');
 const { getAdminProfileImage } = require('../controllers/admin controllers/getAdminProfileImage');
+const { updatePayedStatus } = require('../controllers/admin controllers/updatePayedStatus');
 const router = express.Router();
 
 
@@ -62,6 +63,7 @@ router.put('/update-payment-status/:id', updatePaymentStatus)
 router.put('/update-supplier-status/:supplierId', updateCustomerApprove)
 router.put('/update-order-status/:id', updateOrderStatus)
 router.put('/edit-profile', editAdminProfile)
+router.put('/update-payed-status', updatePayedStatus)
 
 
 

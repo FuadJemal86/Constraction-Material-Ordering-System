@@ -1,9 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import api from '../../api';
-// Assuming you have these utilities in your project
-// import { api } from '../utils/api'; // or wherever your api utility is located
-// import { toast } from 'react-toastify'; // or your toast notification system
 
 const useSocket = (userId, userType) => {
     const [socket, setSocket] = useState(null);
@@ -23,14 +20,13 @@ const useSocket = (userId, userType) => {
     const reconnectAttemptsRef = useRef(0);
     const maxReconnectAttempts = 5;
 
-    // Fetch suppliers from API - Updated to match your API structure
+    // Fetch suppliers from API
     const fetchSuppliers = useCallback(async () => {
         if (userType !== 'customer') return;
 
         setIsLoading(true);
         try {
             const response = await api.get('/customer/get-supplier');
-
             const result = response.data;
 
             if (result.status && result.supplier) {
@@ -59,53 +55,10 @@ const useSocket = (userId, userType) => {
             console.error('Error fetching suppliers:', error);
             const message = error.response?.data?.message || error.message || 'Failed to load suppliers';
             setError(message);
-            // toast.error(message); // uncomment if you're using toast
         } finally {
             setIsLoading(false);
         }
     }, [userType]);
-
-    // Alternative version using your api utility (if you prefer this approach)
-    /*
-    const fetchSuppliers = useCallback(async () => {
-        if (userType !== 'customer') return;
-
-        setIsLoading(true);
-        try {
-            const result = await api.get('/customer/get-supplier');
-            if (result.data.status) {
-                const formattedSuppliers = result.data.supplier
-                    .filter(supplier => supplier.isApproved && supplier.isVerify)
-                    .map(supplier => ({
-                        id: supplier.id,
-                        name: supplier.companyName || `Supplier ${supplier.id}`,
-                        companyName: supplier.companyName,
-                        type: 'supplier',
-                        image: supplier.image || supplier.avatar || null,
-                        address: supplier.address,
-                        isApproved: supplier.isApproved,
-                        isVerify: supplier.isVerify,
-                        lastMessage: '',
-                        lastMessageTime: new Date().toISOString(),
-                        unreadCount: 0
-                    }));
-                
-                setSuppliers(formattedSuppliers);
-                setError(null);
-            } else {
-                toast.error(result.data.message);
-                setError(result.data.message);
-            }
-        } catch (err) {
-            console.log(err);
-            const errorMessage = err.response?.data?.message || 'Error fetching suppliers';
-            toast.error(errorMessage);
-            setError(errorMessage);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [userType]);
-    */
 
     // Connect to socket
     const connect = useCallback(() => {
@@ -137,7 +90,6 @@ const useSocket = (userId, userType) => {
             setCurrentUser(data.user);
             setError(null);
 
-            // Fetch suppliers for customers
             if (userType === 'customer') {
                 fetchSuppliers();
             }
@@ -149,7 +101,6 @@ const useSocket = (userId, userType) => {
             setConnectionStatus('disconnected');
 
             if (reason === 'io server disconnect') {
-                // Server disconnected, manual reconnect needed
                 attemptReconnect();
             }
         });
@@ -164,8 +115,6 @@ const useSocket = (userId, userType) => {
         newSocket.on('newMessage', (message) => {
             console.log('New message received:', message);
             setMessages(prev => [...prev, { ...message, isOwn: false }]);
-
-            // Update conversation with new message
             updateConversationWithMessage(message);
         });
 
@@ -191,6 +140,34 @@ const useSocket = (userId, userType) => {
                     return msg;
                 });
             });
+        });
+
+        // NEW: Message deletion events
+        newSocket.on('messageDeleted', (data) => {
+            console.log('Message deleted:', data);
+            setMessages(prev => prev.filter(msg => msg.id !== data.messageId));
+
+            // Update conversation if this was the last message
+            if (data.newLastMessage) {
+                setConversations(prev => {
+                    return prev.map(conv => {
+                        if ((conv.type === 'customer' && data.conversationPartnerId === conv.id && data.conversationPartnerType === 'customer') ||
+                            (conv.type === 'supplier' && data.conversationPartnerId === conv.id && data.conversationPartnerType === 'supplier')) {
+                            return {
+                                ...conv,
+                                lastMessage: data.newLastMessage.content,
+                                lastMessageTime: data.newLastMessage.createdAt
+                            };
+                        }
+                        return conv;
+                    });
+                });
+            }
+        });
+
+        newSocket.on('messageDeleteFailed', (data) => {
+            console.error('Message delete failed:', data);
+            setError(data.message || 'Failed to delete message');
         });
 
         newSocket.on('conversationHistory', (data) => {
@@ -315,7 +292,6 @@ const useSocket = (userId, userType) => {
             status: 'sending'
         };
 
-        // Add temp message immediately
         setMessages(prev => [...prev, tempMessage]);
 
         socketRef.current.emit('sendMessage', {
@@ -327,6 +303,19 @@ const useSocket = (userId, userType) => {
 
         return true;
     }, [isConnected, userId, userType, currentUser]);
+
+    // NEW: Delete message function
+    const deleteMessage = useCallback((messageId) => {
+        if (!socketRef.current || !isConnected) {
+            return false;
+        }
+
+        socketRef.current.emit('deleteMessage', {
+            messageId: parseInt(messageId)
+        });
+
+        return true;
+    }, [isConnected]);
 
     // Typing indicators
     const sendTyping = useCallback((conversationId, conversationType) => {
@@ -375,7 +364,6 @@ const useSocket = (userId, userType) => {
             conversationType
         });
 
-        // Update local state
         setConversations(prev => {
             return prev.map(conv => {
                 if (conv.id === conversationId && conv.type === conversationType) {
@@ -398,10 +386,9 @@ const useSocket = (userId, userType) => {
         }, 0);
     }, [conversations]);
 
-    // Get all available conversations (existing + suppliers for customers)
+    // Get all available conversations
     const getAllConversations = useCallback(() => {
         if (userType === 'customer') {
-            // For customers, merge existing conversations with available suppliers
             const existingConversationIds = conversations.map(conv =>
                 conv.type === 'supplier' ? conv.id : null
             ).filter(id => id !== null);
@@ -416,7 +403,7 @@ const useSocket = (userId, userType) => {
         return conversations;
     }, [conversations, suppliers, userType]);
 
-    // Get filtered suppliers (only approved and verified)
+    // Get filtered suppliers
     const getApprovedSuppliers = useCallback(() => {
         return suppliers.filter(supplier => supplier.isApproved && supplier.isVerify);
     }, [suppliers]);
@@ -477,6 +464,7 @@ const useSocket = (userId, userType) => {
         error,
         isLoading,
         sendMessage,
+        deleteMessage, // NEW: Export delete message function
         sendTyping,
         sendStopTyping,
         loadConversation,

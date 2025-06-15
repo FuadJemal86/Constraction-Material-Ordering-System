@@ -43,7 +43,7 @@ const getPayment = async (req, res) => {
                 transactionId: { in: transactionIds }
             },
             include: {
-                bank: true,
+                bank: true
             },
             skip,
             take: limit,

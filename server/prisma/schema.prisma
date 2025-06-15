@@ -69,11 +69,10 @@ model address {
 }
 
 model bank {
-  id         Int       @id @default(autoincrement())
+  id         Int    @id @default(autoincrement())
   supplierId Int
   bankName   String
   account    String
-  payment    payment[]
 
   supplier supplier @relation(fields: [supplierId], references: [id], map: "bank_supplierId")
 }
@@ -133,12 +132,13 @@ model payment {
   amount            Float
   bankId            Int
   status            payment_status @default(PENDING)
+  payedStatus       payed_status   @default(PENDING)
   createdAt         DateTime       @default(now())
   bankTransactionId String
   image             String
 
   transaction Transaction @relation(fields: [transactionId], references: [transactionId])
-  bank        bank        @relation(fields: [bankId], references: [id], map: "Payment_bankId")
+  bank        bankAccount @relation(fields: [bankId], references: [id], map: "Payment_bankId")
 }
 
 model product {
@@ -193,9 +193,10 @@ model supplierVerifiy {
 }
 
 model bankAccount {
-  id            Int    @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   name          String
   accountNumber String
+  payment       payment[]
 }
 
 model category {
@@ -225,6 +226,11 @@ enum payment_status {
   COMPLETED
   FAILED
   REFUNDED
+}
+
+enum payed_status {
+  PENDING
+  PAYED
 }
 
 enum order_status {
