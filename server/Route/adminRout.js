@@ -63,7 +63,7 @@ router.put('/update-payment-status/:id', updatePaymentStatus)
 router.put('/update-supplier-status/:supplierId', updateCustomerApprove)
 router.put('/update-order-status/:id', updateOrderStatus)
 router.put('/edit-profile', editAdminProfile)
-router.put('/update-payed-status', updatePayedStatus)
+router.put('/update-payed-status/:id', updatePayedStatus)
 
 
 
