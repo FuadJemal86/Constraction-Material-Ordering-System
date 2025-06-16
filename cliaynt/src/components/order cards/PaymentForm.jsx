@@ -296,7 +296,7 @@ function PaymentForm() {
                                     <p className="font-medium text-gray-900 dark:text-white">{subtotal.toFixed(2)} birr</p>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <p className="text-gray-600 dark:text-gray-400">Tax (8%)</p>
+                                    <p className="text-gray-600 dark:text-gray-400">Service (8%)</p>
                                     <p className="font-medium text-gray-900 dark:text-white">{tax.toFixed(2)} birr</p>
                                 </div>
                                 <div className="flex justify-between text-sm">

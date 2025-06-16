@@ -362,11 +362,12 @@ function ShoppingCart({ onClose }) {
 
                 if (transactionId) {
                     toast.success(result.data.message);
-                    navigator(`/payment-form/${transactionId}`);
+                    window.open(`/payment-form/${transactionId}`, 'paymentTab');
                     onClose();
                 } else {
                     toast.error('Transaction ID not received');
                 }
+
             } else {
                 toast.error(result.data.message);
             }

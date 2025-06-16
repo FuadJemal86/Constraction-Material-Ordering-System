@@ -50,9 +50,8 @@ function CustomerSignIn() {
                     {/* Logo and brand */}
                     <div className="flex flex-col items-center mb-4">
                         <div className="relative mb-1">
-                            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-sm opacity-70"></div>
                             <img
-                                className="relative w-12 h-12 rounded-full border-2 border-white shadow-lg"
+                                className="relative w-48 h-24"
                                 src={logo}
                                 alt="ConstructEasy Logo"
                             />

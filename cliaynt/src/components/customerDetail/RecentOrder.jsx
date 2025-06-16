@@ -23,6 +23,17 @@ function RecentOrder() {
         }
         feachOrder()
     }, [])
+
+    const getStatusBadgeColor = (status) => {
+        const statusColors = {
+            COMPLETED: "bg-green-100 text-green-800",
+            PROCESSING: "bg-blue-100 text-blue-800",
+            PENDING: "bg-yellow-100 text-yellow-800",
+            FAILED: "bg-red-100 text-red-800"
+        };
+
+        return statusColors[status] || "bg-gray-100 text-gray-800";
+    }
     return (
         <div>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
@@ -56,14 +67,11 @@ function RecentOrder() {
                                             }).replace(' ', '.')}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-2 py-1 rounded-full text-xs ${order.status === 'Delivered' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                                                order.status === 'In Progress' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                                                    'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                                                }`}>
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium outline-none ${getStatusBadgeColor(order.status)}`}>
                                                 {order.status}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{order.totalPrice}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">birr {order.totalPrice}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right">
                                             <Link to={`/order-items/${order.id}`} className="text-yellow-500 hover:text-yellow-600 font-medium" >
                                                 View Details

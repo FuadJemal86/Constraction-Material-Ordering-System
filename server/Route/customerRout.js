@@ -27,22 +27,31 @@ const { getProductStock } = require('../controllers/customer controllers/get.sto
 const router = express.Router()
 
 router.post('/sign-up', custoemrSignUp)
+
 router.get('/my-account', getCustomerAccount)
 router.get('/get-order', getCustomerOrder)
+
 router.post('/login', customerLogin)
+
 router.get('/verify-token', verifyCustomerToken)
 router.get('/get-category', customerGetCategory)
 router.get('/get-supplier', getSupplier)
+
 router.post('/place-order', customerPlaceOrder)
+
 router.get('/get-transitionId', customerGetTransaction)
+
 router.post('/make-payment/:transactionId', customerPayment)
+
 router.get('/get-payment-status', getCustomerPayment)
 router.get('/nearby-suppliers', customerNearbt)
 router.get('/get-products/:id', getProduct)
 router.get('/get-pending-payment/:id', getPendingOrder)
 router.get('/get-account', getAccount)
+
 router.put('/update-customer-account', editCustomerProfile)
 router.put('/password-change', updatePassword)
+
 router.get('/get-order-item/:id', getCustomerOrderItem)
 router.get('/get-payment', getCustomerPaymentStatus)
 router.get('/get-transaction/:transactionId', getTransactionPayment)

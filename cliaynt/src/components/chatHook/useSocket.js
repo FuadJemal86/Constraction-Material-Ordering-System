@@ -257,22 +257,27 @@ const useSocket = (userId, userType) => {
     const updateConversationWithMessage = useCallback((message) => {
         setConversations(prev => {
             return prev.map(conv => {
+                // Check if this message belongs to this conversation
                 const isThisConversation =
                     (conv.type === 'customer' && message.senderId === conv.id && message.senderType === 'customer') ||
                     (conv.type === 'supplier' && message.senderId === conv.id && message.senderType === 'supplier');
 
                 if (isThisConversation) {
+                    // Only increment unread count if the message is NOT from the current user
+                    const isMessageFromOtherUser = message.senderId !== parseInt(userId) || message.senderType !== userType;
+
                     return {
                         ...conv,
                         lastMessage: message.content,
                         lastMessageTime: message.createdAt,
-                        unreadCount: (conv.unreadCount || 0) + 1
+                        // Only increment if message is from other user
+                        unreadCount: isMessageFromOtherUser ? (conv.unreadCount || 0) + 1 : conv.unreadCount
                     };
                 }
                 return conv;
             });
         });
-    }, []);
+    }, [userId, userType]);
 
     // Send message
     const sendMessage = useCallback((receiverId, receiverType, content) => {

@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import logo from '../../images/logo constraction.jpeg';
+import logo from '../../images/jejan.svg';
 import toast from 'react-hot-toast';
 import {
     Menu, X, ChevronLeft, ChevronRight, Eye, Package, Box,
@@ -8,16 +8,89 @@ import {
     Settings
 } from "lucide-react";
 import api from '../../api';
-
+import useSocket from '../chatHook/useSocket';
 
 function Nav() {
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [isOnline, setOnline] = useState(true);
     const [isVerifiy, setVerifay] = useState();
-    const [supplierImage, setSupplierImage] = useState({})
+    const [supplierImage, setSupplierImage] = useState({});
+    const [supplierId, setSupplierId] = useState(null);
     const location = useLocation();
 
+    // Enhanced message state management similar to Header.jsx
+    const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+    const [messageNotifications, setMessageNotifications] = useState([]);
+    const [notifications, setNotifications] = useState([]);
+    const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+    const [totalUnreadCount, setTotalUnreadCount] = useState(0);
+
+    // Initialize socket for supplier with enhanced functionality
+    const socket = useSocket(supplierId, 'supplier');
+
+    // Enhanced helper function to calculate unread count
+    const calculateUnreadCount = useCallback((notificationsList) => {
+        const count = notificationsList.filter(n => !n.isRead).length;
+        console.log('Calculating unread count:', count, 'from', notificationsList.length, 'notifications');
+        return count;
+    }, []);
+
+    // Calculate total unread count (notifications + messages)
+    const calculateTotalUnreadCount = useCallback(() => {
+        const notificationCount = calculateUnreadCount(notifications);
+        const messageCount = unreadMessageCount;
+        const total = notificationCount + messageCount;
+        setTotalUnreadCount(total);
+        console.log('Total unread count:', total, '(notifications:', notificationCount, '+ messages:', messageCount, ')');
+        return total;
+    }, [notifications, unreadMessageCount, calculateUnreadCount]);
+
+    // Enhanced notification update function
+    const updateNotificationCount = useCallback((notificationsList) => {
+        const newCount = calculateUnreadCount(notificationsList);
+        setUnreadNotificationCount(newCount);
+        console.log('Updated notification count to:', newCount);
+    }, [calculateUnreadCount]);
+
+    // Update message count from socket
+    const updateMessageCount = useCallback(() => {
+        if (socket && socket.getUnreadCount) {
+            const count = socket.getUnreadCount();
+            setUnreadMessageCount(count);
+            console.log('Updated message count to:', count);
+        }
+    }, [socket]);
+
+    // Create message notification
+    const createMessageNotification = useCallback((message) => {
+        const messageNotification = {
+            id: `message_${message.id}_${Date.now()}`,
+            type: 'message',
+            title: 'New Message',
+            message: `${message.senderName}: ${message.content.substring(0, 50)}${message.content.length > 50 ? '...' : ''}`,
+            isRead: false,
+            createdAt: message.createdAt,
+            data: {
+                messageId: message.id,
+                senderId: message.senderId,
+                senderName: message.senderName,
+                senderType: message.senderType,
+                conversationId: message.senderId,
+                conversationType: message.senderType
+            }
+        };
+
+        setMessageNotifications(prev => [messageNotification, ...prev.slice(0, 19)]); // Keep only last 20
+        setUnreadMessageCount(prev => prev + 1);
+
+        // Show toast notification
+        toast.success(`New message from ${message.senderName}`, {
+            duration: 4000,
+            position: 'top-right',
+            icon: '💬'
+        });
+    }, []);
 
     const toggleSidebar = () => {
         setCollapsed(!collapsed);
@@ -61,8 +134,108 @@ function Nav() {
         }
     };
 
-    useEffect(() => {
+    // Enhanced fetch notifications function
+    const fetchNotifications = async () => {
+        try {
+            const result = await api.get('/supplier/get-notifications');
+            if (result.data.status) {
+                const fetchedNotifications = result.data.notifications || [];
+                console.log('Fetched notifications:', fetchedNotifications);
+                setNotifications(fetchedNotifications);
+                updateNotificationCount(fetchedNotifications);
+            }
+        } catch (err) {
+            console.error('Error fetching notifications:', err);
+        }
+    };
 
+    // Enhanced mark notification as read
+    const markNotificationAsRead = async (notificationId) => {
+        try {
+            const response = await api.put(`/supplier/notifications/${notificationId}/read`);
+
+            if (response.data.status) {
+                setNotifications(prevNotifications => {
+                    const updatedNotifications = prevNotifications.map(n =>
+                        n.id === notificationId ? { ...n, isRead: true } : n
+                    );
+                    updateNotificationCount(updatedNotifications);
+                    return updatedNotifications;
+                });
+            }
+        } catch (err) {
+            console.error('Error marking notification as read:', err);
+
+            // If the API endpoint doesn't exist, just update the state locally
+            if (err.response?.status === 404) {
+                console.log('API endpoint not found, updating locally only');
+                setNotifications(prevNotifications => {
+                    const updatedNotifications = prevNotifications.map(n =>
+                        n.id === notificationId ? { ...n, isRead: true } : n
+                    );
+                    updateNotificationCount(updatedNotifications);
+                    return updatedNotifications;
+                });
+            } else {
+                toast.error('Failed to mark notification as read');
+            }
+        }
+    };
+
+    // Mark message notification as read
+    const markMessageNotificationAsRead = (messageNotificationId) => {
+        setMessageNotifications(prev =>
+            prev.map(n => n.id === messageNotificationId ? { ...n, isRead: true } : n)
+        );
+        setUnreadMessageCount(prev => Math.max(0, prev - 1));
+    };
+
+    // Enhanced mark all notifications as read
+    const markAllNotificationsAsRead = async () => {
+        try {
+            const response = await api.put('/supplier/notifications/mark-all-read');
+
+            if (response.data.status) {
+                setNotifications(prevNotifications => {
+                    const updatedNotifications = prevNotifications.map(n => ({ ...n, isRead: true }));
+                    setUnreadNotificationCount(0);
+                    return updatedNotifications;
+                });
+
+                setMessageNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+                setUnreadMessageCount(0);
+
+                toast.success('All notifications marked as read');
+            }
+        } catch (err) {
+            console.error('Error marking all notifications as read:', err);
+
+            if (err.response?.status === 404) {
+                console.log('Mark all notifications API endpoint not found, updating locally only');
+
+                setNotifications(prevNotifications => {
+                    const updatedNotifications = prevNotifications.map(n => ({ ...n, isRead: true }));
+                    setUnreadNotificationCount(0);
+                    return updatedNotifications;
+                });
+
+                setMessageNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+                setUnreadMessageCount(0);
+
+                toast.success('All notifications marked as read');
+            } else {
+                toast.error('Failed to mark all notifications as read');
+            }
+        }
+    };
+
+    // Get combined notifications (regular + message notifications)
+    const getCombinedNotifications = useCallback(() => {
+        const combined = [...notifications, ...messageNotifications];
+        return combined.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }, [notifications, messageNotifications]);
+
+    useEffect(() => {
         startSupplier();
 
         // Add visibility change event listener
@@ -70,7 +243,6 @@ function Nav() {
 
         const pingInterval = setInterval(() => {
             if (document.visibilityState === 'visible') {
-
                 api.put('/supplier/online').catch(err => console.log(err));
             }
         }, 30000);
@@ -90,6 +262,10 @@ function Nav() {
                 if (result.data.status) {
                     setVerifay(result.data.supplierVerifiy)
                     setOnline(result.data.chekOnline)
+                    setSupplierId(result.data.supplierId || result.data.id);
+
+                    // Fetch initial notifications
+                    await fetchNotifications();
                 } else {
                     toast.error(result.data.message)
                 }
@@ -100,13 +276,15 @@ function Nav() {
         chekVerify()
     }, [])
 
-
     useEffect(() => {
         const fetchProfile = async () => {
             try {
                 const result = await api.get('/supplier/supplier-profile')
                 if (result.data.status) {
                     setSupplierImage(result.data.supplierImage)
+                    if (!supplierId && result.data.supplierId) {
+                        setSupplierId(result.data.supplierId);
+                    }
                 } else {
                     console.log(result.data.message)
                 }
@@ -115,7 +293,106 @@ function Nav() {
             }
         }
         fetchProfile()
-    }, [])
+    }, [supplierId])
+
+    // Enhanced socket event listeners for both notifications and messages
+    useEffect(() => {
+        if (socket.socket && socket.isConnected) {
+            console.log('Setting up notification and message listeners for supplier');
+
+            // Notification listeners
+            const handleNewNotification = (notification) => {
+                console.log('New notification received:', notification);
+
+                const enhancedNotification = {
+                    id: notification.id || `notification_${Date.now()}`,
+                    type: notification.type || 'general',
+                    title: notification.title || 'New Notification',
+                    message: notification.message || 'You have a new notification',
+                    isRead: notification.isRead || false,
+                    createdAt: notification.createdAt || new Date().toISOString(),
+                    data: notification.data || {}
+                };
+
+                setNotifications(prevNotifications => {
+                    const updatedNotifications = [enhancedNotification, ...prevNotifications];
+                    updateNotificationCount(updatedNotifications);
+                    return updatedNotifications;
+                });
+
+                toast.success(enhancedNotification.message, {
+                    duration: 4000,
+                    position: 'top-right'
+                });
+            };
+
+            // Message listeners
+            const handleNewMessage = (message) => {
+                console.log('New message received in supplier nav:', message);
+
+                // Only create notification if message is not from current supplier
+                if (message.senderId !== supplierId) {
+                    createMessageNotification(message);
+                }
+            };
+
+            const handleConversationUpdate = () => {
+                updateMessageCount();
+            };
+
+            const handleNotificationUpdate = (updatedNotification) => {
+                console.log('Notification update received:', updatedNotification);
+
+                setNotifications(prevNotifications => {
+                    const updatedNotifications = prevNotifications.map(n =>
+                        n.id === updatedNotification.id ? { ...n, ...updatedNotification } : n
+                    );
+                    updateNotificationCount(updatedNotifications);
+                    return updatedNotifications;
+                });
+            };
+
+            const handleBulkMarkAsRead = (notificationIds) => {
+                console.log('Bulk mark as read:', notificationIds);
+
+                setNotifications(prevNotifications => {
+                    const updatedNotifications = prevNotifications.map(n =>
+                        notificationIds.includes(n.id) ? { ...n, isRead: true } : n
+                    );
+                    updateNotificationCount(updatedNotifications);
+                    return updatedNotifications;
+                });
+            };
+
+            // Register event listeners
+            socket.socket.on('newNotification', handleNewNotification);
+            socket.socket.on('notificationUpdate', handleNotificationUpdate);
+            socket.socket.on('notificationsMarkedAsRead', handleBulkMarkAsRead);
+            socket.socket.on('newMessage', handleNewMessage);
+            socket.socket.on('conversationsList', handleConversationUpdate);
+
+            return () => {
+                console.log('Cleaning up notification and message listeners');
+                socket.socket.off('newNotification', handleNewNotification);
+                socket.socket.off('notificationUpdate', handleNotificationUpdate);
+                socket.socket.off('notificationsMarkedAsRead', handleBulkMarkAsRead);
+                socket.socket.off('newMessage', handleNewMessage);
+                socket.socket.off('conversationsList', handleConversationUpdate);
+            };
+        }
+    }, [socket.socket, socket.isConnected, updateNotificationCount, supplierId, createMessageNotification, updateMessageCount]);
+
+    // Update total count when either notifications or messages change
+    useEffect(() => {
+        calculateTotalUnreadCount();
+    }, [calculateTotalUnreadCount]);
+
+    // Initialize message count when socket connects
+    useEffect(() => {
+        if (socket.isConnected) {
+            updateMessageCount();
+        }
+    }, [socket.isConnected, updateMessageCount]);
 
     const menuItems = useMemo(() => [
         { icon: <Eye size={20} />, title: 'Overview', path: '/' },
@@ -131,7 +408,6 @@ function Nav() {
         isOnline
             ? { icon: <StopCircle size={20} />, title: 'Stop', onClick: stopSupplier }
             : { icon: <PlayCircle size={20} />, title: 'Start', onClick: startSupplier },
-
     ], [isOnline]);
 
     const [openSubMenus, setOpenSubMenus] = useState({});
@@ -146,27 +422,35 @@ function Nav() {
     return (
         <div className="flex flex-col h-screen lg:flex-row min-h-screen bg-gray-50">
             {/* Mobile overlay */}
-
-
+            {mobileOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                    onClick={toggleMobileSidebar}
+                />
+            )}
 
             {/* Sidebar */}
             <aside className={`
-                fixed lg:static top-0 left-0
+                fixed lg:static top-0 left-0 z-50
                 h-screen bg-gray-900 text-white transition-all duration-300 ease-in-out
                 ${collapsed ? 'w-24' : 'w-64'}
                 ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             `}>
                 {/* Logo section */}
                 <div className="p-4 flex flex-row items-center">
-                    <div className={`
-                        rounded-xl  
-                        flex items-center   ${collapsed ? 'justify-center' : 'gap-3'}
-                    `}>
-                        <span className="bg-white rounded-full flex-shrink-0">
-                            <img className="w-10 h-10 rounded-full" src={logo} alt="Logo" />
-                        </span>
-                        {!collapsed && (
-                            <div className="font-medium text-gray-100 text-xl">Supply Panel</div>
+                    <div className="flex items-center gap-3">
+                        {!collapsed ? (
+                            <div className="relative mb-1">
+                                <img
+                                    className="relative w-40 h-16"
+                                    src={logo}
+                                    alt="ConstructEasy Logo"
+                                />
+                            </div>
+                        ) : (
+                            <div className="bg-blue-500 text-white rounded-lg h-10 w-10 flex items-center justify-center">
+                                <span className="font-bold text-xl">J</span>
+                            </div>
                         )}
                     </div>
                     <button
@@ -178,34 +462,54 @@ function Nav() {
                 </div>
 
                 {/* Navigation */}
-                <nav className="mt-6 ">
+                <nav className="mt-6">
                     <ul className="space-y-1 px-3">
-                        {menuItems.map((item) => {
+                        {menuItems.map((item, index) => {
                             const isActive = location.pathname === item.path;
                             const isSubMenuOpen = openSubMenus[item.title];
 
                             return (
-                                <li key={item.path} className="w-full">
+                                <li key={item.path || index} className="w-full">
+                                    {item.onClick ? (
+                                        <button
+                                            onClick={item.onClick}
+                                            className={`
+                                                w-full flex items-center justify-between py-3 px-3 rounded-lg transition-colors
+                                                text-gray-300 hover:bg-gray-800 hover:text-white
+                                            `}
+                                        >
+                                            <div className="flex items-center">
+                                                <span className="inline-flex">{item.icon}</span>
+                                                {!collapsed && <span className="ml-3 font-medium">{item.title}</span>}
+                                            </div>
+                                        </button>
+                                    ) : (
+                                        <Link
+                                            to={item.path}
+                                            className={`
+                                                flex items-center justify-between py-3 px-3 rounded-lg transition-colors
+                                                ${isActive ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}
+                                            `}
+                                        >
+                                            <div className="flex items-center">
+                                                <span className="inline-flex">{item.icon}</span>
+                                                {!collapsed && <span className="ml-3 font-medium">{item.title}</span>}
+                                            </div>
 
-                                    <Link
-                                        to={item.path}
-                                        className={`
-                                        flex items-center justify-between py-3 px-3 rounded-lg transition-colors
-                                        ${isActive ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}
-                                    `}
-                                    >
-                                        <div className="flex items-center">
-                                            <span className="inline-flex">{item.icon}</span>
-                                            {!collapsed && <span className="ml-3 font-medium">{item.title}</span>}
-                                        </div>
-
-                                        {/* Arrow Icon */}
-                                        {!collapsed && item.Chevron && (
-                                            <span className={`ml-auto transform transition-transform ${isSubMenuOpen ? 'rotate-90' : ''}`} onClick={item.subMenu ? () => toggleSubMenu(item.title) : undefined} >
-                                                {item.Chevron}
-                                            </span>
-                                        )}
-                                    </Link>
+                                            {/* Arrow Icon */}
+                                            {!collapsed && item.Chevron && (
+                                                <span
+                                                    className={`ml-auto transform transition-transform ${isSubMenuOpen ? 'rotate-90' : ''}`}
+                                                    onClick={item.subMenu ? (e) => {
+                                                        e.preventDefault();
+                                                        toggleSubMenu(item.title);
+                                                    } : undefined}
+                                                >
+                                                    {item.Chevron}
+                                                </span>
+                                            )}
+                                        </Link>
+                                    )}
 
                                     {/* If item has subMenu */}
                                     {item.subMenu && !collapsed && (
@@ -217,9 +521,9 @@ function Nav() {
                                                         <Link
                                                             to={subItem.path}
                                                             className={`
-                                                                    block py-2 px-3 rounded-lg text-sm transition-colors
+                                                                block py-2 px-3 rounded-lg text-sm transition-colors
                                                                 ${isSubActive ? 'bg-blue-500 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}
-                                                                `}
+                                                            `}
                                                         >
                                                             <div className='flex items-center'>
                                                                 <span className="inline-flex mr-2 h-5 w-5 items-center">{subItem.icone}</span>
@@ -268,21 +572,144 @@ function Nav() {
                                 <span className="text-sm font-medium">{isOnline ? 'Online' : 'Offline'}</span>
                             </div>
 
-                            {
-                                !isVerifiy ? (
-                                    <Link to={'/supplier-verification'} className="px-2 py-1 bg-red-100 text-red-800 hover:text-gray-900 rounded-full hover:bg-gray-100">
-                                        Unverifiy
-                                    </Link>
-                                ) : (
-                                    <Link className="px-2 py-1 bg-green-100 text-green-800 rounded-full hover:bg-gray-100">
-                                        verifiyed
-                                    </Link>
-                                )
-                            }
+                            {!isVerifiy ? (
+                                <Link to={'/supplier-verification'} className="px-2 py-1 bg-red-100 text-red-800 hover:text-gray-900 rounded-full hover:bg-gray-100">
+                                    Unverified
+                                </Link>
+                            ) : (
+                                <Link className="px-2 py-1 bg-green-100 text-green-800 rounded-full hover:bg-gray-100">
+                                    Verified
+                                </Link>
+                            )}
 
-                            <Link to={'/chat'} className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100">
+                            {/* Enhanced Notification Icon with Combined Count */}
+                            <div className="relative group">
+                                <button
+                                    className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100 transition-colors relative"
+                                    onClick={() => markAllNotificationsAsRead()}
+                                >
+                                    <div className="relative">
+                                        <Bell size={18} />
+                                        {unreadMessageCount > 0 && (
+                                            <MessageCircle className="w-3 h-3 absolute -top-1 -right-1 text-blue-500" />
+                                        )}
+                                    </div>
+                                    {/* Combined notification badge */}
+                                    {totalUnreadCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full animate-pulse min-w-[20px] text-center shadow-lg">
+                                            {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+                                        </span>
+                                    )}
+                                </button>
+
+                                {/* Enhanced Notification Dropdown */}
+                                <div className="absolute right-0 mt-2 w-80 bg-white shadow-xl z-30 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 max-h-96 overflow-y-auto border rounded-lg">
+                                    <div className="p-4">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h3 className="font-bold text-lg">
+                                                Notifications
+                                                {totalUnreadCount > 0 && (
+                                                    <span className="ml-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                                        {totalUnreadCount}
+                                                    </span>
+                                                )}
+                                            </h3>
+                                            {totalUnreadCount > 0 && (
+                                                <button
+                                                    onClick={markAllNotificationsAsRead}
+                                                    className="text-blue-500 hover:text-blue-600 hover:underline text-sm transition-colors"
+                                                >
+                                                    Mark all read
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {/* Notification Type Filters */}
+                                        <div className="flex gap-2 mb-4">
+                                            <div className="flex items-center gap-1 text-xs">
+                                                <Bell className="w-3 h-3" />
+                                                <span>{unreadNotificationCount} system</span>
+                                            </div>
+                                            <div className="flex items-center gap-1 text-xs">
+                                                <MessageCircle className="w-3 h-3" />
+                                                <span>{unreadMessageCount} messages</span>
+                                            </div>
+                                        </div>
+
+                                        {getCombinedNotifications().length === 0 ? (
+                                            <div className="text-center text-gray-500 py-8">
+                                                <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                                                <p>No notifications yet</p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-2">
+                                                {getCombinedNotifications().slice(0, 5).map((notification) => (
+                                                    <div
+                                                        key={notification.id}
+                                                        className={`p-3 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md ${notification.isRead
+                                                            ? 'bg-gray-50 hover:bg-gray-100'
+                                                            : 'bg-blue-50 border-l-4 border-blue-500 hover:bg-blue-100'
+                                                            }`}
+                                                        onClick={() => {
+                                                            if (!notification.isRead) {
+                                                                if (notification.type === 'message') {
+                                                                    markMessageNotificationAsRead(notification.id);
+                                                                } else {
+                                                                    markNotificationAsRead(notification.id);
+                                                                }
+                                                            }
+                                                        }}
+                                                    >
+                                                        <div className="flex justify-between items-start">
+                                                            <div className="flex-1">
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    {notification.type === 'message' ? (
+                                                                        <MessageCircle className="w-4 h-4 text-blue-500" />
+                                                                    ) : (
+                                                                        <Bell className="w-4 h-4 text-gray-500" />
+                                                                    )}
+                                                                    <div className="font-medium text-sm">
+                                                                        {notification.title || 'Notification'}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="text-xs text-gray-600 mb-2 line-clamp-2">
+                                                                    {notification.message}
+                                                                </div>
+                                                                <div className="text-xs text-gray-400">
+                                                                    {new Date(notification.createdAt).toLocaleString()}
+                                                                </div>
+                                                            </div>
+                                                            {!notification.isRead && (
+                                                                <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1 animate-pulse"></div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                {getCombinedNotifications().length > 5 && (
+                                                    <Link
+                                                        to="/notifications"
+                                                        className="block text-center text-blue-500 hover:text-blue-600 hover:underline text-sm py-3 transition-colors"
+                                                    >
+                                                        View all {getCombinedNotifications().length} notifications
+                                                    </Link>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Message icon with count badge */}
+                            <Link to={'/chat'} className="relative p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100">
                                 <MessageCircle size={20} />
+                                {unreadMessageCount > 0 && (
+                                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-5 h-5 flex items-center justify-center animate-pulse">
+                                        {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
+                                    </div>
+                                )}
                             </Link>
+
                             <button className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100">
                                 <Link to={'/setting'}>
                                     <Settings size={20} />
@@ -290,17 +717,15 @@ function Nav() {
                             </button>
                             <div className="ml-2 hidden sm:block">
                                 <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
-                                    {
-                                        supplierImage?.image ? (
-                                            <div className="h-8 w-8 rounded-full  flex items-center justify-center text-white">
-                                                <span className="font-medium text-sm "><img className='rounded-full h-8 w-8' src={`http://localhost:3032/images/${supplierImage.image}`} alt="" srcset="" /></span>
-                                            </div>
-                                        ) : (
-                                            <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
-                                                <span className="font-medium text-sm">S</span>
-                                            </div>
-                                        )
-                                    }
+                                    {supplierImage?.image ? (
+                                        <div className="h-8 w-8 rounded-full  flex items-center justify-center text-white">
+                                            <span className="font-medium text-sm "><img className='rounded-full h-8 w-8' src={`http://localhost:3032/images/${supplierImage.image}`} alt="" srcSet="" /></span>
+                                        </div>
+                                    ) : (
+                                        <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                            <span className="font-medium text-sm">S</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { FaFacebook, FaInstagram, FaGithub, FaLinkedin } from "react-icons/fa";
-import logo from '../../images/logo constraction.jpeg';
+import logo from '../../images/jejan.svg';
 import { Link } from 'react-router-dom';
 import '@fontsource/roboto';
 
@@ -10,27 +10,35 @@ function Footer() {
         <div className='bg-slate-100 dark:bg-gray-950'>
             <div>
                 <div className=' w-full sm:flex grid sm:p-12 p-5 '>
-                    <div className=' w-14 h-14 p-1 text-left'>
-                        <img className='dark:bg-white rounded-full' src={logo} alt="" srcset="" />
+                    <div className='flex items-center gap-2 w-full'>
+                        <div className=' p-1 text-left'>
+                            <img
+                                className="relative w-56 h-24"
+                                src={logo}
+                                alt="ConstructEasy Logo"
+                            />
+                        </div>
+
+                        <div className='w-full p-2'>
+                            <nav className='' >
+                                <ul className='grid sm:flex gap-4 sm:justify-center text-left font-medium' style={{ fontFamily: 'Roboto, sans-serif' }}>
+                                    <li>Contact Us</li>
+                                    <li>About Us</li>
+                                    <li>Help Center</li>
+                                    <li>Blog Posts</li>
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <div className='w-full flex gap-4 sm:justify-end justify-center mt-6'>
+                            <Link><FaFacebook size={24} /></Link>
+                            <Link><FaInstagram size={24} /></Link>
+                            <Link><FaGithub size={24} /></Link>
+                            <Link><FaLinkedin size={24} /></Link>
+                        </div>
                     </div>
 
-                    <div className='w-full p-2'>
-                        <nav className='' >
-                            <ul className='grid sm:flex gap-4 sm:justify-center text-left font-medium' style={{ fontFamily: 'Roboto, sans-serif' }}>
-                                <li>Contact Us</li>
-                                <li>About Us</li>
-                                <li>Help Center</li>
-                                <li>Blong Posts</li>
-                            </ul>
-                        </nav>
-                    </div>
 
-                    <div className='w-full flex gap-4 sm:justify-end justify-center mt-6'>
-                        <Link><FaFacebook size={24} /></Link>
-                        <Link><FaInstagram size={24} /></Link>
-                        <Link><FaGithub size={24} /></Link>
-                        <Link><FaLinkedin size={24} /></Link>
-                    </div>
                 </div>
             </div>
             <div className='px-28'>

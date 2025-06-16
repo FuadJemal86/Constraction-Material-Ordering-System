@@ -1,6 +1,15 @@
 const prisma = require("../../prismaCliaynt");
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
 
 const customerPlaceOrder = async (req, res) => {
     const token = req.cookies["x-auth-token"];
@@ -72,6 +81,16 @@ const customerPlaceOrder = async (req, res) => {
                 };
             });
 
+            // Get supplier info for email
+            const supplier = await prisma.supplier.findUnique({
+                where: { id: parseInt(supplierId, 10) },
+            });
+
+            if (!supplier) {
+                console.error(`Supplier not found: ${supplierId}`);
+                continue; // Skip this supplier or handle error as needed
+            }
+
             const newOrder = await prisma.order.create({
                 data: {
                     customer: { connect: { id: customerId } },
@@ -88,9 +107,11 @@ const customerPlaceOrder = async (req, res) => {
                         create: orderItems
                     }
                 },
-                include: { orderitem: true }
+                include: {
+                    orderitem: true,
+                    customer: true
+                }
             });
-            ;
 
             createdOrders.push({
                 customerId: newOrder.customerId,
@@ -98,6 +119,60 @@ const customerPlaceOrder = async (req, res) => {
                 totalPrice: newOrder.totalPrice,
                 transactionId: newOrder.transactionId,
             });
+
+            // Prepare and send email to supplier
+            try {
+                const mailOptions = {
+                    from: process.env.EMAIL_USER,
+                    to: supplier.email,
+                    subject: 'New Order Received - Jejan Platform',
+                    html: `
+                        <h2>New Order Notification</h2>
+                        <p>Hello ${supplier.companyName},</p>
+                        <p>You have received a new order on Jejan platform with the following details:</p>
+                        
+                        <h3>Order Summary</h3>
+                        <ul>
+                            <li><strong>Order ID:</strong> ${newOrder.id}</li>
+                            <li><strong>Transaction ID:</strong> ${transactionId}</li>
+                            <li><strong>Customer:</strong> ${newOrder.customer.name}</li>
+                            <li><strong>Delivery Address:</strong> ${address}</li>
+                            <li><strong>Delivery Option:</strong> ${deliveryOption}</li>
+                            <li><strong>Total Amount:</strong> ${totalPrice.toFixed(2)}</li>
+                        </ul>
+                        
+                        <h3>Order Items</h3>
+                        <table border="1" cellpadding="5" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${newOrder.orderitem.map(item => `
+                                    <tr>
+                                        <td>${item.quantity}</td>
+                                        <td>${item.unitPrice.toFixed(2)}</td>
+                                        <td>${item.subtotal.toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        
+                        <p>Please log in to your Jejan supplier dashboard to process this order.</p>
+                        <p>Thank you for using our platform!</p>
+                        <p><strong>Jejan Team</strong></p>
+                    `
+                };
+
+                await transporter.sendMail(mailOptions);
+                console.log(`Email sent to supplier ${supplier.email}`);
+            } catch (emailError) {
+                console.error('Failed to send email to supplier:', emailError);
+            }
         }
 
         return res.status(201).json({
