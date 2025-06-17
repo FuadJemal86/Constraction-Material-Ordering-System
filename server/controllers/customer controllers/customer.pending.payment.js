@@ -26,7 +26,7 @@ const getPendingOrder = async (req, res) => {
             }
         })
 
-        return res.status(200).json({status: true , message: pendingSatus})
+        return res.status(200).json({ status: true, message: pendingSatus })
 
     } catch (err) {
         console.error(err);
@@ -36,4 +36,4 @@ const getPendingOrder = async (req, res) => {
 }
 
 
-module.exports = {getPendingOrder}
+module.exports = { getPendingOrder }

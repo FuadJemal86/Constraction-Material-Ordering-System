@@ -9,7 +9,7 @@ import api from '../../api';
 function ShoppingCart({ onClose }) {
     // Core state management
     const { cart, removeItem, updateQuantity } = useCart();
-    const navigator = useNavigate();
+    const navigate = useNavigate();
 
     // Map related state
     const mapRef = useRef(null);
@@ -18,6 +18,7 @@ function ShoppingCart({ onClose }) {
     const [userLocation, setUserLocation] = useState(null);
     const [locationAddress, setLocationAddress] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [mapLoaded, setMapLoaded] = useState(false);
 
     // Product stock state
     const [products, setProducts] = useState([]);
@@ -82,18 +83,21 @@ function ShoppingCart({ onClose }) {
         }));
     }, [finalTotal, deliveryFee]);
 
-    // Map initialization
+    // Map initialization effect
     useEffect(() => {
-        if (order.deliveryOption === "delivery" && mapRef.current) {
+        if (order.deliveryOption === "delivery" && !mapLoaded) {
             loadGoogleMapsScript()
-                .then(() => initializeMap())
+                .then(() => {
+                    initializeMap();
+                    setMapLoaded(true);
+                })
                 .catch(error => {
                     console.error("Failed to load map:", error);
                     toast.error("Failed to load Google Maps. Please refresh the page.");
                     setIsLoading(false);
                 });
         }
-    }, [order.deliveryOption]);
+    }, [order.deliveryOption, mapLoaded]);
 
     // Load Google Maps API
     const loadGoogleMapsScript = () => {
@@ -116,10 +120,12 @@ function ShoppingCart({ onClose }) {
 
     // Initialize the map
     const initializeMap = () => {
-        if (!mapRef.current) return;
+        if (!mapRef.current || !window.google) return;
+
         setIsLoading(true);
 
-        const defaultCenter = { lat: 9.145, lng: 40.4897 }; // Ethiopia center
+        // Default center (Ethiopia)
+        const defaultCenter = { lat: 9.145, lng: 40.4897 };
 
         const mapInstance = new window.google.maps.Map(mapRef.current, {
             center: defaultCenter,
@@ -127,133 +133,144 @@ function ShoppingCart({ onClose }) {
             mapTypeControl: false,
             streetViewControl: false,
             fullscreenControl: false,
+            zoomControl: true,
+            styles: [
+                {
+                    featureType: "poi",
+                    elementType: "labels",
+                    stylers: [{ visibility: "off" }]
+                }
+            ]
         });
 
-        // Add location button
-        const locationButton = document.createElement("button");
-        locationButton.innerHTML = `<div style="background-color: #fff; border: 2px solid #fff; border-radius: 3px; 
-                    box-shadow: 0 2px 6px rgba(0,0,0,.3); cursor: pointer; text-align: center; 
-                    width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-location-arrow" style="color: #1a73e8; font-size: 18px;"></i>
-        </div>`;
-        locationButton.classList.add("custom-map-control-button");
-        locationButton.setAttribute("title", "Find my location");
-        locationButton.type = "button";
-        locationButton.addEventListener("click", getUserLocation);
+        // Add click event listener to map
+        mapInstance.addListener('click', (event) => {
+            const lat = event.latLng.lat();
+            const lng = event.latLng.lng();
 
-        mapInstance.controls[window.google.maps.ControlPosition.RIGHT_BOTTOM].push(locationButton);
-
-        // Add click event listener
-        window.google.maps.event.addListener(mapInstance, 'click', handleMapClick);
+            setLocationOnMap(lat, lng, mapInstance);
+            toast.success('Location selected successfully!');
+        });
 
         setMap(mapInstance);
         setIsLoading(false);
+
+        // Try to get user's current location on map load
+        getCurrentLocation(mapInstance);
     };
 
     // Get user's current location
-    const getUserLocation = () => {
-        setIsLoading(true);
-
+    const getCurrentLocation = (mapInstance = map) => {
         if (!navigator.geolocation) {
-            toast.error('Geolocation is not supported by your browser.');
-            setIsLoading(false);
+            console.log('Geolocation not supported');
             return;
         }
 
+        setIsLoading(true);
+
         navigator.geolocation.getCurrentPosition(
-            position => {
-                const { latitude, longitude } = position.coords;
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
 
-                // Update state with location
-                setUserLocation({ latitude, longitude });
-                setOrder(prev => ({
-                    ...prev,
-                    latitude,
-                    longitude
-                }));
-
-                // Get address
-                getAddressFromCoordinates(latitude, longitude);
-
-                // Update map
-                if (map) {
-                    const userPos = new window.google.maps.LatLng(latitude, longitude);
-                    map.setCenter(userPos);
-                    map.setZoom(14);
-
-                    // Update marker
-                    if (userMarker) userMarker.setMap(null);
-
-                    const newMarker = new window.google.maps.Marker({
-                        position: userPos,
-                        map: map,
-                        title: 'Your Location'
-                    });
-
-                    setUserMarker(newMarker);
+                if (mapInstance) {
+                    mapInstance.setCenter({ lat, lng });
+                    mapInstance.setZoom(15);
+                    setLocationOnMap(lat, lng, mapInstance);
+                    toast.success('Current location found!');
                 }
-
                 setIsLoading(false);
-                toast.success('Location found successfully!');
             },
-            error => {
-                console.error('Geolocation error:', error);
-                toast.error('Location permission denied. Please enable it in your browser.');
+            (error) => {
+                console.log('Geolocation error:', error);
                 setIsLoading(false);
+                // Don't show error toast, just silently fail for better UX
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 300000
             }
         );
     };
 
-    // Handle map click to set location
-    const handleMapClick = (event) => {
-        const latitude = event.latLng.lat();
-        const longitude = event.latLng.lng();
+    // Set location on map with marker and address
+    const setLocationOnMap = (lat, lng, mapInstance = map) => {
+        // Clear existing marker
+        if (userMarker) {
+            userMarker.setMap(null);
+        }
 
-        // Update location state
-        setUserLocation({ latitude, longitude });
-        setOrder(prev => ({
-            ...prev,
-            latitude,
-            longitude
-        }));
-
-        // Get address for the selected location
-        getAddressFromCoordinates(latitude, longitude);
-
-        // Update marker
-        if (userMarker) userMarker.setMap(null);
-
+        // Create new marker
         const marker = new window.google.maps.Marker({
-            position: event.latLng,
-            map: map,
-            title: 'Selected Location'
+            position: { lat, lng },
+            map: mapInstance,
+            draggable: true,
+            title: 'Delivery Location',
+            icon: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 0C6.716 0 0 6.716 0 15c0 15 15 30 15 30s15-15 15-30c0-8.284-6.716-15-15-15z" fill="#FF6B6B"/>
+                        <circle cx="15" cy="15" r="8" fill="white"/>
+                        <circle cx="15" cy="15" r="4" fill="#FF6B6B"/>
+                    </svg>
+                `),
+                scaledSize: new window.google.maps.Size(30, 30),
+                anchor: new window.google.maps.Point(15, 30)
+            }
+        });
+
+        // Add drag event listener
+        marker.addListener('dragend', (event) => {
+            const newLat = event.latLng.lat();
+            const newLng = event.latLng.lng();
+            updateLocationData(newLat, newLng);
+            getAddressFromCoordinates(newLat, newLng);
         });
 
         setUserMarker(marker);
-        toast.success('Location selected!');
+        updateLocationData(lat, lng);
+        getAddressFromCoordinates(lat, lng);
     };
 
-    // Get human-readable address from coordinates
-    const getAddressFromCoordinates = (latitude, longitude) => {
-        const geocoder = new window.google.maps.Geocoder();
-        const latLng = new window.google.maps.LatLng(latitude, longitude);
+    // Update location data in state
+    const updateLocationData = (lat, lng) => {
+        setUserLocation({ latitude: lat, longitude: lng });
+        setOrder(prev => ({
+            ...prev,
+            latitude: lat,
+            longitude: lng
+        }));
+    };
 
-        geocoder.geocode({ location: latLng }, (results, status) => {
-            if (status === "OK" && results[0]) {
-                const address = results[0].formatted_address;
-                setLocationAddress(address);
-                setOrder(prev => ({
-                    ...prev,
-                    address: address
-                }));
-            } else {
-                setLocationAddress("Address not found");
-                setOrder(prev => ({
-                    ...prev,
-                    address: ""
-                }));
-            }
-        });
+    // Get human-readable address from coordinates using OpenStreetMap (same as SupplierSignUp)
+    const getAddressFromCoordinates = async (latitude, longitude) => {
+        try {
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+            );
+
+            const data = await response.json();
+            const address = data.display_name || 'Selected location';
+
+            setLocationAddress(address);
+            setOrder(prev => ({
+                ...prev,
+                address: address
+            }));
+        } catch (error) {
+            console.error('Reverse geocoding error:', error);
+            setLocationAddress("Could not resolve address");
+        }
+    };
+
+    // Handle manual location button click
+    const handleFindMyLocation = () => {
+        if (!map) {
+            toast.error('Map not loaded yet');
+            return;
+        }
+        getCurrentLocation(map);
     };
 
     // Handle delivery option change
@@ -278,6 +295,16 @@ function ShoppingCart({ onClose }) {
                 setUserMarker(null);
             }
         }
+    };
+
+    // Handle manual address input
+    const handleAddressChange = (e) => {
+        const address = e.target.value;
+        setOrder(prev => ({
+            ...prev,
+            address: address
+        }));
+        setLocationAddress(address);
     };
 
     // Get product stock for a specific item
@@ -314,9 +341,11 @@ function ShoppingCart({ onClose }) {
         e.preventDefault();
 
         // Validation
-        if (order.deliveryOption === 'delivery' && !userLocation && !order.address.trim()) {
-            toast.error('Please select a delivery location on the map or enter your address manually');
-            return;
+        if (order.deliveryOption === 'delivery') {
+            if (!userLocation && !order.address.trim()) {
+                toast.error('Please select a delivery location on the map or enter your address manually');
+                return;
+            }
         }
 
         // Check stock for all items
@@ -329,6 +358,9 @@ function ShoppingCart({ onClose }) {
             toast.error('Some items exceed available stock. Please adjust quantities.');
             return;
         }
+
+        // Show loading state
+        const loadingToast = toast.loading('Placing your order...');
 
         try {
             const orderData = {
@@ -357,27 +389,52 @@ function ShoppingCart({ onClose }) {
 
             const result = await api.post('/customer/place-order', orderData);
 
-            if (result.data.status) {
-                const transactionId = result.data.orders[0]?.transactionId;
+            // Dismiss loading toast
+            toast.dismiss(loadingToast);
 
-                if (transactionId) {
-                    toast.success(result.data.message);
-                    window.open(`/payment-form/${transactionId}`, 'paymentTab');
-                    onClose();
-                } else {
-                    toast.error('Transaction ID not received');
+            if (result.data && result.data.status) {
+                // Try to get transaction ID from different possible locations
+                let transactionId = null;
+
+                if (result.data.transactionId) {
+                    transactionId = result.data.transactionId;
+                } else if (result.data.orders && result.data.orders.length > 0) {
+                    transactionId = result.data.orders[0].transactionId;
+                } else if (result.data.order && result.data.order.transactionId) {
+                    transactionId = result.data.order.transactionId;
+                } else if (result.data.data && result.data.data.transactionId) {
+                    transactionId = result.data.data.transactionId;
                 }
 
+                if (transactionId) {
+                    toast.success(result.data.message || 'Order placed successfully!');
+                    onClose();
+                    setTimeout(() => {
+                        navigate(`/payment-form/${transactionId}`);
+                    }, 500);
+                } else {
+                    toast.error('Order placed but payment link not available');
+                    onClose();
+                    setTimeout(() => {
+                        navigate('/orders');
+                    }, 1000);
+                }
             } else {
-                toast.error(result.data.message);
+                toast.error(result.data?.message || 'Failed to place order');
             }
+
         } catch (err) {
-            console.error(err);
+            console.error('Order submission error:', err);
+            toast.dismiss(loadingToast);
+
             if (err.response?.status === 401) {
                 toast.error('Please sign in to place an order');
-                navigator('/customer-sign-in');
+                setTimeout(() => {
+                    navigate('/customer-sign-in');
+                }, 1000);
             } else {
-                toast.error(err.response?.data?.message || 'An error occurred while placing the order');
+                const errorMessage = err.response?.data?.message || 'An error occurred while placing the order';
+                toast.error(errorMessage);
             }
         }
     };
@@ -404,10 +461,10 @@ function ShoppingCart({ onClose }) {
                 <div className="p-4">
                     {/* Delivery Options */}
                     <div className="mb-4">
-                        <h3 className="font-medium mb-2">Delivery Options</h3>
+                        <h3 className="font-medium mb-3">Delivery Options</h3>
 
                         {/* Delivery Radio Options */}
-                        <div className="flex items-center gap-4 mb-4">
+                        <div className="flex flex-col gap-3 mb-4">
                             <div className="flex items-center">
                                 <input
                                     id="delivery-pickup"
@@ -416,10 +473,10 @@ function ShoppingCart({ onClose }) {
                                     value="pickup"
                                     checked={order.deliveryOption === "pickup"}
                                     onChange={() => handleDeliveryOptionChange("pickup")}
-                                    className="h-4 w-4 text-blue-600"
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                                 />
-                                <label htmlFor="delivery-pickup" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                                    I'll pick up
+                                <label htmlFor="delivery-pickup" className="ml-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                                    I'll pick up (Free)
                                 </label>
                             </div>
                             <div className="flex items-center">
@@ -430,67 +487,82 @@ function ShoppingCart({ onClose }) {
                                     value="delivery"
                                     checked={order.deliveryOption === "delivery"}
                                     onChange={() => handleDeliveryOptionChange("delivery")}
-                                    className="h-4 w-4 text-blue-600"
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                                 />
-                                <label htmlFor="delivery-delivery" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                                    Delivery to my location
+                                <label htmlFor="delivery-delivery" className="ml-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                                    Delivery to my location (+Birr 50.00)
                                 </label>
                             </div>
                         </div>
 
-                        {/* Show map only when delivery is selected */}
+                        {/* Show map and location controls only when delivery is selected */}
                         {order.deliveryOption === "delivery" && (
-                            <>
-                                <div className="relative">
+                            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-gray-50 dark:bg-gray-800">
+                                <div className="flex justify-between items-center mb-3">
+                                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Select Delivery Location
+                                    </h4>
+                                    <button
+                                        type="button"
+                                        onClick={handleFindMyLocation}
+                                        className="px-3 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
+                                        disabled={isLoading}
+                                    >
+                                        {isLoading ? 'Finding...' : 'Find My Location'}
+                                    </button>
+                                </div>
+
+                                <div className="relative mb-3">
                                     <div
                                         ref={mapRef}
-                                        className="w-full h-64 bg-gray-100 dark:bg-gray-800 rounded-lg mb-2"
+                                        className="w-full h-48 bg-gray-200 dark:bg-gray-700 rounded-lg"
                                     ></div>
 
-                                    {/* Map loading state */}
+                                    {/* Map loading overlay */}
                                     {isLoading && (
-                                        <div className="absolute inset-0 bg-white bg-opacity-70 dark:bg-gray-900 dark:bg-opacity-70 flex items-center justify-center rounded-lg">
+                                        <div className="absolute inset-0 bg-white bg-opacity-80 dark:bg-gray-900 dark:bg-opacity-80 flex items-center justify-center rounded-lg">
                                             <div className="flex flex-col items-center">
-                                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-2"></div>
-                                                <p className="text-gray-700 dark:text-gray-300 font-medium">
-                                                    Loading map...
-                                                </p>
+                                                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400">Loading map...</p>
                                             </div>
                                         </div>
                                     )}
                                 </div>
 
-                                {/* Location Message */}
-                                <p className="text-sm text-gray-500 mb-2">
-                                    {!userLocation ? 'Click on the map to select your delivery location or use "Find my location"' :
-                                        '✓ Location selected'}
+                                {/* Map instructions */}
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 text-center">
+                                    Click on the map to select your delivery location
                                 </p>
 
                                 {/* Manual Address Input */}
                                 <div className="mb-3">
-                                    <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
-                                        Or manually enter your exact location:
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Or enter your address manually:
                                     </label>
                                     <input
                                         type="text"
-                                        placeholder="Enter your exact delivery address"
+                                        placeholder="Enter your delivery address"
                                         value={order.address}
-                                        onChange={e => setOrder({ ...order, address: e.target.value })}
-                                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900 text-sm"
+                                        onChange={handleAddressChange}
+                                        className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-md dark:bg-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 </div>
 
-                                {/* Display Selected Location */}
+                                {/* Selected Location Display */}
                                 {userLocation && locationAddress && (
-                                    <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md mb-4 flex items-start">
-                                        <MapPin size={18} className="text-blue-500 mt-1 flex-shrink-0 mr-2" />
-                                        <div>
-                                            <h4 className="font-medium text-sm">Selected Location:</h4>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">{locationAddress}</p>
+                                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-3 rounded-md flex items-start">
+                                        <MapPin size={16} className="text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0 mr-2" />
+                                        <div className="flex-1">
+                                            <h5 className="text-sm font-medium text-green-800 dark:text-green-200">
+                                                Selected Location:
+                                            </h5>
+                                            <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                                                {locationAddress}
+                                            </p>
                                         </div>
                                     </div>
                                 )}
-                            </>
+                            </div>
                         )}
                     </div>
 
@@ -522,38 +594,37 @@ function ShoppingCart({ onClose }) {
                                                     <Wrench className="text-gray-400" size={16} />
                                                 </div>
                                                 <div className="ml-3 flex-grow">
-                                                    <h3 className="font-medium">{item.name}</h3>
-                                                    <div className="text-xs text-gray-500">
+                                                    <h3 className="font-medium text-sm">{item.name}</h3>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400">
                                                         Stock: {stock} available
                                                         {exceedsStock && (
                                                             <span className="text-red-500 ml-2">
-                                                                (Exceeds available stock!)
+                                                                (Exceeds stock!)
                                                             </span>
                                                         )}
                                                     </div>
                                                 </div>
-                                                <span
+                                                <button
+                                                    type="button"
                                                     onClick={() => removeItem(item.id)}
-                                                    className="p-1 text-gray-500 hover:text-red-500 cursor-pointer"
+                                                    className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                                                 >
                                                     <X size={16} />
-                                                </span>
+                                                </button>
                                             </div>
 
-                                            <div className="grid grid-cols-12 gap-2 mt-2">
+                                            <div className="flex items-center justify-between">
                                                 {/* Quantity Controls */}
-                                                <div className="col-span-6 flex items-center">
-                                                    {/* Minus Button */}
+                                                <div className="flex items-center space-x-2">
                                                     <button
                                                         type="button"
                                                         onClick={() => handleQuantityUpdate(index, item.quantity - 1)}
                                                         disabled={item.quantity <= 1}
-                                                        className="p-1 bg-gray-100 dark:bg-gray-800 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        className="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                                                     >
                                                         <Minus size={14} />
                                                     </button>
 
-                                                    {/* Quantity Display */}
                                                     <input
                                                         type="number"
                                                         value={item.quantity}
@@ -563,24 +634,25 @@ function ShoppingCart({ onClose }) {
                                                             const newQuantity = parseInt(e.target.value) || 1;
                                                             handleQuantityUpdate(index, newQuantity);
                                                         }}
-                                                        className={`w-full mx-1 p-1 text-center border border-gray-200 dark:border-gray-700 rounded dark:bg-gray-900 text-sm ${exceedsStock ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ''
-                                                            }`}
+                                                        className={`w-16 px-2 py-1 text-center border rounded-md text-sm dark:bg-gray-900 dark:text-white ${exceedsStock
+                                                            ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
+                                                            : 'border-gray-200 dark:border-gray-600'
+                                                            } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                                                     />
 
-                                                    {/* Plus Button */}
                                                     <button
                                                         type="button"
                                                         onClick={() => handleQuantityUpdate(index, item.quantity + 1)}
                                                         disabled={!canIncreaseQuantity(item) || isOutOfStock}
-                                                        className="p-1 bg-gray-100 dark:bg-gray-800 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        className="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                                                     >
                                                         <Plus size={14} />
                                                     </button>
                                                 </div>
 
                                                 {/* Price */}
-                                                <div className="col-span-6 flex justify-end items-center">
-                                                    <span className="font-medium">
+                                                <div className="text-right">
+                                                    <span className="font-medium text-sm">
                                                         Birr {(item.price * item.quantity).toFixed(2)}
                                                     </span>
                                                 </div>
@@ -591,45 +663,45 @@ function ShoppingCart({ onClose }) {
                             </div>
 
                             {/* Cart Totals */}
-                            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-                                <div className="flex justify-between mb-2">
+                            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4 space-y-2">
+                                <div className="flex justify-between text-sm">
                                     <span>Subtotal</span>
                                     <span className="font-medium">Birr {cartTotal.toFixed(2)}</span>
                                 </div>
                                 {order.deliveryOption === 'delivery' && (
-                                    <div className="flex justify-between mb-2">
+                                    <div className="flex justify-between text-sm">
                                         <span>Delivery Fee</span>
                                         <span className="font-medium">Birr {deliveryFee.toFixed(2)}</span>
                                     </div>
                                 )}
-                                <div className="flex justify-between mb-4">
-                                    <span className="font-bold">Total</span>
-                                    <span className="font-bold">
-                                        Birr {finalTotal.toFixed(2)}
-                                    </span>
+                                <div className="flex justify-between font-bold text-lg border-t border-gray-200 dark:border-gray-700 pt-2">
+                                    <span>Total</span>
+                                    <span>Birr {finalTotal.toFixed(2)}</span>
                                 </div>
 
-                                <button
-                                    type="submit"
-                                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-3 px-4 rounded-md mb-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                    disabled={
-                                        (order.deliveryOption === 'delivery' && !userLocation && !order.address.trim()) ||
-                                        cart.some(item => item.quantity > getProductStock(item.id))
-                                    }
-                                >
-                                    {order.deliveryOption === 'delivery' && !userLocation && !order.address.trim()
-                                        ? 'Please Select Location'
-                                        : cart.some(item => item.quantity > getProductStock(item.id))
-                                            ? 'Check Stock Availability'
-                                            : 'Order Now'}
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={onClose}
-                                    className="w-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 py-2 px-4 rounded-md transition-all"
-                                >
-                                    Continue Shopping
-                                </button>
+                                <div className="space-y-2 pt-4">
+                                    <button
+                                        type="submit"
+                                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-3 px-4 rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled={
+                                            (order.deliveryOption === 'delivery' && !userLocation && !order.address.trim()) ||
+                                            cart.some(item => item.quantity > getProductStock(item.id))
+                                        }
+                                    >
+                                        {order.deliveryOption === 'delivery' && !userLocation && !order.address.trim()
+                                            ? 'Please Select Location'
+                                            : cart.some(item => item.quantity > getProductStock(item.id))
+                                                ? 'Check Stock Availability'
+                                                : 'Place Order'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={onClose}
+                                        className="w-full border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 py-2 px-4 rounded-md transition-all"
+                                    >
+                                        Continue Shopping
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     )}

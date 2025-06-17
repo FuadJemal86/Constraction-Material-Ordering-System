@@ -152,71 +152,71 @@ function SupplierOrders() {
                         <FileSpreadsheet />
                     </button>
                 </div>
-                <div className='w-full overflow-x-auto'>
-                    <table className="w-full border-collapse min-w-[1000px]">
-                        <thead className="bg-gray-100">
-                            <tr>
-                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Id</th>
-                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Delivery</th>
-                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Total Price</th>
-                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Order Item</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {order.map((c, index) => (
-                                <tr
-                                    key={c.id || index}
-                                    className={index % 2 === 0 ? "bg-white hover:bg-gray-100" : "bg-gray-100 hover:bg-gray-100"}
-                                >
-                                    <td className="p-3 text-sm text-indigo-600 font-medium">{c.id}</td>
-                                    <td className="p-3 text-sm text-gray-800">{c.customer.name}</td>
-                                    <td className="p-3 text-sm text-gray-800">
-                                        <span className={` ${c.address && c.address.length > 0}` ? 'bg-green-100 px-2 py-1 rounded-full text-green-800' : 'bg-red-100 px-2 py-1 rounded-full text-green-800'}>
-                                            {c.address && c.address.length > 0 ? c.address : 'No'}
-                                        </span>
-                                    </td>
-
-                                    <td className="p-3 text-sm text-gray-500">
-                                        {new Date(c.createdAt).toLocaleDateString('en-GB', {
-                                            day: 'numeric',
-                                            month: 'long',
-                                            year: 'numeric'
-                                        }).replace(' ', '.')}
-                                    </td>
-
-                                    <td className="p-3 text-sm text-gray-800 font-medium">birr {c.totalPrice}</td>
-                                    <td className="p-3 text-sm">
-                                        <select
-                                            value={c.status || "PROCESSING"}
-                                            onChange={e => handleStatus(e.target.value, c.id)}
-                                            className={`px-2 py-1 rounded-full text-xs font-medium outline-none} ${getStatusBadgeColor(c.status)}`}
-                                        >
-                                            <option value="PENDING">PENDING</option>
-                                            <option value="PROCESSING">PROCESSING</option>
-                                            <option value="SHIPPED">SHIPPED</option>
-                                            <option value="DELIVERED">DELIVERED</option>
-                                            <option value="CANCELLED">CANCELLED</option>
-                                        </select>
-                                    </td>
-                                    <td className='p-3 text-sm'>
-                                        <span onClick={e => handleOrderItem(c.id)} className='text-blue-600 cursor-pointer'><Eye /></span>
-                                    </td>
-                                </tr>
-                            ))}
-                            {order.length === 0 && (
+                <div className="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
                                 <tr>
-                                    <td colSpan="6" className="p-4 text-center text-gray-500">
-                                        No orders found
-                                    </td>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Id</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delivery</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Price</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Item</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {order.length > 0 ? (
+                                    order.map((c, index) => (
+                                        <tr key={c.id || index} className="hover:bg-gray-50 transition-colors duration-150">
+                                            <td className="py-4 px-4 text-indigo-600 font-medium">{c.id}</td>
+                                            <td className="py-4 px-4 text-gray-900">{c.customer.name}</td>
+                                            <td className="py-4 px-4">
+                                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${c.address && c.address.length > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                    {c.address && c.address.length > 0 ? c.address : 'No'}
+                                                </span>
+                                            </td>
+                                            <td className="py-4 px-4 text-gray-500">
+                                                {new Date(c.createdAt).toLocaleDateString('en-GB', {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric'
+                                                }).replace(' ', '.')}
+                                            </td>
+                                            <td className="py-4 px-4 text-gray-900 font-medium">birr {c.totalPrice}</td>
+                                            <td className="py-4 px-4">
+                                                <select
+                                                    value={c.status || "PROCESSING"}
+                                                    onChange={e => handleStatus(e.target.value, c.id)}
+                                                    className={`px-2 py-1 rounded-full text-xs font-medium outline-none ${getStatusBadgeColor(c.status)}`}
+                                                >
+                                                    <option value="PENDING">PENDING</option>
+                                                    <option value="PROCESSING">PROCESSING</option>
+                                                    <option value="SHIPPED">SHIPPED</option>
+                                                    <option value="DELIVERED">DELIVERED</option>
+                                                    <option value="CANCELLED">CANCELLED</option>
+                                                </select>
+                                            </td>
+                                            <td className="py-4 px-4">
+                                                <span onClick={() => handleOrderItem(c.id)} className="text-blue-600 cursor-pointer hover:underline">
+                                                    <Eye />
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="7" className="py-8 text-center text-gray-500">
+                                            No orders found
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+
                 <div className="flex justify-center items-center mt-6 space-x-2">
                     <button
                         disabled={page === 1}

@@ -123,56 +123,59 @@ function DonePayment() {
                         </div>
 
                     </div>
-                    <div className='w-full overflow-x-auto border-collapse'>
-                        <table className={`bg-gray-100 min-w-[1200px]`}>
-                            <thead>
-                                <tr>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Id</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Customer Name</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Customer Phone</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">View Detail</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {donePayment.map((c, index) => (
-                                    <tr
-                                        key={c.id || index}
-                                        className={index % 2 === 0 ? "bg-white hover:bg-gray-100" : "bg-gray-100 hover:bg-gray-100"}
-                                    >
-                                        <td className="p-3 text-sm text-indigo-600 font-medium">{c.id}</td>
-                                        <td className="p-3 text-sm text-gray-800">{c.customer.name}</td>
-                                        <td className="p-3 text-sm text-gray-800">{c.customer.phone}</td>
-                                        <td className="p-3 text-sm">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 ${getStatusBadgeColor(c.status)}`}>
-                                                {c.status}
-                                            </span>
-                                        </td>
-                                        <td className="p-3 text-sm text-gray-800">{c.amount}</td>
-                                        <td className="p-3 text-sm text-gray-500">
-                                            {new Date(c.createdAt).toLocaleDateString('en-GB', {
-                                                day: 'numeric',
-                                                month: 'long',
-                                                year: 'numeric'
-                                            }).replace(' ', '.')}
-                                        </td>
-                                        <td className='p-3 text-sm'>
-                                            <span onClick={e => handleOrderItem(c.id)} className='text-blue-600 cursor-pointer'><Eye /></span>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {donePayment.length === 0 && (
+                    <div className="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
                                     <tr>
-                                        <td colSpan="6" className="p-4 text-center text-gray-500">
-                                            No product found
-                                        </td>
+                                        <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Id</th>
+                                        <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Name</th>
+                                        <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Phone</th>
+                                        <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                        <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">View Detail</th>
                                     </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {donePayment.length > 0 ? (
+                                        donePayment.map((c, index) => (
+                                            <tr key={c.id || index} className="hover:bg-gray-50 transition-colors duration-150">
+                                                <td className="py-4 px-4 text-indigo-600 font-medium">{c.id}</td>
+                                                <td className="py-4 px-4 text-gray-900">{c.customer.name}</td>
+                                                <td className="py-4 px-4 text-gray-700">{c.customer.phone}</td>
+                                                <td className="py-4 px-4">
+                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 ${getStatusBadgeColor(c.status)}`}>
+                                                        {c.status}
+                                                    </span>
+                                                </td>
+                                                <td className="py-4 px-4 text-gray-900">{c.amount}</td>
+                                                <td className="py-4 px-4 text-gray-500">
+                                                    {new Date(c.createdAt).toLocaleDateString('en-GB', {
+                                                        day: 'numeric',
+                                                        month: 'long',
+                                                        year: 'numeric'
+                                                    }).replace(' ', '.')}
+                                                </td>
+                                                <td className="py-4 px-4">
+                                                    <span onClick={() => handleOrderItem(c.id)} className="text-blue-600 cursor-pointer hover:underline">
+                                                        <Eye />
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="7" className="py-8 text-center text-gray-500">
+                                                No product found
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+
                     <div className="flex justify-center items-center mt-6 space-x-2">
                         <button
                             disabled={page === 1}

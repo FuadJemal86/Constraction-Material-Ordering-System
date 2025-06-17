@@ -108,10 +108,15 @@ const customerPlaceOrder = async (req, res) => {
                     }
                 },
                 include: {
-                    orderitem: true,
+                    orderitem: {
+                        include: {
+                            product: true  // <--- This allows you to access product name
+                        }
+                    },
                     customer: true
                 }
             });
+
 
             createdOrders.push({
                 customerId: newOrder.customerId,
@@ -154,9 +159,10 @@ const customerPlaceOrder = async (req, res) => {
                             <tbody>
                                 ${newOrder.orderitem.map(item => `
                                     <tr>
+                                        <td>${item.product.name}</td>
                                         <td>${item.quantity}</td>
-                                        <td>${item.unitPrice.toFixed(2)}</td>
-                                        <td>${item.subtotal.toFixed(2)}</td>
+                                        <td>Birr ${item.unitPrice.toFixed(2)}</td>
+                                        <td>Birr ${item.subtotal.toFixed(2)}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>

@@ -119,50 +119,51 @@ function Product({ orders = [] }) {
                         </div>
 
                     </div>
-                    <div className='w-full overflow-x-auto border-collapse'>
-                        <table className="bg-gray-100 min-w-[1185px]">
-                            <thead>
-                                <tr>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Id</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
-                                    <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {product.map((order, index) => (
-                                    <tr
-                                        key={order.id || index}
-                                        className={index % 2 === 0 ? "bg-white hover:bg-gray-100" : "bg-gray-100 hover:bg-gray-100"}
-                                    >
-                                        <td className="p-3 text-sm text-indigo-600 font-medium">{order.id}</td>
-                                        <td className="p-3 text-sm text-gray-800">{order.name}</td>
-                                        <td className="p-3 text-sm text-gray-800">{order.category.category}</td>
-                                        <td className="p-3 text-sm">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 ${getStatusBadgeColor(order.status)}`}>
-                                                birr {order.price}/{order.unit}
-                                            </span>
-                                        </td>
-                                        <td className="p-3 text-sm text-gray-500">{order.stock}</td>
-                                        <td className="p-3 text-sm text-gray-800">
-                                            <button onClick={e => handleDelete(order.id)}>
-                                                <Trash2 className='text-red-700' size={20} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {product.length === 0 && (
+                    <div className="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
                                     <tr>
-                                        <td colSpan="6" className="p-4 text-center text-gray-500">
-                                            No product found
-                                        </td>
+                                        <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Id</th>
+                                        <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                        <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                        <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                        <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                                        <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                                     </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {product.length > 0 ? (
+                                        product.map((order, index) => (
+                                            <tr key={order.id || index} className="hover:bg-gray-50 transition-colors duration-150">
+                                                <td className="py-4 px-4 text-indigo-600 font-medium">{order.id}</td>
+                                                <td className="py-4 px-4 text-gray-900">{order.name}</td>
+                                                <td className="py-4 px-4 text-gray-700">{order.category.category}</td>
+                                                <td className="py-4 px-4">
+                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 ${getStatusBadgeColor(order.status)}`}>
+                                                        birr {order.price}/{order.unit}
+                                                    </span>
+                                                </td>
+                                                <td className="py-4 px-4 text-gray-500">{order.stock}</td>
+                                                <td className="py-4 px-4">
+                                                    <button onClick={() => handleDelete(order.id)} className="hover:scale-110 transition-transform duration-150">
+                                                        <Trash2 className='text-red-600' size={20} />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="6" className="py-8 text-center text-gray-500">
+                                                No product found
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+
                     <div className="flex justify-center items-center mt-6 space-x-2">
                         <button
                             disabled={page === 1}
