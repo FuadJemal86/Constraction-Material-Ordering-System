@@ -22,6 +22,10 @@ const { donePayment } = require('../controllers/supplier controllers/get.done.pa
 const { supplierProfile } = require('../controllers/supplier controllers/get.supplier.account')
 const { editSupplierProfile } = require('../controllers/supplier controllers/edit.Supplier.profile')
 const { getSupplierProfileImage } = require('../controllers/supplier controllers/get.supplier.image')
+const { completedPaymentOrderItem } = require('../controllers/supplier controllers/getCompletedOrderItem')
+const { getNotifaction } = require('../controllers/supplier controllers/getNotification')
+const { notificationRed } = require('../controllers/supplier controllers/notificationRed')
+const { markAsAllRed } = require('../controllers/supplier controllers/markAllRed')
 
 
 
@@ -40,6 +44,8 @@ router.put('/offline', offlineStatus)
 router.put('/update-product/:id', updateProduct)
 router.put('/online', onlineStatus)
 router.put('/edit-profile', editSupplierProfile)
+router.put('/notifications/:id/read', notificationRed)
+router.put('/notifications/mark-all-read', markAsAllRed)
 
 router.delete('/delete-product/:id', deleteProduct)
 router.delete('/delete-account/:id', deleteAccount)
@@ -57,4 +63,7 @@ router.get('/supplier-data/:id', supplierData)
 router.get('/get-completed-payment', donePayment)
 router.get('/get-supplier-profile', supplierProfile)
 router.get('/supplier-profile', getSupplierProfileImage)
+router.get('/get-done-item/:id', completedPaymentOrderItem)
+router.get('/get-notifications', getNotifaction)
+
 module.exports = router

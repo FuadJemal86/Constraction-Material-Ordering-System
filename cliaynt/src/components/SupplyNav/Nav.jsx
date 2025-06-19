@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../../images/jejan.svg';
 import toast from 'react-hot-toast';
 import {
@@ -11,6 +11,7 @@ import api from '../../api';
 import useSocket from '../chatHook/useSocket';
 
 function Nav() {
+    const navigate = useNavigate()
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [isOnline, setOnline] = useState(true);
@@ -139,7 +140,7 @@ function Nav() {
         try {
             const result = await api.get('/supplier/get-notifications');
             if (result.data.status) {
-                const fetchedNotifications = result.data.notifications || [];
+                const fetchedNotifications = result.data.data || [];
                 console.log('Fetched notifications:', fetchedNotifications);
                 setNotifications(fetchedNotifications);
                 updateNotificationCount(fetchedNotifications);
@@ -419,6 +420,11 @@ function Nav() {
         }));
     };
 
+    const handleNavigate = () => {
+        navigate('/chat')
+
+    }
+
     return (
         <div className="flex flex-col h-screen lg:flex-row min-h-screen bg-gray-50">
             {/* Mobile overlay */}
@@ -582,22 +588,17 @@ function Nav() {
                                 </Link>
                             )}
 
-                            {/* Enhanced Notification Icon with Combined Count */}
+                            {/* FIXED: Enhanced Notification Bell Icon with Proper Count Badge */}
                             <div className="relative group">
                                 <button
                                     className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100 transition-colors relative"
                                     onClick={() => markAllNotificationsAsRead()}
                                 >
-                                    <div className="relative">
-                                        <Bell size={18} />
-                                        {unreadMessageCount > 0 && (
-                                            <MessageCircle className="w-3 h-3 absolute -top-1 -right-1 text-blue-500" />
-                                        )}
-                                    </div>
-                                    {/* Combined notification badge */}
-                                    {totalUnreadCount > 0 && (
+                                    <MessageCircle size={18} onClick={handleNavigate} />
+                                    {/* FIXED: Show notification count badge only when there are unread notifications */}
+                                    {unreadNotificationCount > 0 && (
                                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full animate-pulse min-w-[20px] text-center shadow-lg">
-                                            {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+                                            {unreadNotificationCount > 99 ? '99+' : unreadNotificationCount}
                                         </span>
                                     )}
                                 </button>
@@ -699,16 +700,6 @@ function Nav() {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Message icon with count badge */}
-                            <Link to={'/chat'} className="relative p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100">
-                                <MessageCircle size={20} />
-                                {unreadMessageCount > 0 && (
-                                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-5 h-5 flex items-center justify-center animate-pulse">
-                                        {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
-                                    </div>
-                                )}
-                            </Link>
 
                             <button className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100">
                                 <Link to={'/setting'}>

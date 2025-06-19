@@ -45,7 +45,8 @@ function Payment() {
             COMPLETED: "bg-green-100 text-green-800",
             PROCESSING: "bg-blue-100 text-blue-800",
             PENDING: "bg-yellow-100 text-yellow-800",
-            FAILED: "bg-red-100 text-red-800"
+            FAILED: "bg-red-100 text-red-800",
+            PAYED: "bg-green-100 text-green-800"
         };
 
         return statusColors[status] || "bg-gray-100 text-gray-800";
@@ -119,7 +120,8 @@ function Payment() {
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank Transaction</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Payment</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">You Payment</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -141,6 +143,11 @@ function Payment() {
                                             <td className="py-4 px-4 whitespace-nowrap">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(c.status)}`}>
                                                     {c.status}
+                                                </span>
+                                            </td>
+                                            <td className="py-4 px-4">
+                                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(c.payedStatus)}`}>
+                                                    {c.payedStatus}
                                                 </span>
                                             </td>
                                         </tr>

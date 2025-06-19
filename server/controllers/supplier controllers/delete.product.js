@@ -7,6 +7,13 @@ const deleteProduct = async (req, res) => {
     const id = req.params.id
 
     try {
+        const isOrdered = await prisma.orderitem.findMany({
+            where: { productId: Number(id) }
+        })
+
+        if (isOrdered.length > 0) {
+            return res.status(200).json({ status: false, message: 'This product already order by customer' })
+        }
 
         await prisma.product.delete({ where: { id: Number(id) } })
 

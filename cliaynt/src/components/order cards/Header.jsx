@@ -4,7 +4,7 @@ import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import { LightMode, DarkMode } from "@mui/icons-material";
 import { Menu, X, User, LogIn, MessageCircle, Bell } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from "../CartContext";
 import logo from '../../images/jejan.svg';
 import bannerImage from '../../images/banner2 page2.jpg';
@@ -15,6 +15,7 @@ import HeaderProfile from './HeaderProfile';
 import useSocket from '../chatHook/useSocket';
 
 function Header() {
+    const navigate = useNavigate()
     // Core state management
     const { cart } = useCart();
     const [mobilePaymentsOpen, setMobilePaymentsOpen] = useState(false);
@@ -140,7 +141,7 @@ function Header() {
         try {
             const result = await api.get('/customer/get-notifications');
             if (result.data.status) {
-                const fetchedNotifications = result.data.notifications || [];
+                const fetchedNotifications = result.data.data || [];
                 console.log('Fetched notifications:', fetchedNotifications);
                 setNotifications(fetchedNotifications);
                 updateNotificationCount(fetchedNotifications);
@@ -466,6 +467,14 @@ function Header() {
         fetchStatus();
     }, []);
 
+
+
+    // to navigate in to chat
+
+    const handelNavigate = () => {
+        navigate('/chat')
+    }
+
     return (
         <div>
             <Toaster
@@ -549,13 +558,13 @@ function Header() {
 
                         {/* NEW: Enhanced Notification Icon with Combined Count */}
                         {isBell && (
-                            <div className="relative hidden md:block group">
+                            <div className="relative group">
                                 <button
                                     className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors relative"
                                     onClick={() => markAllNotificationsAsRead()}
                                 >
                                     <div className="relative">
-                                        <Bell className="w-6 h-6" />
+                                        <MessageCircle onClick={handelNavigate} className="w-6 h-6" />
                                         {unreadMessageCount > 0 && (
                                             <MessageCircle className="w-3 h-3 absolute -top-1 -right-1 text-blue-500" />
                                         )}
@@ -654,7 +663,7 @@ function Header() {
 
                                                 {getCombinedNotifications().length > 5 && (
                                                     <Link
-                                                        to="/notifications"
+                                                        to="/chat"
                                                         className="block text-center text-yellow-500 hover:text-yellow-600 hover:underline text-sm py-3 transition-colors"
                                                     >
                                                         View all {getCombinedNotifications().length} notifications
@@ -670,7 +679,7 @@ function Header() {
                         {/* Dark Mode Toggle */}
                         <button
                             onClick={() => setDarkMode(!darkMode)}
-                            className="p-1 md:p-2 bg-gray-200 dark:bg-gray-800 text-black dark:text-white rounded flex items-center transition-colors"
+                            className="hidden md:flex p-1 md:p-2 bg-gray-200 dark:bg-gray-800 text-black dark:text-white rounded  items-center transition-colors"
                         >
                             {darkMode ? <LightMode className="text-xl md:text-2xl" /> : <DarkMode className="text-xl md:text-2xl" />}
                         </button>
@@ -703,6 +712,7 @@ function Header() {
                                     <li className="p-2 border-b border-gray-100 dark:border-gray-800">
                                         <Link to="/contact" className="text-lg font-medium block">Contact</Link>
                                     </li>
+
                                     {islogin && (
                                         <li className="p-2 border-b border-gray-100 dark:border-gray-800">
                                             <Link
@@ -720,6 +730,19 @@ function Header() {
                                     )}
                                 </ul>
                             </nav>
+
+                            {/* dark and Light mode */}
+                            <div
+                                className="flex items-center justify-between p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            >
+                                <button
+                                    onClick={() => setDarkMode(!darkMode)}
+                                    className=" p-1 md:p-2 bg-gray-200 dark:bg-gray-800 text-black dark:text-white rounded  items-center transition-colors"
+                                >
+                                    {darkMode ? <LightMode className="text-xl md:text-2xl" /> : <DarkMode className="text-xl md:text-2xl" />}
+                                </button>
+
+                            </div>
 
                             {/* Mobile Bottom Actions */}
                             <div className="mt-auto relative pt-6">
@@ -739,6 +762,7 @@ function Header() {
                                 )}
 
                                 {/* Mobile Cart */}
+
                                 <div
                                     className="flex items-center justify-between p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                     onClick={() => setCartOpen(true)}
@@ -753,6 +777,7 @@ function Header() {
                                         </span>
                                     )}
                                 </div>
+
                             </div>
                         </div>
                     </div>

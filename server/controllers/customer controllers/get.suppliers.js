@@ -12,7 +12,10 @@ const getSupplier = async (req, res) => {
                 companyName: true,
                 isApproved: true,
                 address: true,
-                isVerify: true
+                isVerify: true,
+                lat: true,
+                lng: true
+
             }
         });
 

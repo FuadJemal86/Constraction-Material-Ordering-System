@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Minus, Plus, MapPin, Wrench, User } from 'lucide-react';
+import { X, Minus, Plus, MapPin, Wrench, User, AlertCircle, Truck } from 'lucide-react';
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import { useCart } from "../CartContext";
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,6 +7,36 @@ import toast, { Toaster } from 'react-hot-toast';
 import api from '../../api';
 
 function ShoppingCart({ onClose }) {
+    // Ethiopia boundary definition
+    const ETHIOPIA_BOUNDS = {
+        north: 14.8942,   // Northern boundary
+        south: 3.4024,    // Southern boundary  
+        east: 47.9823,    // Eastern boundary
+        west: 32.9975     // Western boundary
+    };
+
+    // Function to check if coordinates are within Ethiopia
+    const isLocationInEthiopia = (lat, lng) => {
+        return (
+            lat >= ETHIOPIA_BOUNDS.south &&
+            lat <= ETHIOPIA_BOUNDS.north &&
+            lng >= ETHIOPIA_BOUNDS.west &&
+            lng <= ETHIOPIA_BOUNDS.east
+        );
+    };
+
+    // Address validation for Ethiopia
+    const validateEthiopianAddress = (address) => {
+        const ethiopianKeywords = [
+            'ethiopia', 'addis ababa', 'dire dawa', 'mekelle', 'gondar', 'hawassa',
+            'bahir dar', 'dessie', 'jimma', 'jijiga', 'shashamane', 'arba minch',
+            'nekemte', 'bishoftu', 'debre markos', 'gambela', 'adama', 'awasa'
+        ];
+
+        const addressLower = address.toLowerCase();
+        return ethiopianKeywords.some(keyword => addressLower.includes(keyword));
+    };
+
     // Core state management
     const { cart, removeItem, updateQuantity } = useCart();
     const navigate = useNavigate();
@@ -15,10 +45,13 @@ function ShoppingCart({ onClose }) {
     const mapRef = useRef(null);
     const [map, setMap] = useState(null);
     const [userMarker, setUserMarker] = useState(null);
+    const [supplierMarker, setSupplierMarker] = useState(null);
     const [userLocation, setUserLocation] = useState(null);
+    const [supplierLocation, setSupplierLocation] = useState(null);
     const [locationAddress, setLocationAddress] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [mapLoaded, setMapLoaded] = useState(false);
+    const [deliveryDistance, setDeliveryDistance] = useState(null);
 
     // Product stock state
     const [products, setProducts] = useState([]);
@@ -36,8 +69,42 @@ function ShoppingCart({ onClose }) {
 
     // Cart calculations
     const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-    const deliveryFee = order.deliveryOption === 'delivery' ? 50 : 0;
-    const finalTotal = cartTotal + deliveryFee;
+
+    // Get supplier delivery info from cart data with correct property names
+    const getSupplierDeliveryInfo = () => {
+        if (cart.length === 0) {
+            return {
+                offersDelivery: false,
+                deliveryPricePerKm: 0,
+                latitude: null,
+                longitude: null
+            };
+        }
+
+        // Get delivery info from the first cart item (assuming all items are from same supplier)
+        const firstItem = cart[0];
+        return {
+            offersDelivery: firstItem.offersDelivery || false,
+            deliveryPricePerKm: firstItem.deliveryPricePerKm || 0,
+            latitude: firstItem.latitude || null,
+            longitude: firstItem.longitude || null
+        };
+    };
+
+    const supplierDeliveryInfo = getSupplierDeliveryInfo();
+    const supplierOffersDelivery = supplierDeliveryInfo.offersDelivery;
+    const deliveryPricePerKm = supplierDeliveryInfo.deliveryPricePerKm;
+
+    // Calculate delivery fee based on distance and supplier's price per km
+    const calculateDeliveryFee = () => {
+        if (order.deliveryOption !== 'delivery' || !deliveryDistance || !deliveryPricePerKm) {
+            return 0;
+        }
+        return deliveryDistance * deliveryPricePerKm;
+    };
+
+    const deliveryFee = calculateDeliveryFee();
+    const finalTotal = cartTotal; // Delivery fee is paid in cash, not added to total
 
     // Fetch product stock information
     useEffect(() => {
@@ -64,6 +131,43 @@ function ShoppingCart({ onClose }) {
         fetchProductsByIds();
     }, [cart]);
 
+    // Fetch supplier location if not available in cart data
+    useEffect(() => {
+        const fetchSupplierLocation = async () => {
+            if (cart.length > 0 && !supplierDeliveryInfo.latitude && !supplierDeliveryInfo.longitude) {
+                try {
+                    // Fetch supplier details to get location
+                    const supplierId = cart[0].supplierId;
+                    const response = await api.get(`/customer/supplier/${supplierId}`);
+
+                    if (response.data && response.data.data) {
+                        const supplier = response.data.data;
+                        setSupplierLocation({
+                            latitude: supplier.latitude,
+                            longitude: supplier.longitude
+                        });
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch supplier location:", error);
+                    // If we can't get supplier location, disable delivery
+                    if (order.deliveryOption === 'delivery') {
+                        toast.error("Cannot load supplier location for delivery");
+                        setOrder(prev => ({ ...prev, deliveryOption: 'pickup' }));
+                    }
+                }
+            } else if (supplierDeliveryInfo.latitude && supplierDeliveryInfo.longitude) {
+                setSupplierLocation({
+                    latitude: supplierDeliveryInfo.latitude,
+                    longitude: supplierDeliveryInfo.longitude
+                });
+            } else {
+                setSupplierLocation(null);
+            }
+        };
+
+        fetchSupplierLocation();
+    }, [cart, supplierDeliveryInfo.latitude, supplierDeliveryInfo.longitude]);
+
     // Effect to set supplierId from first cart item
     useEffect(() => {
         if (cart.length > 0) {
@@ -74,7 +178,7 @@ function ShoppingCart({ onClose }) {
         }
     }, [cart]);
 
-    // Effect to update total price and delivery fee when cart or delivery option changes
+    // Effect to update total price when cart changes
     useEffect(() => {
         setOrder(prev => ({
             ...prev,
@@ -85,7 +189,7 @@ function ShoppingCart({ onClose }) {
 
     // Map initialization effect
     useEffect(() => {
-        if (order.deliveryOption === "delivery" && !mapLoaded) {
+        if (order.deliveryOption === "delivery" && supplierOffersDelivery && !mapLoaded) {
             loadGoogleMapsScript()
                 .then(() => {
                     initializeMap();
@@ -97,7 +201,35 @@ function ShoppingCart({ onClose }) {
                     setIsLoading(false);
                 });
         }
-    }, [order.deliveryOption, mapLoaded]);
+    }, [order.deliveryOption, supplierOffersDelivery, mapLoaded]);
+
+    // Calculate distance between two points (Haversine formula)
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371; // Radius of the Earth in kilometers
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c;
+        return distance;
+    };
+
+    // Update delivery distance when locations change
+    useEffect(() => {
+        if (userLocation && supplierLocation && order.deliveryOption === 'delivery') {
+            const distance = calculateDistance(
+                userLocation.latitude,
+                userLocation.longitude,
+                supplierLocation.latitude,
+                supplierLocation.longitude
+            );
+            setDeliveryDistance(Math.round(distance * 100) / 100); // Round to 2 decimal places
+        } else {
+            setDeliveryDistance(null);
+        }
+    }, [userLocation, supplierLocation, order.deliveryOption]);
 
     // Load Google Maps API
     const loadGoogleMapsScript = () => {
@@ -118,22 +250,32 @@ function ShoppingCart({ onClose }) {
         });
     };
 
-    // Initialize the map
+    // Initialize the map with Ethiopia restrictions
     const initializeMap = () => {
         if (!mapRef.current || !window.google) return;
 
         setIsLoading(true);
 
         // Default center (Ethiopia)
-        const defaultCenter = { lat: 9.145, lng: 40.4897 };
+        const defaultCenter = supplierLocation || { lat: 9.145, lng: 40.4897 };
 
         const mapInstance = new window.google.maps.Map(mapRef.current, {
             center: defaultCenter,
-            zoom: 6,
+            zoom: supplierLocation ? 12 : 6,
             mapTypeControl: false,
             streetViewControl: false,
             fullscreenControl: false,
             zoomControl: true,
+            // Restrict map bounds to Ethiopia
+            restriction: {
+                latLngBounds: {
+                    north: ETHIOPIA_BOUNDS.north,
+                    south: ETHIOPIA_BOUNDS.south,
+                    east: ETHIOPIA_BOUNDS.east,
+                    west: ETHIOPIA_BOUNDS.west
+                },
+                strictBounds: true
+            },
             styles: [
                 {
                     featureType: "poi",
@@ -143,13 +285,42 @@ function ShoppingCart({ onClose }) {
             ]
         });
 
-        // Add click event listener to map
+        // Add supplier marker if location is available
+        if (supplierLocation) {
+            const supplierMarkerInstance = new window.google.maps.Marker({
+                position: {
+                    lat: supplierLocation.latitude,
+                    lng: supplierLocation.longitude
+                },
+                map: mapInstance,
+                title: 'Supplier Location',
+                icon: {
+                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 0C6.716 0 0 6.716 0 15c0 15 15 30 15 30s15-15 15-30c0-8.284-6.716-15-15-15z" fill="#10B981"/>
+                            <circle cx="15" cy="15" r="8" fill="white"/>
+                            <circle cx="15" cy="15" r="4" fill="#10B981"/>
+                        </svg>
+                    `),
+                    scaledSize: new window.google.maps.Size(30, 30),
+                    anchor: new window.google.maps.Point(15, 30)
+                }
+            });
+            setSupplierMarker(supplierMarkerInstance);
+        }
+
+        // Add click event listener to map with Ethiopia validation
         mapInstance.addListener('click', (event) => {
             const lat = event.latLng.lat();
             const lng = event.latLng.lng();
 
+            // Check if location is within Ethiopia
+            if (!isLocationInEthiopia(lat, lng)) {
+                toast.error('Delivery is only available within Ethiopia. Please select a location within the country.');
+                return;
+            }
+
             setLocationOnMap(lat, lng, mapInstance);
-            toast.success('Location selected successfully!');
         });
 
         setMap(mapInstance);
@@ -159,7 +330,7 @@ function ShoppingCart({ onClose }) {
         getCurrentLocation(mapInstance);
     };
 
-    // Get user's current location
+    // Get user's current location with Ethiopia validation
     const getCurrentLocation = (mapInstance = map) => {
         if (!navigator.geolocation) {
             console.log('Geolocation not supported');
@@ -173,18 +344,25 @@ function ShoppingCart({ onClose }) {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
 
+                // Check if user's location is within Ethiopia
+                if (!isLocationInEthiopia(lat, lng)) {
+                    toast.error('Your current location is outside Ethiopia. Please manually select a location within Ethiopia for delivery.');
+                    setIsLoading(false);
+                    return;
+                }
+
                 if (mapInstance) {
                     mapInstance.setCenter({ lat, lng });
                     mapInstance.setZoom(15);
                     setLocationOnMap(lat, lng, mapInstance);
-                    toast.success('Current location found!');
+                    toast.success('Current location found within Ethiopia!');
                 }
                 setIsLoading(false);
             },
             (error) => {
                 console.log('Geolocation error:', error);
+                toast.error('Could not get your location. Please select your delivery location manually on the map.');
                 setIsLoading(false);
-                // Don't show error toast, just silently fail for better UX
             },
             {
                 enableHighAccuracy: true,
@@ -194,14 +372,42 @@ function ShoppingCart({ onClose }) {
         );
     };
 
-    // Set location on map with marker and address
+    // Set location on map with marker and address (Ethiopia validation)
     const setLocationOnMap = (lat, lng, mapInstance = map) => {
-        // Clear existing marker
+        // Double-check Ethiopia boundaries
+        if (!isLocationInEthiopia(lat, lng)) {
+            toast.error('Selected location is outside Ethiopia. Delivery is only available within Ethiopia.');
+            return;
+        }
+
+        // Clear existing user marker
         if (userMarker) {
             userMarker.setMap(null);
         }
 
-        // Create new marker
+        // Calculate distance to supplier if supplier location exists
+        let distance = null;
+        if (supplierLocation) {
+            distance = calculateDistance(
+                lat, lng,
+                supplierLocation.latitude,
+                supplierLocation.longitude
+            );
+        }
+
+        // Check if distance is within allowed range (3-7km)
+        if (distance !== null) {
+            if (distance < 3) {
+                toast.error('Delivery location must be at least 3km from supplier');
+                return;
+            }
+            if (distance > 7) {
+                toast.error('Delivery location must be within 7km from supplier');
+                return;
+            }
+        }
+
+        // Create new user marker
         const marker = new window.google.maps.Marker({
             position: { lat, lng },
             map: mapInstance,
@@ -220,10 +426,35 @@ function ShoppingCart({ onClose }) {
             }
         });
 
-        // Add drag event listener
+        // Add drag event listener with Ethiopia validation
         marker.addListener('dragend', (event) => {
             const newLat = event.latLng.lat();
             const newLng = event.latLng.lng();
+
+            // Check if dragged location is still within Ethiopia
+            if (!isLocationInEthiopia(newLat, newLng)) {
+                toast.error('Delivery location must be within Ethiopia. Please select a location within the country.');
+                // Reset marker to previous valid position
+                marker.setPosition({ lat, lng });
+                return;
+            }
+
+            // Check distance constraints on drag
+            if (supplierLocation) {
+                const newDistance = calculateDistance(
+                    newLat, newLng,
+                    supplierLocation.latitude,
+                    supplierLocation.longitude
+                );
+
+                if (newDistance < 3 || newDistance > 7) {
+                    toast.error('Delivery location must be between 3-7km from supplier');
+                    // Reset marker to previous valid position
+                    marker.setPosition({ lat, lng });
+                    return;
+                }
+            }
+
             updateLocationData(newLat, newLng);
             getAddressFromCoordinates(newLat, newLng);
         });
@@ -231,6 +462,12 @@ function ShoppingCart({ onClose }) {
         setUserMarker(marker);
         updateLocationData(lat, lng);
         getAddressFromCoordinates(lat, lng);
+
+        if (distance !== null) {
+            toast.success(`Location selected within Ethiopia! Distance: ${distance.toFixed(2)}km`);
+        } else {
+            toast.success('Location selected successfully within Ethiopia!');
+        }
     };
 
     // Update location data in state
@@ -243,7 +480,7 @@ function ShoppingCart({ onClose }) {
         }));
     };
 
-    // Get human-readable address from coordinates using OpenStreetMap (same as SupplierSignUp)
+    // Get human-readable address from coordinates using OpenStreetMap
     const getAddressFromCoordinates = async (latitude, longitude) => {
         try {
             const response = await fetch(
@@ -275,6 +512,12 @@ function ShoppingCart({ onClose }) {
 
     // Handle delivery option change
     const handleDeliveryOptionChange = (option) => {
+        // Check if supplier offers delivery
+        if (option === 'delivery' && !supplierOffersDelivery) {
+            toast.error('This supplier does not offer delivery service');
+            return;
+        }
+
         setOrder(prev => ({
             ...prev,
             deliveryOption: option,
@@ -290,6 +533,7 @@ function ShoppingCart({ onClose }) {
         if (option === 'pickup') {
             setUserLocation(null);
             setLocationAddress("");
+            setDeliveryDistance(null);
             if (userMarker) {
                 userMarker.setMap(null);
                 setUserMarker(null);
@@ -297,7 +541,7 @@ function ShoppingCart({ onClose }) {
         }
     };
 
-    // Handle manual address input
+    // Handle manual address input with Ethiopia validation
     const handleAddressChange = (e) => {
         const address = e.target.value;
         setOrder(prev => ({
@@ -305,6 +549,11 @@ function ShoppingCart({ onClose }) {
             address: address
         }));
         setLocationAddress(address);
+
+        // Warn if address doesn't seem to be in Ethiopia
+        if (address.length > 10 && !validateEthiopianAddress(address)) {
+            toast.warning('Please ensure your address is within Ethiopia for delivery service.');
+        }
     };
 
     // Get product stock for a specific item
@@ -342,8 +591,18 @@ function ShoppingCart({ onClose }) {
 
         // Validation
         if (order.deliveryOption === 'delivery') {
+            if (!supplierOffersDelivery) {
+                toast.error('This supplier does not offer delivery service');
+                return;
+            }
+
             if (!userLocation && !order.address.trim()) {
                 toast.error('Please select a delivery location on the map or enter your address manually');
+                return;
+            }
+
+            if (deliveryDistance !== null && (deliveryDistance < 3 || deliveryDistance > 7)) {
+                toast.error('Delivery location must be between 3-7km from supplier');
                 return;
             }
         }
@@ -367,7 +626,7 @@ function ShoppingCart({ onClose }) {
                 supplierId: order.supplierId,
                 totalPrice: order.totalPrice,
                 deliveryOption: order.deliveryOption,
-                deliveryFee: order.deliveryFee,
+                deliveryFee: 0, // Delivery fee is paid in cash
                 products: cart.map(item => ({
                     productId: item.id,
                     quantity: item.quantity,
@@ -381,10 +640,16 @@ function ShoppingCart({ onClose }) {
                 orderData.latitude = order.latitude;
                 orderData.longitude = order.longitude;
                 orderData.address = order.address.trim();
+                orderData.deliveryDistance = deliveryDistance;
+                orderData.deliveryPricePerKm = deliveryPricePerKm;
+                orderData.cashDeliveryFee = deliveryFee; // Track cash delivery fee
             } else {
                 orderData.latitude = null;
                 orderData.longitude = null;
                 orderData.address = '';
+                orderData.deliveryDistance = null;
+                orderData.deliveryPricePerKm = null;
+                orderData.cashDeliveryFee = 0;
             }
 
             const result = await api.post('/customer/place-order', orderData);
@@ -407,7 +672,11 @@ function ShoppingCart({ onClose }) {
                 }
 
                 if (transactionId) {
-                    toast.success(result.data.message || 'Order placed successfully!');
+                    const successMessage = order.deliveryOption === 'delivery'
+                        ? `Order placed successfully! Delivery will be paid in cash to the driver.`
+                        : 'Order placed successfully!';
+
+                    toast.success(successMessage);
                     onClose();
                     setTimeout(() => {
                         navigate(`/payment-form/${transactionId}`);
@@ -463,6 +732,32 @@ function ShoppingCart({ onClose }) {
                     <div className="mb-4">
                         <h3 className="font-medium mb-3">Delivery Options</h3>
 
+                        {/* Supplier Delivery Info */}
+                        {cart.length > 0 && (
+                            <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                <div className="flex items-center mb-2">
+                                    <Truck size={16} className="text-blue-600 dark:text-blue-400 mr-2" />
+                                    <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                                        Supplier Delivery Info
+                                    </span>
+                                </div>
+                                {supplierOffersDelivery ? (
+                                    <div className="text-sm text-blue-700 dark:text-blue-300">
+                                        <p>✓ Delivery available</p>
+                                        <p>Price: Birr {deliveryPricePerKm}/km</p>
+                                        <p className="text-xs mt-1 text-blue-600 dark:text-blue-400">
+                                            * Delivery fee paid in cash to driver
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="text-sm text-blue-700 dark:text-blue-300">
+                                        <p>✗ This supplier does not offer delivery</p>
+                                        <p>Pickup only</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         {/* Delivery Radio Options */}
                         <div className="flex flex-col gap-3 mb-4">
                             <div className="flex items-center">
@@ -487,16 +782,27 @@ function ShoppingCart({ onClose }) {
                                     value="delivery"
                                     checked={order.deliveryOption === "delivery"}
                                     onChange={() => handleDeliveryOptionChange("delivery")}
-                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                                    disabled={!supplierOffersDelivery}
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 disabled:opacity-50"
                                 />
-                                <label htmlFor="delivery-delivery" className="ml-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
-                                    Delivery to my location (+Birr 50.00)
+                                <label htmlFor="delivery-delivery" className={`ml-2 text-sm cursor-pointer ${supplierOffersDelivery
+                                    ? 'text-gray-700 dark:text-gray-300'
+                                    : 'text-gray-400 dark:text-gray-600'
+                                    }`}>
+                                    Delivery to my location
+                                    {supplierOffersDelivery ? (
+                                        <span className="text-orange-600 dark:text-orange-400">
+                                            {deliveryDistance ? ` (Birr ${deliveryFee.toFixed(2)} - Cash)` : ' (Price calculated on location)'}
+                                        </span>
+                                    ) : (
+                                        <span className="text-gray-400"> (Not available)</span>
+                                    )}
                                 </label>
                             </div>
                         </div>
 
-                        {/* Show map and location controls only when delivery is selected */}
-                        {order.deliveryOption === "delivery" && (
+                        {/* Show map and location controls only when delivery is selected and offered */}
+                        {order.deliveryOption === "delivery" && supplierOffersDelivery && (
                             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-gray-50 dark:bg-gray-800">
                                 <div className="flex justify-between items-center mb-3">
                                     <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -531,8 +837,26 @@ function ShoppingCart({ onClose }) {
 
                                 {/* Map instructions */}
                                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 text-center">
-                                    Click on the map to select your delivery location
+                                    Click on the map to select your delivery location.
+                                    <span className="block">Green marker = Supplier, Red marker = Your location</span>
                                 </p>
+
+                                {/* Distance and Fee Display */}
+                                {deliveryDistance && (
+                                    <div className="mb-3 p-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-md">
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-orange-700 dark:text-orange-300">
+                                                Distance: {deliveryDistance}km
+                                            </span>
+                                            <span className="font-medium text-orange-800 dark:text-orange-200">
+                                                Cash Fee: Birr {deliveryFee.toFixed(2)}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                                            * This amount will be paid in cash to the driver upon delivery
+                                        </p>
+                                    </div>
+                                )}
 
                                 {/* Manual Address Input */}
                                 <div className="mb-3">
@@ -668,12 +992,7 @@ function ShoppingCart({ onClose }) {
                                     <span>Subtotal</span>
                                     <span className="font-medium">Birr {cartTotal.toFixed(2)}</span>
                                 </div>
-                                {order.deliveryOption === 'delivery' && (
-                                    <div className="flex justify-between text-sm">
-                                        <span>Delivery Fee</span>
-                                        <span className="font-medium">Birr {deliveryFee.toFixed(2)}</span>
-                                    </div>
-                                )}
+
                                 <div className="flex justify-between font-bold text-lg border-t border-gray-200 dark:border-gray-700 pt-2">
                                     <span>Total</span>
                                     <span>Birr {finalTotal.toFixed(2)}</span>

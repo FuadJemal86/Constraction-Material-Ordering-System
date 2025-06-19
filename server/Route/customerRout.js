@@ -21,6 +21,9 @@ const { getCustomerPaymentStatus } = require('../controllers/customer controller
 const { getTransactionPayment } = require('../controllers/customer controllers/get.transactionPayment')
 const { getProfile } = require('../controllers/customer controllers/get.profile')
 const { getProductStock } = require('../controllers/customer controllers/get.stock.product')
+const { getNotifaction } = require('../controllers/customer controllers/customerGetNoti')
+const { notificationRed } = require('../controllers/customer controllers/notifactionRed')
+const { markAsAllRed } = require('../controllers/customer controllers/markAsRead')
 
 
 
@@ -36,6 +39,8 @@ router.post('/login', customerLogin)
 router.get('/verify-token', verifyCustomerToken)
 router.get('/get-category', customerGetCategory)
 router.get('/get-supplier', getSupplier)
+router.get('/get-notifications', getNotifaction)
+
 
 router.post('/place-order', customerPlaceOrder)
 
@@ -51,6 +56,8 @@ router.get('/get-account', getAccount)
 
 router.put('/update-customer-account', editCustomerProfile)
 router.put('/password-change', updatePassword)
+router.put('/notifications/:id/read', notificationRed)
+router.put('/notifications/mark-all-read', markAsAllRed)
 
 router.get('/get-order-item/:id', getCustomerOrderItem)
 router.get('/get-payment', getCustomerPaymentStatus)

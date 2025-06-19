@@ -54,13 +54,15 @@ model customer {
 }
 
 model message {
-  id           Int                  @id @default(autoincrement())
-  senderId     Int
-  senderType   message_senderType
-  receiverId   Int
-  receiverType message_receiverType
-  content      String
-  createdAt    DateTime             @default(now())
+  id            Int                  @id @default(autoincrement())
+  senderId      Int
+  senderType    message_senderType
+  receiverId    Int
+  receiverType  message_receiverType
+  content       String
+  createdAt     DateTime             @default(now())
+  custoemrRed   Boolean              @default(false)
+  suppliermrRed Boolean              @default(false)
 }
 
 model address {

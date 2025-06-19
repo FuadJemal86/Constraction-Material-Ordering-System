@@ -57,7 +57,7 @@ const addProduct = [upload.single('image'), async (req, res) => {
                 stock: parseInt(stock),
                 supplierId,
                 categoryId: parseInt(categoryId),
-                unit,
+                unit: unit ?? null,
                 deliveryPricePerKm: parseFloat(deliveryPricePerKm),
                 image: req.file ? req.file.filename : null,
             },

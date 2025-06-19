@@ -53,10 +53,10 @@ function DonePayment() {
         }
 
         try {
-            const result = await api.get(`/supplier/get-order-item/${id}`)
+            const result = await api.get(`/supplier/get-done-item/${id}`)
 
             if (result.data.status) {
-                setOrderItem(result.data.orderItem)
+                setOrderItem(result.data.orderItems)
             } else {
                 console.log(err)
             }
@@ -149,7 +149,7 @@ function DonePayment() {
                                                         {c.status}
                                                     </span>
                                                 </td>
-                                                <td className="py-4 px-4 text-gray-900">{c.amount}</td>
+                                                <td className="py-4 px-4 text-gray-900">Birr {c.amount}</td>
                                                 <td className="py-4 px-4 text-gray-500">
                                                     {new Date(c.createdAt).toLocaleDateString('en-GB', {
                                                         day: 'numeric',
@@ -158,7 +158,7 @@ function DonePayment() {
                                                     }).replace(' ', '.')}
                                                 </td>
                                                 <td className="py-4 px-4">
-                                                    <span onClick={() => handleOrderItem(c.id)} className="text-blue-600 cursor-pointer hover:underline">
+                                                    <span onClick={() => handleOrderItem(c.transactionId)} className="text-blue-600 cursor-pointer hover:underline">
                                                         <Eye />
                                                     </span>
                                                 </td>

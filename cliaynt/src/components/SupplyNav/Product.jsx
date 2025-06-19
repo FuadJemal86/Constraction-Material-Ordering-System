@@ -4,6 +4,8 @@ import api from '../../api';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { Printer, FileSpreadsheet, Trash2 } from "lucide-react";
+import toast, { Toaster } from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 
 function Product({ orders = [] }) {
@@ -82,18 +84,41 @@ function Product({ orders = [] }) {
     const handleDelete = async (id) => {
 
         try {
-            const result = await api.delete(`/supplier/delete-product/${id}`)
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            })
 
-            if (result.data.status) {
-                fetchData()
-            }
+                .then(async (result) => {
+                    if (result.isConfirmed) {
+                        const response = await api.delete(`/supplier/delete-product/${id}`)
+                        if (response.data.status) {
+                            Swal.fire({
+                                title: "Deleted!",
+                                text: "Your file has been deleted.",
+                                icon: "success"
+                            });
+                            fetchData()
+                        } else {
+                            toast.error(response.data.message)
+                        }
+                    }
+                })
         } catch (err) {
-            console.log(err)
+            console.log(err);
+            const errorMessage = err.response?.data?.message || 'This product already order by customer';
+            toast.error(errorMessage);
         }
     }
 
     return (
         <div>
+            <Toaster position="top-center" reverseOrder={false} />
             <span className='flex justify-end mt-2'>
                 <Link to={'/supplier-page/add-product'} className='bg-blue-950 flex items-center rounded-lg text-gray-300 px-4 py-2'>Post Product</Link>
             </span>

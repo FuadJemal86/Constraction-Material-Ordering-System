@@ -17,7 +17,7 @@ function AddProduct() {
         name: "",
         categoryId: "",
         price: "",
-        unit: "piece", // Default unit
+        unit: "", // Default unit
         stock: 0,
         image: "",
         offersDelivery: false,
@@ -46,7 +46,7 @@ function AddProduct() {
         const { name, categoryId, price, unit, stock, image, offersDelivery, deliveryPricePerKm } = product;
 
         // Basic validation
-        if (!name || !categoryId || !price || !unit || !stock || !image) {
+        if (!name || !categoryId || !price || !stock || !image) {
             return toast.error('Please fill all required fields');
         }
 
@@ -190,20 +190,20 @@ function AddProduct() {
 
     };
 
-    const handleDeleteAccount = async(id) => {
+    const handleDeleteAccount = async (id) => {
 
         try {
             const result = await api.delete(`/supplier/delete-account/${id}`)
-            if(result.data.status) {
+            if (result.data.status) {
                 feachData()
             } else {
                 toast.error(result.data.message)
             }
-        } catch(err) {
+        } catch (err) {
             console.log(err)
             toast.error(err.response.data.message)
         }
-        
+
     };
 
     const feachData = async () => {
@@ -222,7 +222,7 @@ function AddProduct() {
 
     useEffect(() => {
         feachData()
-    },[])
+    }, [])
 
     return (
         <div className="mt-9 flex justify-center items-center p-4">
@@ -356,45 +356,26 @@ function AddProduct() {
 
                         <div className="flex gap-2">
                             <div className="relative flex-1">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span className="text-gray-500">$</span>
+                                <div className="absolute inset-y-0 left-0 pl-1 flex items-center pointer-events-none">
+                                    <span className="text-gray-500">Birr</span>
                                 </div>
                                 <input
                                     value={product.price}
                                     onChange={e => setProduct({ ...product, price: e.target.value })}
-                                    className="w-full h-10 pl-7 pr-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
+                                    className="w-full h-10 pl-8 pr-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
                                     placeholder="Price *"
                                     type="number"
                                     min="0"
                                     step="0.01"
                                 />
                             </div>
+                            <input
+                                value={product.unit}
+                                onChange={e => setProduct({ ...product, unit: e.target.value })}
+                                className="w-32 h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
+                                placeholder="Unit *"
+                            />
 
-                            {!customUnit ? (
-                                <div className="relative w-32">
-                                    <select
-                                        value={product.unit}
-                                        onChange={handleUnitChange}
-                                        className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none appearance-none"
-                                    >
-                                        {commonUnits.map(unit => (
-                                            <option key={unit.value} value={unit.value}>{unit.label}</option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            ) : (
-                                <input
-                                    value={product.unit}
-                                    onChange={e => setProduct({ ...product, unit: e.target.value })}
-                                    className="w-32 h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
-                                    placeholder="Unit *"
-                                />
-                            )}
                         </div>
 
                         <input
