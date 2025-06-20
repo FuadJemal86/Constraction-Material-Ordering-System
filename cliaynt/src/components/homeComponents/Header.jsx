@@ -117,10 +117,10 @@ function Header() {
                     {/* CTA Buttons - Desktop */}
                     <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
                         <Link to="/products" className="border border-gray-300 rounded-full px-3 py-1.5 lg:px-5 lg:py-2 text-gray-700 font-medium hover:bg-gray-100 transition-colors text-sm lg:text-base dark:text-white dark:hover:bg-gray-500">
-                            Materials
+                            Shop Now
                         </Link>
                         <Link to="/sign-up" className="border border-fuchsia-500 bg-fuchsia-500 rounded-full px-3 py-1.5 lg:px-5 lg:py-2 text-white font-medium hover:bg-fuchsia-600 hover:border-fuchsia-600 transition-colors text-sm lg:text-base">
-                            Post Now
+                            Supplier
                         </Link>
                     </div>
 
@@ -181,25 +181,7 @@ function Header() {
                                     className="block text-gray-600 dark:text-white hover:text-fuchsia-500  transition-colors"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
-                                    Materials
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/services/ordering"
-                                    className="block text-gray-600 dark:text-white hover:text-fuchsia-500 transition-colors"
-                                    onClick={() => setIsMenuOpen(false)}
-                                >
-                                    Ordering
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/services/tracking"
-                                    className="block text-gray-600 dark:text-white hover:text-fuchsia-500 transition-colors"
-                                    onClick={() => setIsMenuOpen(false)}
-                                >
-                                    Tracking
+                                    Shop Now
                                 </Link>
                             </li>
                         </ul>
@@ -211,15 +193,9 @@ function Header() {
                             className="border border-gray-300 dark:text-white rounded-full px-5 py-2 text-center text-gray-700 font-medium hover:bg-gray-100 transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
-                            Join Now
+                            Supplier
                         </Link>
-                        <Link
-                            to="/learn"
-                            className="border border-fuchsia-500 bg-fuchsia-500 rounded-full px-5 py-2 text-center text-white font-medium hover:bg-fuchsia-600 hover:border-fuchsia-600 transition-colors"
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            Learn More
-                        </Link>
+
                     </li>
                 </ul>
             </div>

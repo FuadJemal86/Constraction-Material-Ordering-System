@@ -1,119 +1,135 @@
 import React, { useState } from 'react';
-import banner from '../../images/construction banner.jpg';
-import { ArrowRight, Building, TruckIcon, ClipboardCheck, Users } from 'lucide-react';
+import { ArrowRight, ShoppingBag, Truck, Shield, Star, Tag, Gift, CreditCard } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function Body() {
+    const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState('suppliers');
 
     const services = [
         {
             id: 'suppliers',
             title: 'Trusted Suppliers',
-            icon: <TruckIcon className="w-10 h-10 text-fuchsia-500" />,
-            description: 'Access our network of vetted suppliers offering quality materials at competitive prices.'
+            icon: <ShoppingBag className="w-10 h-10 text-blue-500" />,
+            description: 'Connect with verified suppliers offering quality products and reliable service.'
         },
         {
-            id: 'ordering',
-            title: 'Easy Ordering',
-            icon: <ClipboardCheck className="w-10 h-10 text-fuchsia-500" />,
-            description: 'Place orders with just a few clicks, track deliveries, and manage everything in one place.'
+            id: 'delivery',
+            title: 'Direct Delivery',
+            icon: <Truck className="w-10 h-10 text-blue-500" />,
+            description: 'Get products delivered directly from suppliers to your location with real-time tracking.'
         },
         {
-            id: 'projects',
-            title: 'Project Management',
-            icon: <Building className="w-10 h-10 text-fuchsia-500" />,
-            description: 'Organize materials by project, set schedules, and keep everything on track.'
+            id: 'security',
+            title: 'Secure Transactions',
+            icon: <Shield className="w-10 h-10 text-blue-500" />,
+            description: 'Safe and secure payment processing with buyer protection and supplier verification.'
         },
         {
-            id: 'network',
-            title: 'Contractor Network',
-            icon: <Users className="w-10 h-10 text-fuchsia-500" />,
-            description: 'Connect with other professionals to share resources and collaborate on projects.'
+            id: 'support',
+            title: 'Partnership Support',
+            icon: <Star className="w-10 h-10 text-blue-500" />,
+            description: 'Dedicated support team to help maintain strong supplier-customer relationships.'
         }
     ];
 
-    // Testimonials data
-    const testimonials = [
+    const features = [
         {
-            name: "Fuad Jemal",
-            company: "Johnson Construction",
-            text: "This platform has cut our ordering time in half. Materials arrive on schedule every time."
+            icon: <Tag className="w-8 h-8 text-green-500" />,
+            title: 'Competitive Pricing',
+            description: 'Direct supplier pricing with no middleman markup'
         },
         {
-            name: "Abdu Read",
-            company: "Rodriguez Builders",
-            text: "The supplier network is excellent, and the order tracking feature has saved us countless hours."
+            icon: <Gift className="w-8 h-8 text-purple-500" />,
+            title: 'Bulk Discounts',
+            description: 'Special pricing for larger orders and loyal customers'
         },
         {
-            name: "A/rehman Moha",
-            company: "Chen Properties",
-            text: "Easy to use, great customer service, and helps us stay organized across multiple projects."
+            icon: <CreditCard className="w-8 h-8 text-orange-500" />,
+            title: 'Flexible Terms',
+            description: 'Customizable payment and delivery terms with suppliers'
+        },
+        {
+            icon: <Shield className="w-8 h-8 text-red-500" />,
+            title: 'Quality Assurance',
+            description: 'All suppliers vetted for quality and reliability standards'
         }
     ];
+
+    const handleNavigation = () => {
+        navigate('/products')
+    }
 
     return (
-        <div className="w-full overflow-x-hidden mt-8">
-            {/* Hero Section */}
-            <section className="mt-8 md:mt-20 px-4 md:px-10 lg:px-20">
-                <div className="flex flex-col md:flex-row items-center justify-between">
-                    <div className="text-left w-full md:w-1/2 p-2 md:p-5 md:pr-8 mb-8 md:mb-0">
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 dark:text-gray-400">
-                            Streamline Your Construction Material Ordering Today
+        <div className="w-full overflow-x-hidden">
+            {/* Hero Section - Full Width Banner */}
+            <section className="relative w-full h-[70vh] min-h-[500px] bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 dark:from-gray-900 dark:via-gray-800 dark:to-black">
+                <div className="absolute inset-0 bg-black bg-opacity-40 dark:bg-opacity-60"></div>
+                <div className="absolute inset-0 dark:bg-gradient-to-br dark:from-purple-900/30 dark:via-blue-900/20 dark:to-gray-900/40"></div>
+                <div className="relative z-10 flex items-center justify-center h-full px-4">
+                    <div className="text-center text-white max-w-4xl">
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                            Welcome to
+                            <span className="block bg-gradient-to-r from-yellow-400 to-pink-400 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
+                                Jejan Marketplace
+                            </span>
                         </h1>
-                        <p className="text-sm md:text-base pt-3 md:pt-5 text-gray-600">
-                            Discover an efficient way to manage your construction material needs.
-                            Our platform connects you with trusted suppliers for seamless ordering and tracking.
+                        <p className="text-lg md:text-xl mb-8 text-gray-200 dark:text-gray-300 max-w-2xl mx-auto">
+                            Discover trusted suppliers and explore a wide range of quality products.
+                            Start building strong business relationships and grow with Jejan.
                         </p>
-
-                        <div className="pt-6 md:pt-10 flex gap-3">
-                            <button className="border rounded-full px-4 py-2 text-sm font-medium bg-fuchsia-500 text-white hover:bg-fuchsia-600 transition duration-300">
-                                Explore
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button onClick={handleNavigation} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-cyan-500 dark:to-purple-500 text-white font-semibold rounded-full hover:from-blue-600 hover:to-purple-700 dark:hover:from-cyan-600 dark:hover:to-purple-600 transform hover:scale-105 transition duration-300 shadow-lg dark:shadow-cyan-500/25">
+                                Find Suppliers
                             </button>
-                            <button className="border rounded-full px-4 py-2 text-sm font-medium hover:bg-gray-100 transition duration-300">
-                                Learn More
+                            <button onClick={handleNavigation} className="px-8 py-4 border-2 border-white dark:border-cyan-400 text-white dark:text-cyan-400 font-semibold rounded-full hover:bg-white hover:text-gray-900 dark:hover:bg-cyan-400 dark:hover:text-gray-900 transition duration-300">
+                                Browse Products
                             </button>
                         </div>
                     </div>
-
-                    <div className="w-full md:w-2/3 flex justify-center md:justify-end">
-                        <img
-                            className="w-full max-w-md h-auto rounded-2xl shadow-lg object-cover"
-                            src={banner}
-                            alt="Construction materials"
-                        />
-                    </div>
                 </div>
+
+                {/* Animated background elements */}
+                <div className="absolute top-10 left-10 w-20 h-20 bg-yellow-400 dark:bg-cyan-400 rounded-full opacity-20 dark:opacity-30 animate-pulse"></div>
+                <div className="absolute top-32 right-20 w-16 h-16 bg-pink-400 dark:bg-purple-400 rounded-full opacity-20 dark:opacity-30 animate-bounce"></div>
+                <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-green-400 dark:bg-blue-400 rounded-full opacity-20 dark:opacity-30 animate-pulse"></div>
+                <div className="absolute top-1/2 right-1/3 w-8 h-8 bg-blue-400 dark:bg-pink-400 rounded-full opacity-10 dark:opacity-20 animate-ping"></div>
+                <div className="absolute bottom-32 right-10 w-14 h-14 bg-purple-400 dark:bg-yellow-400 rounded-full opacity-15 dark:opacity-25 animate-pulse"></div>
             </section>
 
             {/* Services Section */}
-            <section className="mt-20 md:mt-32 px-4 md:px-10 lg:px-20 bg-gray-50 py-16 dark:bg-gray-900" id='service'>
-                <div className="text-center mb-12">
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-400">Our Services</h2>
-                    <p className="text-gray-600 mt-2">Everything you need to manage your construction materials</p>
+            <section className="py-20 px-4 md:px-10 lg:px-20 bg-gray-50 dark:bg-gray-900">
+                <div className="text-center mb-16">
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-4">
+                        Why Choose Our Platform?
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
+                        Experience seamless supplier-customer connections with our comprehensive platform designed for business growth
+                    </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
                     {services.map((service) => (
                         <div
                             key={service.id}
-                            className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer dark:bg-gray-700"
+                            className="group p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 cursor-pointer transform hover:-translate-y-2"
                             onClick={() => setActiveTab(service.id)}
                         >
-                            <div className="mb-4">{service.icon}</div>
-                            <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
-                            <p className="text-gray-600 text-sm dark:text-gray-300">{service.description}</p>
+                            <div className="mb-6 group-hover:scale-110 transition duration-300">{service.icon}</div>
+                            <h3 className="text-xl font-bold mb-3 text-gray-800 dark:text-white">{service.title}</h3>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{service.description}</p>
                         </div>
                     ))}
                 </div>
 
-                <div className="mt-12 p-6 bg-white dark:bg-gray-700 rounded-lg shadow-md">
-                    <div className="mb-4 flex border-b">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+                    <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200 dark:border-gray-700">
                         {services.map((service) => (
                             <button
                                 key={service.id}
-                                className={`px-4 py-2 text-sm font-medium mr-2 ${activeTab === service.id
-                                    ? 'border-b-2 border-fuchsia-500 text-fuchsia-500'
-                                    : 'text-gray-500 dark:text-gray-200 hover:text-gray-800'
+                                className={`px-6 py-3 text-sm font-semibold rounded-lg transition duration-300 ${activeTab === service.id
+                                    ? 'bg-blue-500 text-white shadow-lg'
+                                    : 'text-gray-500 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700'
                                     }`}
                                 onClick={() => setActiveTab(service.id)}
                             >
@@ -121,93 +137,111 @@ function Body() {
                             </button>
                         ))}
                     </div>
-                    <div className="py-4">
+                    <div className="py-6 text-gray-700 dark:text-gray-300 text-lg">
                         {services.find(s => s.id === activeTab).description}
                     </div>
                 </div>
             </section>
 
             {/* How It Works Section */}
-            <section className="mt-20 px-4 md:px-10 lg:px-20" id='learn-more'>
-                <div className="text-center mb-12">
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-400">How It Works</h2>
-                    <p className="text-gray-600 mt-2 dark:text-gray-500">Simple steps to optimize your material management</p>
+            <section className="py-20 px-4 md:px-10 lg:px-20 bg-white dark:bg-gray-800">
+                <div className="text-center mb-16">
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-4">
+                        How It Works
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
+                        Three simple steps to connect with suppliers and start building profitable business relationships
+                    </p>
                 </div>
 
-                <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-                    <div className="flex flex-col items-center text-center p-4 max-w-xs">
-                        <div className="w-16 h-16 rounded-full bg-fuchsia-100 dark:bg-slate-700 flex items-center justify-center mb-4">
-                            <span className="text-2xl font-bold text-fuchsia-500">1</span>
+                <div className="flex flex-col lg:flex-row justify-between items-center gap-12 max-w-6xl mx-auto">
+                    <div className="flex flex-col items-center text-center max-w-sm">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center mb-6 shadow-lg">
+                            <span className="text-3xl font-bold text-white">1</span>
                         </div>
-                        <h3 className="text-xl font-semibold mb-2 dark:text-gray-300">Sign Up</h3>
-                        <p className="text-gray-600 text-sm">Create your account and set up your company profile</p>
+                        <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Connect & Browse</h3>
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                            Find and connect with verified suppliers in your area or industry of interest
+                        </p>
                     </div>
 
-                    <ArrowRight className="hidden md:block w-6 h-6 text-gray-400" />
+                    <ArrowRight className="hidden lg:block w-8 h-8 text-gray-400 transform rotate-0 lg:rotate-0" />
 
-                    <div className="flex flex-col items-center text-center p-4 max-w-xs">
-                        <div className="w-16 h-16 rounded-full bg-fuchsia-100 dark:bg-slate-700 flex items-center justify-center mb-4">
-                            <span className="text-2xl font-bold text-fuchsia-500">2</span>
+                    <div className="flex flex-col items-center text-center max-w-sm">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center mb-6 shadow-lg">
+                            <span className="text-3xl font-bold text-white">2</span>
                         </div>
-                        <h3 className="text-xl font-semibold mb-2 dark:text-gray-300">Connect</h3>
-                        <p className="text-gray-600 text-sm">Browse our network of suppliers and add them to your contacts</p>
+                        <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Negotiate & Order</h3>
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                            Discuss terms, pricing, and quantities directly with suppliers to get the best deals
+                        </p>
                     </div>
 
-                    <ArrowRight className="hidden md:block w-6 h-6 text-gray-400" />
+                    <ArrowRight className="hidden lg:block w-8 h-8 text-gray-400" />
 
-                    <div className="flex flex-col items-center text-center p-4 max-w-xs">
-                        <div className="w-16 h-16 rounded-full bg-fuchsia-100 dark:bg-slate-700 flex items-center justify-center mb-4">
-                            <span className="text-2xl font-bold text-fuchsia-500">3</span>
+                    <div className="flex flex-col items-center text-center max-w-sm">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-r from-pink-500 to-red-600 flex items-center justify-center mb-6 shadow-lg">
+                            <span className="text-3xl font-bold text-white">3</span>
                         </div>
-                        <h3 className="text-xl font-semibold mb-2 dark:text-gray-300">Order</h3>
-                        <p className="text-gray-600 text-sm">Place orders, track deliveries, and manage your inventory</p>
+                        <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Receive & Grow</h3>
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                            Get your products delivered and build long-term partnerships for sustained business growth
+                        </p>
                     </div>
                 </div>
             </section>
 
-            {/* Testimonials Section */}
-            <section className="mt-20 md:mt-32 px-4 md:px-10 lg:px-20 bg-gray-50 dark:bg-gray-900 py-16" id='about-us'>
-                <div className="text-center mb-12">
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-400">What Our Clients Say</h2>
-                    <p className="text-gray-600 mt-2">Trusted by construction professionals nationwide</p>
+            {/* Features Section */}
+            <section className="py-20 px-4 md:px-10 lg:px-20 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
+                <div className="text-center mb-16">
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-4">
+                        Partnership Benefits
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
+                        Enjoy exclusive benefits designed to strengthen supplier-customer relationships and boost your business success
+                    </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {testimonials.map((testimonial, index) => (
-                        <div key={index} className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-md">
-                            <div className="mb-4">
-                                <div className="flex text-yellow-400">
-                                    {[...Array(5)].map((_, i) => (
-                                        <span key={i}>★</span>
-                                    ))}
-                                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {features.map((feature, index) => (
+                        <div key={index} className="group p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1">
+                            <div className="mb-6 group-hover:scale-110 transition duration-300">
+                                {feature.icon}
                             </div>
-                            <p className="text-gray-600 italic mb-4 dark:text-gray-300">"{testimonial.text}"</p>
-                            <div className="font-semibold">{testimonial.name}</div>
-                            <div className="text-sm text-gray-500 dark:text-gray-200">{testimonial.company}</div>
+                            <h3 className="text-xl font-bold mb-3 text-gray-800 dark:text-white">
+                                {feature.title}
+                            </h3>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                {feature.description}
+                            </p>
                         </div>
                     ))}
                 </div>
             </section>
 
             {/* CTA Section */}
-            <section className="mt-20 md:mt-32 mb-20 md:mb-32 mx-4 md:mx-14 dark:bg-gray-900">
-                <div className="bg-white dark:bg-gray-700  p-6 md:p-10 rounded-lg shadow-md">
-                    <div className="flex flex-col md:flex-row justify-between items-center">
-                        <div className="mb-6 md:mb-0 text-center md:text-left">
-                            <h2 className="text-xl md:text-2xl font-bold mb-2">Join Our Construction Network</h2>
-                            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">Connect with suppliers and streamline your material orders.</p>
-                        </div>
+            <section className="py-20 px-4 md:px-10 lg:px-20">
+                <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 dark:from-gray-900 dark:via-purple-900 dark:to-gray-800 p-12 md:p-16 rounded-3xl shadow-2xl dark:shadow-purple-900/50 text-center text-white relative overflow-hidden border dark:border-purple-500/20">
+                    <div className="absolute inset-0 dark:bg-gradient-to-br dark:from-cyan-900/20 dark:via-purple-900/30 dark:to-gray-900/40"></div>
+                    <div className="relative z-10">
+                        <h2 className="text-3xl md:text-4xl font-bold mb-6 dark:bg-gradient-to-r dark:from-cyan-300 dark:to-purple-300 dark:bg-clip-text dark:text-transparent">
+                            Ready to Build Strong Partnerships?
+                        </h2>
+                        <p className="text-xl mb-8 text-gray-200 dark:text-gray-300 max-w-2xl mx-auto">
+                            Join thousands of successful businesses already using our platform to connect with reliable suppliers and grow their operations.
+                        </p>
 
-                        <div className="flex gap-3">
-                            <button className="border rounded-full px-6 py-2 text-sm font-medium bg-fuchsia-500 text-white hover:bg-fuchsia-600 transition duration-300">
-                                Sign Up
-                            </button>
-                            <button className="border rounded-full px-6 py-2 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-500 transition duration-300">
-                                Learn More
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button onClick={handleNavigation} className="px-8 py-4 bg-white text-blue-600 dark:bg-gradient-to-r dark:from-cyan-500 dark:to-purple-500 dark:text-white font-bold rounded-full hover:bg-gray-100 dark:hover:from-cyan-600 dark:hover:to-purple-600 transform hover:scale-105 transition duration-300 shadow-lg dark:shadow-cyan-500/25">
+                                Start Connecting
                             </button>
                         </div>
                     </div>
+
+                    {/* Background decoration */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white dark:bg-cyan-400 opacity-5 dark:opacity-10 rounded-full transform translate-x-32 -translate-y-32"></div>
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-white dark:bg-purple-400 opacity-5 dark:opacity-10 rounded-full transform -translate-x-24 translate-y-24"></div>
+                    <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-pink-400 dark:bg-blue-400 opacity-5 dark:opacity-15 rounded-full transform -translate-x-16 -translate-y-16 animate-pulse"></div>
                 </div>
             </section>
         </div>

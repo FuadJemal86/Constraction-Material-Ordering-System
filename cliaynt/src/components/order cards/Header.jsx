@@ -788,35 +788,32 @@ function Header() {
             </header>
 
             {/* Banner Section */}
-            <div className={`pt-16 md:pt-20 ${mobileMenuOpen ? 'hidden' : 'block'}`}>
-                <div className="relative w-full h-64 md:h-96">
-                    <img
-                        src={bannerImage}
-                        alt="Construction Services"
-                        className="w-full h-full object-cover"
-                    />
-
-                    <div className="absolute inset-0 bg-gradient-to-r from-gray-900/70 to-transparent"></div>
-
-                    <div className="absolute inset-0 flex flex-col justify-center px-4 md:px-16">
-                        <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white mb-2 md:mb-4 max-w-xl">
-                            Building Tomorrow With Quality Today
+            <section className="relative w-full h-[70vh] min-h-[500px] bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 dark:from-gray-900 dark:via-gray-800 dark:to-black">
+                <div className="absolute inset-0 bg-black bg-opacity-40 dark:bg-opacity-60"></div>
+                <div className="absolute inset-0 dark:bg-gradient-to-br dark:from-purple-900/30 dark:via-blue-900/20 dark:to-gray-900/40"></div>
+                <div className="relative z-10 flex items-center justify-center h-full px-4">
+                    <div className="text-center text-white max-w-4xl">
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                            Connect with
+                            <span className="block bg-gradient-to-r from-yellow-400 to-pink-400 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
+                                Trusted Suppliers
+                            </span>
                         </h1>
-                        <p className="text-white/90 text-sm sm:text-base md:text-xl mb-4 md:mb-6 max-w-lg">
-                            Professional construction services for residential and commercial projects
+                        <p className="text-lg md:text-xl mb-8 text-gray-200 dark:text-gray-300 max-w-2xl mx-auto">
+                            Bridge the gap between customers and suppliers. Find quality products,
+                            build lasting partnerships, and grow your business together.
                         </p>
-                        <div className="flex gap-2 md:gap-4">
-                            <button className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-2 px-3 md:py-3 md:px-6 rounded-md text-sm md:text-base transition-all flex items-center gap-1 md:gap-2">
-                                <span className="md:w-5 md:h-5">🔧</span>
-                                Our Services
-                            </button>
-                            <button className="bg-transparent hover:bg-white/10 text-white border border-white py-2 px-3 md:py-3 md:px-6 rounded-md text-sm md:text-base transition-all">
-                                Contact Us
-                            </button>
-                        </div>
                     </div>
+
                 </div>
-            </div>
+
+                {/* Animated background elements */}
+                <div className="absolute top-10 left-10 w-20 h-20 bg-yellow-400 dark:bg-cyan-400 rounded-full opacity-20 dark:opacity-30 animate-pulse"></div>
+                <div className="absolute top-32 right-20 w-16 h-16 bg-pink-400 dark:bg-purple-400 rounded-full opacity-20 dark:opacity-30 animate-bounce"></div>
+                <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-green-400 dark:bg-blue-400 rounded-full opacity-20 dark:opacity-30 animate-pulse"></div>
+                <div className="absolute top-1/2 right-1/3 w-8 h-8 bg-blue-400 dark:bg-pink-400 rounded-full opacity-10 dark:opacity-20 animate-ping"></div>
+                <div className="absolute bottom-32 right-10 w-14 h-14 bg-purple-400 dark:bg-yellow-400 rounded-full opacity-15 dark:opacity-25 animate-pulse"></div>
+            </section>
         </div>
     );
 }
