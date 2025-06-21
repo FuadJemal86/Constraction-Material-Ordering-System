@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken')
 
 // get payment status
 
-const customerPayment =  async (req, res) => {
+const customerPayment = async (req, res) => {
     const token = req.cookies['x-auth-token'];
 
     if (!token) {
@@ -62,4 +62,4 @@ const customerPayment =  async (req, res) => {
 };
 
 
-module.exports = {customerPayment}
+module.exports = { customerPayment }

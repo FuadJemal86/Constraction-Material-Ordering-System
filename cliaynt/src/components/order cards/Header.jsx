@@ -440,7 +440,7 @@ function Header() {
                     toast.error(result.data.message);
                 }
             } catch (err) {
-                toast.error(err.response?.data?.message || 'Failed to fetch transition ID');
+                // toast.error(err.response?.data?.message || 'Failed to fetch transition ID');
             }
         };
 
@@ -460,7 +460,7 @@ function Header() {
                 }
             } catch (err) {
                 console.error('Error fetching payment statuses:', err);
-                toast.error(err.response?.data?.message || 'Failed to fetch payment statuses');
+                // toast.error(err.response?.data?.message || 'Failed to fetch payment statuses');
             }
         };
 
@@ -502,9 +502,9 @@ function Header() {
                         <nav>
                             <ul className='flex gap-6 font-semibold'>
                                 <li><Link to="/" className="hover:text-yellow-500 transition-colors">Home</Link></li>
-                                <li><Link to="/category" className="hover:text-yellow-500 transition-colors">Category</Link></li>
-                                <li><Link to="/about" className="hover:text-yellow-500 transition-colors">About Us</Link></li>
-                                <li><Link to="/contact" className="hover:text-yellow-500 transition-colors">Contact</Link></li>
+                                <li><Link className="hover:text-yellow-500 transition-colors">Category</Link></li>
+                                <li><Link to="/about-us" className="hover:text-yellow-500 transition-colors">About Us</Link></li>
+                                <li><Link to="https://officaltechreach.vercel.app/" className="hover:text-yellow-500 transition-colors">Contact</Link></li>
                             </ul>
                         </nav>
                     </div>

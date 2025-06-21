@@ -31,6 +31,13 @@ const { editAdminProfile } = require('../controllers/admin controllers/editProfi
 const { getAdminProfileImage } = require('../controllers/admin controllers/getAdminProfileImage');
 const { updatePayedStatus } = require('../controllers/admin controllers/updatePayedStatus');
 const { getAllConversations } = require('../controllers/admin controllers/getAllMessage');
+const { getTotalSupplier } = require('../controllers/admin controllers/getAllSupplier');
+const { getTotalCustomer } = require('../controllers/admin controllers/totalCustomer');
+const { getAllCategory } = require('../controllers/admin controllers/allCategory');
+const { getActiveSupplier } = require('../controllers/admin controllers/activeSupplier');
+const { getPendingSupplier } = require('../controllers/admin controllers/pendingSuppliers');
+const { getRejectedSupplier } = require('../controllers/admin controllers/rejectedSupplier');
+const { getNewCustomer } = require('../controllers/admin controllers/newCustomer');
 const router = express.Router();
 
 
@@ -54,6 +61,16 @@ router.get('/get-detil-paymen/:transactionId', getPaymentDetali)
 router.get('/get-account', adminGetAccount)
 router.get('/admin-profile', getAdminProfileImage)
 router.get('/get-conversation', getAllConversations)
+
+// Dashboard info
+
+router.get('/get-total-supplier', getTotalSupplier)
+router.get('/get-total-customer', getTotalCustomer)
+router.get('/get-all-category', getAllCategory)
+router.get('/get-active-supplier', getActiveSupplier)
+router.get('/get-pending-supplier', getPendingSupplier)
+router.get('/get-rejected-supplier', getRejectedSupplier)
+router.get('/get-new-customer', getNewCustomer)
 
 
 router.put('/delete-supplier/:id', deleteSupplier)

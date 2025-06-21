@@ -1,11 +1,22 @@
 import React from 'react'
 import { FaFacebook, FaInstagram, FaGithub, FaLinkedin } from "react-icons/fa";
 import logo from '../../images/jejan.svg';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '@fontsource/roboto';
 
 
 function Footer() {
+    const navigatore = useNavigate()
+
+    const handleNaviget = () => {
+        window.open('https://officaltechreach.vercel.app/', '_blank');
+    }
+
+
+    const handleNavigetAbout = () => {
+        navigatore('/about-us')
+
+    }
     return (
         <div className='bg-slate-100 dark:bg-gray-950'>
             <div>
@@ -22,8 +33,8 @@ function Footer() {
                         <div className='w-full p-2'>
                             <nav className='' >
                                 <ul className='grid sm:flex gap-4 sm:justify-center text-left font-medium' style={{ fontFamily: 'Roboto, sans-serif' }}>
-                                    <li>Contact Us</li>
-                                    <li>About Us</li>
+                                    <li onClick={handleNaviget} className='cursor-pointer'>Contact Us</li>
+                                    <li onClick={handleNavigetAbout} className='cursor-pointer'>About Us</li>
                                     <li>Help Center</li>
                                     <li>Blog Posts</li>
                                 </ul>
@@ -46,7 +57,7 @@ function Footer() {
             </div>
             <div>
                 <div>
-                    <p className='text-center py-4 text-slate-400 text-sm md:text-base'>2025 Constraction Material Ordering System. All rights reserved.</p>
+                    <p className='text-center py-4 text-slate-400 text-sm md:text-base'>© 2025 Jejan E-Commerce. All rights reserved.</p>
                 </div>
             </div>
         </div>

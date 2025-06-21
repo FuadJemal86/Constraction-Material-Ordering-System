@@ -32,7 +32,7 @@ function Cards() {
                 }
             } catch (err) {
                 console.log(err)
-                toast.error(err.response?.data?.message || "An error occurred")
+                // toast.error(err.response?.data?.message || "An error occurred")
             }
         }
 

@@ -396,7 +396,7 @@ function Nav() {
     }, [socket.isConnected, updateMessageCount]);
 
     const menuItems = useMemo(() => [
-        { icon: <Eye size={20} />, title: 'Overview', path: '/' },
+        { icon: <Eye size={20} />, title: 'Overview', path: '' },
         { icon: <Package size={20} />, title: 'Orders', path: '/supplier-page/order' },
         {
             icon: <CreditCard size={20} />, title: 'Payments', path: '/supplier-page/payment',

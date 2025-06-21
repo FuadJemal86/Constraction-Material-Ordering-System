@@ -69,49 +69,16 @@ function Header() {
                             </Link>
                         </li>
                         <li>
-                            <Link onClick={() => handelSection('about-us')} className="text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
+                            <Link to={'/about-us'} className="text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
                                 About Us
                             </Link>
                         </li>
                         <li>
-                            <Link to="/contact" className="text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
+                            <Link to="https://officaltechreach.vercel.app/" className="text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
                                 Contact Us
                             </Link>
                         </li>
-                        <li className="relative">
-                            <button
-                                className="flex items-center text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base"
-                                onClick={() => setDropdownOpen(!dropdownOpen)}
-                            >
-                                Services <ChevronDown className="ml-1 h-4 w-4" />
-                            </button>
 
-                            {dropdownOpen && (
-                                <div className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-20 dark:bg-gray-900">
-                                    <Link
-                                        to="/products"
-                                        className="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg"
-                                        onClick={() => setDropdownOpen(false)}
-                                    >
-                                        Materials
-                                    </Link>
-                                    <Link
-                                        to="/services/ordering"
-                                        className="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg"
-                                        onClick={() => setDropdownOpen(false)}
-                                    >
-                                        Ordering
-                                    </Link>
-                                    <Link
-                                        to="/services/tracking"
-                                        className="block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg"
-                                        onClick={() => setDropdownOpen(false)}
-                                    >
-                                        Tracking
-                                    </Link>
-                                </div>
-                            )}
-                        </li>
                     </ul>
 
                     {/* CTA Buttons - Desktop */}
@@ -189,7 +156,7 @@ function Header() {
 
                     <li className="pt-4 flex flex-col space-y-3">
                         <Link
-                            to="/signup"
+                            to="/sign-up"
                             className="border border-gray-300 dark:text-white rounded-full px-5 py-2 text-center text-gray-700 font-medium hover:bg-gray-100 transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >

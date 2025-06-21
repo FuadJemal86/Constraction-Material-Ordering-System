@@ -58,4 +58,4 @@ const getCustomerPayment = async (req, res) => {
 };
 
 
-module.exports = {getCustomerPayment}
+module.exports = { getCustomerPayment }

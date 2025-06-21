@@ -45,7 +45,7 @@ function HeaderProfile() {
                     toast.error(result.data.message)
                 }
             } catch (err) {
-                toast.error(err.response.data.message)
+                // toast.error(err.response.data.message)
             }
         }
 
@@ -67,7 +67,7 @@ function HeaderProfile() {
                 }
             } catch (err) {
                 console.error('Error fetching payment statuses:', err);
-                toast.error(err.response?.data?.message || 'Failed to fetch payment statuses');
+                // toast.error(err.response?.data?.message || 'Failed to fetch payment statuses');
             }
         };
 

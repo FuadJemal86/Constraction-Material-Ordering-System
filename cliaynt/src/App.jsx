@@ -24,6 +24,8 @@ import DonePayment from './components/SupplyNav/DonePayment';
 import SupplierSignUp from './components/login page/SupplierSignUp';
 import SupplierSetting from './components/SupplyNav/Settings';
 import Chat from './components/Chat';
+import AboutUs from './components/homeComponents/AboutUs';
+import SupplierDashboard from './components/SupplyNav/SupplierDashboard';
 
 
 
@@ -32,6 +34,7 @@ function App() {
         <Router>
             <Routes>
                 <Route path='/' element={<HomeParent />} />
+                <Route path='/about-us' element={<AboutUs />} />
                 <Route path='/sign-up' element={<SupplierSignUp />} />
                 <Route path='/sign-in' element={<SignIn />} />
                 <Route path='/order-items/:id' element={<ViewDetails />} />
@@ -49,7 +52,9 @@ function App() {
 
 
                 <Route path='/supplier-verification' element={<SupplierVerification />} />
+
                 <Route path="/supplier-page" element={<Nav />}>
+                    <Route path='' element={<SupplierDashboard />} />
                     <Route path='order' element={<SupplierOrders />} />
                     <Route path='product' element={<Product />} />
                     <Route path='add-product' element={<AddProduct />} />

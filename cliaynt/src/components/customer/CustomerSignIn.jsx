@@ -110,13 +110,14 @@ function CustomerSignIn() {
 
             {/* Right section - Banner Image */}
             <div className="hidden md:block md:w-1/2 bg-cover bg-center" style={{ backgroundImage: `url(${banner})` }}>
-                <div className="w-full h-full flex items-end p-10  bg-gradient-to-br from-blue-600/80 to-indigo-900/60">
+                <div className="w-full h-full flex items-end p-10 bg-gradient-to-br from-blue-600/80 to-indigo-900/60">
                     <div className="text-white max-w-lg">
-                        <h2 className="text-3xl md:text-4xl font-bold mb-3">Quality Materials, <br /><span className="text-blue-300">Solid Results</span></h2>
-                        <p className="text-gray-200 text-base">Find quality construction products from trusted suppliers in our marketplace.</p>
+                        <h2 className="text-3xl md:text-4xl font-bold mb-3">Discover Products, <br /><span className="text-blue-300">Shop with Confidence</span></h2>
+                        <p className="text-gray-200 text-base">Jejan E-Commerce connects you with trusted sellers, offering a wide range of quality products for your daily needs in Ethiopia.</p>
                     </div>
                 </div>
             </div>
+
         </div>
     );
 }
