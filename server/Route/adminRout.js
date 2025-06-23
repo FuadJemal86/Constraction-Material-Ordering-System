@@ -38,6 +38,9 @@ const { getActiveSupplier } = require('../controllers/admin controllers/activeSu
 const { getPendingSupplier } = require('../controllers/admin controllers/pendingSuppliers');
 const { getRejectedSupplier } = require('../controllers/admin controllers/rejectedSupplier');
 const { getNewCustomer } = require('../controllers/admin controllers/newCustomer');
+const { totalOrder } = require('../controllers/admin controllers/totalOrder');
+const { totalBirr } = require('../controllers/admin controllers/totalBirr');
+const { getRecentCustomer } = require('../controllers/admin controllers/recentCustomer');
 const router = express.Router();
 
 
@@ -71,6 +74,9 @@ router.get('/get-active-supplier', getActiveSupplier)
 router.get('/get-pending-supplier', getPendingSupplier)
 router.get('/get-rejected-supplier', getRejectedSupplier)
 router.get('/get-new-customer', getNewCustomer)
+router.get('/total-order', totalOrder)
+router.get('/total-birr', totalBirr)
+router.get('/recent-customer', getRecentCustomer)
 
 
 router.put('/delete-supplier/:id', deleteSupplier)
