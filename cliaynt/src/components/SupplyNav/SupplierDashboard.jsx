@@ -45,6 +45,8 @@ const SupplierDashboard = () => {
     const [totalOrders, setTotalOrders] = useState(0);
     const [activeCustomers, setActiveCustomers] = useState(0);
     const [pendingOrders, setPendingOrders] = useState(0);
+    const [returnRate, setReturnRate] = useState(0);
+    const [doneOrder, setDoneOrder] = useState(0);
 
     const [metrics, setMetrics] = useState({
         totalOrders: 1847,
@@ -160,6 +162,65 @@ const SupplierDashboard = () => {
         fetchData()
     }, [])
 
+    // total Process Order Birr
+
+    let averageOrder = 0
+
+    if (totalOrders !== 0) {
+        averageOrder = totalRevenue / totalOrders
+    }
+
+    // return rate 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await api.get('/supplier/get-return-rate')
+
+                if (result.data.status) {
+                    setReturnRate(safeExtractValue(result.data.returnRate))
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        fetchData()
+    }, [])
+
+    let returnOrderRate = 0
+
+    if (totalRevenue !== 0) {
+        returnOrderRate = (returnRate * 100) / totalOrders
+    }
+
+
+    // done Orders
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await api.get('/supplier/get-done-order')
+
+                if (result.data.status) {
+                    setDoneOrder(safeExtractValue(result.data.doneOrder))
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        fetchData()
+    }, [])
+
+
+
+
+
+
     // Sample data for charts
     const revenueData = [
         { month: 'Jan', revenue: 42000, orders: 145, customers: 120 },
@@ -247,7 +308,7 @@ const SupplierDashboard = () => {
 
                 <MetricCard
                     title="Avg Order Value"
-                    value={metrics.averageOrderValue}
+                    value={averageOrder}
                     icon={TrendingUp}
                     change={6.8}
                     color="bg-indigo-500"
@@ -256,7 +317,7 @@ const SupplierDashboard = () => {
 
                 <MetricCard
                     title="Return Rate"
-                    value={metrics.returnRate}
+                    value={returnRate}
                     icon={Truck}
                     change={-12.4}
                     color="bg-red-500"
@@ -265,11 +326,11 @@ const SupplierDashboard = () => {
 
                 <MetricCard
                     title="Customer Rating"
-                    value={metrics.customerSatisfaction}
+                    value={doneOrder}
                     icon={Star}
                     change={4.1}
                     color="bg-pink-500"
-                    suffix="/5"
+                    suffix=""
                 />
             </div>
 

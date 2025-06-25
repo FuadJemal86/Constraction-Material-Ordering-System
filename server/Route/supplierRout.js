@@ -31,6 +31,9 @@ const { totalOrder } = require('../controllers/supplier controllers/totalOrder')
 const { totalProduct } = require('../controllers/supplier controllers/totalProduct')
 const { totalCustomer } = require('../controllers/supplier controllers/totalCustomer')
 const { pendingOrder } = require('../controllers/supplier controllers/pendingOrder')
+const { totalProseOrderBirr } = require('../controllers/supplier controllers/totalOrderPros')
+const { returnRate } = require('../controllers/supplier controllers/return.rate')
+const { doneOrder } = require('../controllers/supplier controllers/doneOrder')
 
 
 
@@ -81,5 +84,8 @@ router.get('/get-total-order', totalOrder)
 router.get('/get-total-product', totalProduct)
 router.get('/get-total-customer', totalCustomer)
 router.get('/get-pending-order', pendingOrder)
+router.get('/get-total-orderProc', totalProseOrderBirr)
+router.get('/get-return-rate', returnRate)
+router.get('/get-done-order', doneOrder)
 
 module.exports = router
