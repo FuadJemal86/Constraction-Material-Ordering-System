@@ -92,9 +92,15 @@ function PaymentForm() {
 
         setIsLoading(true);
 
+        // Calculate service amount (tax)
+        const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+        const taxRate = 0.08;
+        const service = subtotal * taxRate;
+
         const formData = new FormData();
         formData.append('bankId', payment.bankId);
         formData.append('bankTransactionId', payment.bankTransactionId);
+        formData.append('service', service.toFixed(2)); // Send calculated service amount
         formData.append('image', payment.image);
 
         try {
@@ -117,9 +123,8 @@ function PaymentForm() {
     const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     const taxRate = 0.08;
     const shippingCost = 10;
-    const tax = subtotal * taxRate;
-    const total = subtotal + tax + shippingCost;
-
+    const service = subtotal * taxRate; // Renamed from 'tax' to 'service' for clarity
+    const total = subtotal + service + shippingCost;
 
     const isPending = paymentStatus?.status === 'PENDING';
 
@@ -272,7 +277,7 @@ function PaymentForm() {
                                             <div className="flex items-center">
                                                 <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 dark:border-gray-600">
                                                     <img
-                                                        src={`http://localhost:3032/images/${item.image}`}
+                                                        src={`${api.defaults.baseURL}/images/${item.image}`}
                                                         alt={item.name}
                                                         className="h-full w-full object-cover object-center"
                                                     />
@@ -297,7 +302,7 @@ function PaymentForm() {
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <p className="text-gray-600 dark:text-gray-400">Service (8%)</p>
-                                    <p className="font-medium text-gray-900 dark:text-white">{tax.toFixed(2)} birr</p>
+                                    <p className="font-medium text-gray-900 dark:text-white">{service.toFixed(2)} birr</p>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <p className="text-gray-600 dark:text-gray-400">Shipping</p>

@@ -20,6 +20,9 @@ function AddProduct() {
         unit: "", // Default unit
         stock: 0,
         image: "",
+        image1: "",
+        image2: "",
+        image3: "",
         offersDelivery: false,
         deliveryPricePerKm: "",
     });
@@ -43,7 +46,7 @@ function AddProduct() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const { name, categoryId, price, unit, stock, image, offersDelivery, deliveryPricePerKm } = product;
+        const { name, categoryId, price, unit, stock, image, image1, image2, image3, offersDelivery, deliveryPricePerKm } = product;
 
         // Basic validation
         if (!name || !categoryId || !price || !stock || !image) {
@@ -55,7 +58,6 @@ function AddProduct() {
         }
 
         if (supplierAccount.length == 0) {
-
             return toast.error('Please add at least one bank account');
         }
 
@@ -68,6 +70,12 @@ function AddProduct() {
         formData.append('unit', product.unit);
         formData.append('stock', product.stock);
         formData.append('image', product.image);
+
+        // Append additional images if they exist
+        if (product.image1) formData.append('image1', product.image1);
+        if (product.image2) formData.append('image2', product.image2);
+        if (product.image3) formData.append('image3', product.image3);
+
         formData.append('offersDelivery', product.offersDelivery);
 
         if (product.offersDelivery) {
@@ -90,11 +98,17 @@ function AddProduct() {
                     unit: "piece",
                     stock: "",
                     image: "",
+                    image1: "",
+                    image2: "",
+                    image3: "",
                     offersDelivery: false,
                     deliveryPricePerKm: "",
                 });
                 setHasDelivery(false);
                 setPreviewImage(null);
+                setPreviewImage1(null);
+                setPreviewImage2(null);
+                setPreviewImage3(null);
                 setCustomUnit(false);
                 setAccounts([]);
             } else {
@@ -133,23 +147,70 @@ function AddProduct() {
         }
     };
 
-    // Preview image state
+    // Preview image states
     const [previewImage, setPreviewImage] = useState(null);
+    const [previewImage1, setPreviewImage1] = useState(null);
+    const [previewImage2, setPreviewImage2] = useState(null);
+    const [previewImage3, setPreviewImage3] = useState(null);
     const [customUnit, setCustomUnit] = useState(false);
 
-    const handleImageChange = (e) => {
+    const handleImageChange = (e, imageField) => {
         const file = e.target.files[0];
 
         if (file) {
-            setProduct({ ...product, image: file });
+            setProduct({ ...product, [imageField]: file });
 
             const reader = new FileReader();
             reader.onloadend = () => {
-                setPreviewImage(reader.result);
+                switch (imageField) {
+                    case 'image':
+                        setPreviewImage(reader.result);
+                        break;
+                    case 'image1':
+                        setPreviewImage1(reader.result);
+                        break;
+                    case 'image2':
+                        setPreviewImage2(reader.result);
+                        break;
+                    case 'image3':
+                        setPreviewImage3(reader.result);
+                        break;
+                }
             };
             reader.readAsDataURL(file);
         } else {
-            setPreviewImage(null);
+            switch (imageField) {
+                case 'image':
+                    setPreviewImage(null);
+                    break;
+                case 'image1':
+                    setPreviewImage1(null);
+                    break;
+                case 'image2':
+                    setPreviewImage2(null);
+                    break;
+                case 'image3':
+                    setPreviewImage3(null);
+                    break;
+            }
+        }
+    };
+
+    const removeImage = (imageField) => {
+        setProduct({ ...product, [imageField]: "" });
+        switch (imageField) {
+            case 'image':
+                setPreviewImage(null);
+                break;
+            case 'image1':
+                setPreviewImage1(null);
+                break;
+            case 'image2':
+                setPreviewImage2(null);
+                break;
+            case 'image3':
+                setPreviewImage3(null);
+                break;
         }
     };
 
@@ -173,13 +234,10 @@ function AddProduct() {
             const result = await api.post('/supplier/add-account', newAccount)
 
             if (result.data.status) {
-
                 feachData()
-
                 setAccounts([...accounts, { ...newAccount }]);
                 setNewAccount({ bankName: '', account: '' });
                 setShowAccountForm(false);
-
             } else {
                 toast.error(result.data.message)
             }
@@ -187,11 +245,9 @@ function AddProduct() {
             console.log(err)
             toast.error(err.response.data.message)
         }
-
     };
 
     const handleDeleteAccount = async (id) => {
-
         try {
             const result = await api.delete(`/supplier/delete-account/${id}`)
             if (result.data.status) {
@@ -203,7 +259,6 @@ function AddProduct() {
             console.log(err)
             toast.error(err.response.data.message)
         }
-
     };
 
     const feachData = async () => {
@@ -230,22 +285,56 @@ function AddProduct() {
             <div className="w-full max-w-md bg-white rounded-lg shadow-md p-5 border border-gray-200">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-800">Add Product</h2>
-                    {previewImage && (
-                        <div className="relative">
-                            <img src={previewImage} alt="Preview" className="h-12 w-12 object-cover rounded-md" />
-                            <button
-                                type="button"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    setPreviewImage(null);
-                                    setProduct({ ...product, image: "" });
-                                }}
-                                className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 w-4 h-4 flex items-center justify-center text-xs"
-                            >
-                                ×
-                            </button>
-                        </div>
-                    )}
+                    <div className="flex gap-2">
+                        {previewImage && (
+                            <div className="relative">
+                                <img src={previewImage} alt="Main Preview" className="h-12 w-12 object-cover rounded-md" />
+                                <button
+                                    type="button"
+                                    onClick={() => removeImage('image')}
+                                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 w-4 h-4 flex items-center justify-center text-xs"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        )}
+                        {previewImage1 && (
+                            <div className="relative">
+                                <img src={previewImage1} alt="Preview 1" className="h-12 w-12 object-cover rounded-md" />
+                                <button
+                                    type="button"
+                                    onClick={() => removeImage('image1')}
+                                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 w-4 h-4 flex items-center justify-center text-xs"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        )}
+                        {previewImage2 && (
+                            <div className="relative">
+                                <img src={previewImage2} alt="Preview 2" className="h-12 w-12 object-cover rounded-md" />
+                                <button
+                                    type="button"
+                                    onClick={() => removeImage('image2')}
+                                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 w-4 h-4 flex items-center justify-center text-xs"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        )}
+                        {previewImage3 && (
+                            <div className="relative">
+                                <img src={previewImage3} alt="Preview 3" className="h-12 w-12 object-cover rounded-md" />
+                                <button
+                                    type="button"
+                                    onClick={() => removeImage('image3')}
+                                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 w-4 h-4 flex items-center justify-center text-xs"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -375,7 +464,6 @@ function AddProduct() {
                                 className="w-32 h-10 px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
                                 placeholder="Unit *"
                             />
-
                         </div>
 
                         <input
@@ -436,25 +524,90 @@ function AddProduct() {
                             )}
                         </div>
 
-                        {/* Product Image */}
-                        {!previewImage && (
-                            <div className="flex h-10">
-                                <label className="flex-1 flex justify-center items-center border border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
-                                    <div className="flex items-center text-gray-500">
-                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                        </svg>
-                                        <span className="text-sm">Upload Image *</span>
-                                    </div>
-                                    <input
-                                        onChange={handleImageChange}
-                                        type="file"
-                                        className="hidden"
-                                        accept="image/*"
-                                    />
-                                </label>
-                            </div>
-                        )}
+                        {/* Product Images Section */}
+                        <div className="space-y-2">
+                            <h3 className="text-sm font-medium text-gray-700">Product Images</h3>
+
+                            {/* Main Product Image */}
+                            {!previewImage && (
+                                <div className="flex h-10">
+                                    <label className="flex-1 flex justify-center items-center border border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
+                                        <div className="flex items-center text-gray-500">
+                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                            <span className="text-sm">Upload Main Image *</span>
+                                        </div>
+                                        <input
+                                            onChange={(e) => handleImageChange(e, 'image')}
+                                            type="file"
+                                            className="hidden"
+                                            accept="image/*"
+                                        />
+                                    </label>
+                                </div>
+                            )}
+
+                            {/* Additional Image 1 */}
+                            {!previewImage1 && (
+                                <div className="flex h-10">
+                                    <label className="flex-1 flex justify-center items-center border border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
+                                        <div className="flex items-center text-gray-500">
+                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                            <span className="text-sm">Upload Additional Image 1</span>
+                                        </div>
+                                        <input
+                                            onChange={(e) => handleImageChange(e, 'image1')}
+                                            type="file"
+                                            className="hidden"
+                                            accept="image/*"
+                                        />
+                                    </label>
+                                </div>
+                            )}
+
+                            {/* Additional Image 2 */}
+                            {!previewImage2 && (
+                                <div className="flex h-10">
+                                    <label className="flex-1 flex justify-center items-center border border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
+                                        <div className="flex items-center text-gray-500">
+                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                            <span className="text-sm">Upload Additional Image 2</span>
+                                        </div>
+                                        <input
+                                            onChange={(e) => handleImageChange(e, 'image2')}
+                                            type="file"
+                                            className="hidden"
+                                            accept="image/*"
+                                        />
+                                    </label>
+                                </div>
+                            )}
+
+                            {/* Additional Image 3 */}
+                            {!previewImage3 && (
+                                <div className="flex h-10">
+                                    <label className="flex-1 flex justify-center items-center border border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
+                                        <div className="flex items-center text-gray-500">
+                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                            <span className="text-sm">Upload Additional Image 3</span>
+                                        </div>
+                                        <input
+                                            onChange={(e) => handleImageChange(e, 'image3')}
+                                            type="file"
+                                            className="hidden"
+                                            accept="image/*"
+                                        />
+                                    </label>
+                                </div>
+                            )}
+                        </div>
 
                         {/* Submit Button */}
                         <button

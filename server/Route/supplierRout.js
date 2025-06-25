@@ -26,6 +26,11 @@ const { completedPaymentOrderItem } = require('../controllers/supplier controlle
 const { getNotifaction } = require('../controllers/supplier controllers/getNotification')
 const { notificationRed } = require('../controllers/supplier controllers/notificationRed')
 const { markAsAllRed } = require('../controllers/supplier controllers/markAllRed')
+const { totalRevenue } = require('../controllers/supplier controllers/totalRevenu')
+const { totalOrder } = require('../controllers/supplier controllers/totalOrder')
+const { totalProduct } = require('../controllers/supplier controllers/totalProduct')
+const { totalCustomer } = require('../controllers/supplier controllers/totalCustomer')
+const { pendingOrder } = require('../controllers/supplier controllers/pendingOrder')
 
 
 
@@ -65,5 +70,16 @@ router.get('/get-supplier-profile', supplierProfile)
 router.get('/supplier-profile', getSupplierProfileImage)
 router.get('/get-done-item/:id', completedPaymentOrderItem)
 router.get('/get-notifications', getNotifaction)
+
+
+
+// dashboard data
+
+
+router.get('/get-total-birr', totalRevenue)
+router.get('/get-total-order', totalOrder)
+router.get('/get-total-product', totalProduct)
+router.get('/get-total-customer', totalCustomer)
+router.get('/get-pending-order', pendingOrder)
 
 module.exports = router

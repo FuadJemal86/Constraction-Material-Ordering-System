@@ -696,88 +696,150 @@ function Header() {
 
                 {/* Mobile Menu */}
                 {mobileMenuOpen && (
-                    <div className="fixed top-0 inset-0 bg-white dark:bg-gray-900 z-10 pt-16">
-                        <div className="flex flex-col p-5">
-                            <nav>
-                                <ul className="flex flex-col space-y-4">
-                                    <li className="p-2 border-b border-gray-100 dark:border-gray-800">
-                                        <Link to="/" className="text-lg font-medium block">Home</Link>
+                    <div className="fixed inset-0 z-50 bg-white dark:bg-gray-900 overflow-y-auto">
+                        {/* Header with close button */}
+                        <div className="sticky top-0 bg-white dark:bg-gray-900 z-10 flex justify-between items-center px-4 py-4 border-b border-gray-200 dark:border-gray-700">
+                            <h2 className="text-xl font-bold">Menu</h2>
+                            <button
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                aria-label="Close menu"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div className="container mx-auto px-4 py-6 pt-2">
+                            <nav className="mb-8">
+                                <ul className="space-y-2">
+                                    <li className="border-b border-gray-200 dark:border-gray-700">
+                                        <Link
+                                            to="/"
+                                            className="block py-3 text-lg font-medium hover:text-yellow-500 transition-colors"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                        >
+                                            Home
+                                        </Link>
                                     </li>
-                                    <li className="p-2 border-b border-gray-100 dark:border-gray-800">
-                                        <Link to="/category" className="text-lg font-medium block">Category</Link>
+                                    <li className="border-b border-gray-200 dark:border-gray-700">
+                                        <Link
+                                            to="/category"
+                                            className="block py-3 text-lg font-medium hover:text-yellow-500 transition-colors"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                        >
+                                            Category
+                                        </Link>
                                     </li>
-                                    <li className="p-2 border-b border-gray-100 dark:border-gray-800">
-                                        <Link to="/about" className="text-lg font-medium block">About Us</Link>
+                                    <li className="border-b border-gray-200 dark:border-gray-700">
+                                        <Link
+                                            to="/about"
+                                            className="block py-3 text-lg font-medium hover:text-yellow-500 transition-colors"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                        >
+                                            About Us
+                                        </Link>
                                     </li>
-                                    <li className="p-2 border-b border-gray-100 dark:border-gray-800">
-                                        <Link to="/contact" className="text-lg font-medium block">Contact</Link>
+                                    <li className="border-b border-gray-200 dark:border-gray-700">
+                                        <Link
+                                            to="/contact"
+                                            className="block py-3 text-lg font-medium hover:text-yellow-500 transition-colors"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                        >
+                                            Contact
+                                        </Link>
                                     </li>
 
                                     {islogin && (
-                                        <li className="p-2 border-b border-gray-100 dark:border-gray-800">
+                                        <li className="border-b border-gray-200 dark:border-gray-700">
                                             <Link
                                                 to="/customer-sign-in"
-                                                className="flex items-center gap-3 text-lg font-medium hover:text-yellow-500 transition-colors group"
+                                                className="flex items-center gap-3 py-3 text-lg font-medium hover:text-yellow-500 transition-colors group"
+                                                onClick={() => setMobileMenuOpen(false)}
                                             >
-                                                <User className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                                                <User className="w-5 h-5 group-hover:scale-110 transition-transform" />
                                                 <span className="relative">
                                                     Login
                                                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-yellow-500 group-hover:w-full transition-all duration-300"></span>
                                                 </span>
-                                                <LogIn className="w-4 h-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                                                <LogIn className="w-4 h-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                                             </Link>
                                         </li>
                                     )}
                                 </ul>
                             </nav>
 
-                            {/* dark and Light mode */}
-                            <div
-                                className="flex items-center justify-between p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                            >
+                            {/* Theme Toggle */}
+                            <div className="flex items-center justify-between p-4 mb-6 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                                <span className="font-medium">Theme</span>
                                 <button
-                                    onClick={() => setDarkMode(!darkMode)}
-                                    className=" p-1 md:p-2 bg-gray-200 dark:bg-gray-800 text-black dark:text-white rounded  items-center transition-colors"
+                                    onClick={() => {
+                                        setDarkMode(!darkMode);
+                                    }}
+                                    className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                                    aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
                                 >
-                                    {darkMode ? <LightMode className="text-xl md:text-2xl" /> : <DarkMode className="text-xl md:text-2xl" />}
+                                    {darkMode ? (
+                                        <LightMode className="text-xl" />
+                                    ) : (
+                                        <DarkMode className="text-xl" />
+                                    )}
                                 </button>
-
                             </div>
 
-                            {/* Mobile Bottom Actions */}
-                            <div className="mt-auto relative pt-6">
-                                {/* Enhanced Mobile Notifications */}
+                            {/* Mobile Actions */}
+                            <div className="space-y-4">
+                                {/* Notifications */}
                                 {isBell && (
-                                    <div className="flex items-center justify-between p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 rounded-lg mb-2">
+                                    <div
+                                        className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                        onClick={() => {
+                                            setMobileMenuOpen(false);
+                                            // Add your notification handler here
+                                        }}
+                                    >
                                         <div className="flex items-center space-x-3">
                                             <NotificationsNoneIcon className="text-2xl" />
                                             <span className="font-medium">Notifications</span>
                                         </div>
                                         {unreadNotificationCount > 0 && (
-                                            <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+                                            <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                                                 {unreadNotificationCount > 99 ? '99+' : unreadNotificationCount}
                                             </span>
                                         )}
                                     </div>
                                 )}
 
-                                {/* Mobile Cart */}
-
+                                {/* Cart */}
                                 <div
-                                    className="flex items-center justify-between p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                                    onClick={() => setCartOpen(true)}
+                                    className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                    onClick={() => {
+                                        setMobileMenuOpen(false);
+                                        setCartOpen(true);
+                                    }}
                                 >
                                     <div className="flex items-center space-x-3">
                                         <ShoppingCartOutlinedIcon className="text-2xl" />
                                         <span className="font-medium">Cart</span>
                                     </div>
                                     {cartItemCount > 0 && (
-                                        <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+                                        <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                                             {cartItemCount}
                                         </span>
                                     )}
                                 </div>
-
                             </div>
                         </div>
                     </div>

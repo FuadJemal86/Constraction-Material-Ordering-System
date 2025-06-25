@@ -27,6 +27,7 @@ const { markAsAllRed } = require('../controllers/customer controllers/markAsRead
 
 
 
+
 const router = express.Router()
 
 router.post('/sign-up', custoemrSignUp)
@@ -64,6 +65,8 @@ router.get('/get-payment', getCustomerPaymentStatus)
 router.get('/get-transaction/:transactionId', getTransactionPayment)
 router.get('/profile', getProfile)
 router.get('/get-products-stock', getProductStock)
+
+
 
 
 module.exports = router;

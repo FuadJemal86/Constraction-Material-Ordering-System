@@ -16,35 +16,41 @@ export const CartProvider = ({ children }) => {
 
     const addToCart = (product) => {
         let updatedCart = [...cart];
-    
+
         const existingProduct = updatedCart.find(item => item.id === product.id);
         if (existingProduct) {
             existingProduct.quantity += 1;
         } else {
             updatedCart.push({ ...product, quantity: 1 });
         }
-    
+
         setCart(updatedCart);
     };
 
     const updateQuantity = (index, newQuantity) => {
         if (newQuantity < 1) return;
-        
+
         setCart((prevCart) =>
             prevCart.map((item, i) =>
                 i === index ? { ...item, quantity: newQuantity } : item
             )
         );
     };
-    
-    
 
-    const removeItem = (itemId) => {
-        setCart(cart.filter((item) => item.id !== itemId)); 
+
+
+    // In your CartContext.js
+    const removeItem = (index) => {
+        setCart(prevCart => {
+            const newCart = [...prevCart];
+            newCart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(newCart));
+            return newCart;
+        });
     };
 
     return (
-        <CartContext.Provider value={{ cart, setCart, addToCart, updateQuantity , removeItem }}>
+        <CartContext.Provider value={{ cart, setCart, addToCart, updateQuantity, removeItem }}>
             {children}
         </CartContext.Provider>
     );

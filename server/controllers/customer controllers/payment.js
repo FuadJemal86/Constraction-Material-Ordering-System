@@ -27,7 +27,7 @@ const customerPayment = [
     upload.single('image'),
     async (req, res) => {
         const transactionId = req.params.transactionId;
-        const { bankTransactionId, bankId } = req.body;
+        const { bankTransactionId, bankId, service } = req.body;
 
         if (!transactionId) {
             return res.status(400).json({ status: false, message: 'Order Not Found' });
@@ -64,6 +64,7 @@ const customerPayment = [
                     bankId: parseInt(bankId),
                     status: "PENDING",
                     transactionId,
+                    service: parseFloat(service),
                     image: req.file ? req.file.filename : null,
                     bankTransactionId
                 }

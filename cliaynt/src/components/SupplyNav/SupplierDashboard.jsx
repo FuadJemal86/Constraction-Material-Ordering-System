@@ -2,37 +2,163 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { Package, ShoppingCart, TrendingUp, DollarSign, Truck, Star, AlertCircle, Users } from 'lucide-react';
 
-const MetricCard = ({ title, value, icon: Icon, change, color, prefix = '', suffix = '' }) => (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
-        <div className="flex items-center justify-between">
-            <div className={`p-3 rounded-lg ${color}`}>
-                <Icon className="w-6 h-6 text-white" />
+import api from '../../api';
+
+const MetricCard = ({ title, value, icon: Icon, change, color, prefix = '', suffix = '' }) => {
+    // Helper function to safely render values
+    const renderValue = (val) => {
+        if (val === null || val === undefined) return 'N/A';
+        if (typeof val === 'object') {
+            console.error('Object detected in MetricCard value:', val);
+            return 'Error';
+        }
+        if (typeof val === 'number') return val.toLocaleString();
+        return String(val);
+    };
+
+    return (
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
+            <div className="flex items-center justify-between">
+                <div className={`p-3 rounded-lg ${color}`}>
+                    <Icon className="w-6 h-6 text-white" />
+                </div>
+                <div className={`flex items-center text-sm font-medium ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <TrendingUp className={`w-4 h-4 mr-1 ${change < 0 ? 'rotate-180' : ''}`} />
+                    {Math.abs(change)}%
+                </div>
             </div>
-            <div className={`flex items-center text-sm font-medium ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                <TrendingUp className={`w-4 h-4 mr-1 ${change < 0 ? 'rotate-180' : ''}`} />
-                {Math.abs(change)}%
+            <div className="mt-4">
+                <h3 className="text-2xl font-bold text-gray-900">
+                    {prefix}
+                    {renderValue(value)}
+                    {suffix}
+                </h3>
+                <p className="text-gray-600 text-sm mt-1">{title}</p>
             </div>
         </div>
-        <div className="mt-4">
-            <h3 className="text-2xl font-bold text-gray-900">
-                {prefix}{typeof value === 'number' ? value.toLocaleString() : value}{suffix}
-            </h3>
-            <p className="text-gray-600 text-sm mt-1">{title}</p>
-        </div>
-    </div>
-);
+    );
+};
 
 const SupplierDashboard = () => {
+    const [totalRevenue, setTotalRevenue] = useState(0);
+    const [totalProducts, setTotalProducts] = useState(0);
+    const [totalOrders, setTotalOrders] = useState(0);
+    const [activeCustomers, setActiveCustomers] = useState(0);
+    const [pendingOrders, setPendingOrders] = useState(0);
+
     const [metrics, setMetrics] = useState({
-        totalRevenue: 245680,
         totalOrders: 1847,
         totalProducts: 324,
-        activeCustomers: 892,
-        pendingOrders: 47,
         averageOrderValue: 133,
         returnRate: 2.4,
         customerSatisfaction: 4.7
     });
+
+    // Helper function to safely extract numeric values
+    const safeExtractValue = (data, fallback = 0) => {
+        if (data === null || data === undefined) return fallback;
+        if (typeof data === 'object') {
+            console.error('Unexpected object received:', data);
+            return fallback;
+        }
+        const numValue = Number(data);
+        return isNaN(numValue) ? fallback : numValue;
+    };
+
+    // total Revenue
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await api.get('/supplier/get-total-birr')
+
+                if (result.data.status) {
+                    setTotalRevenue(safeExtractValue(result.data.totalPayment))
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        fetchData()
+    }, [])
+
+    // total product 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await api.get('/supplier/get-total-product')
+
+                if (result.data.status) {
+                    setTotalProducts(safeExtractValue(result.data.totalProduct))
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        fetchData()
+    }, [])
+
+    // total orders
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await api.get('/supplier/get-total-order')
+
+                if (result.data.status) {
+                    setTotalOrders(safeExtractValue(result.data.totalOrders))
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        fetchData()
+    }, [])
+
+    // active customer
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await api.get('/supplier/get-total-customer')
+
+                if (result.data.status) {
+                    setActiveCustomers(safeExtractValue(result.data.totalCustomer))
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        fetchData()
+    }, [])
+
+    // pending order
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await api.get('/supplier/get-pending-order')
+
+                if (result.data.status) {
+                    setPendingOrders(safeExtractValue(result.data.pendingOrder))
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        fetchData()
+    }, [])
 
     // Sample data for charts
     const revenueData = [
@@ -70,35 +196,39 @@ const SupplierDashboard = () => {
         { metric: 'Customer Returns', current: 44, previous: 67 }
     ];
 
+
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             {/* Key Metrics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <MetricCard
                     title="Total Revenue"
-                    value={metrics.totalRevenue}
+                    value={totalRevenue}
                     icon={DollarSign}
                     change={12.5}
                     color="bg-blue-500"
-                    prefix="$"
+                    prefix="Birr"
                 />
+
                 <MetricCard
                     title="Total Orders"
-                    value={metrics.totalOrders}
+                    value={totalOrders}
                     icon={ShoppingCart}
                     change={8.2}
                     color="bg-green-500"
                 />
+
                 <MetricCard
                     title="Active Products"
-                    value={metrics.totalProducts}
+                    value={totalProducts}
                     icon={Package}
                     change={5.7}
                     color="bg-purple-500"
                 />
+
                 <MetricCard
                     title="Active Customers"
-                    value={metrics.activeCustomers}
+                    value={activeCustomers}
                     icon={Users}
                     change={15.3}
                     color="bg-orange-500"
@@ -109,19 +239,21 @@ const SupplierDashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <MetricCard
                     title="Pending Orders"
-                    value={metrics.pendingOrders}
+                    value={pendingOrders}
                     icon={AlertCircle}
                     change={-3.2}
                     color="bg-yellow-500"
                 />
+
                 <MetricCard
                     title="Avg Order Value"
                     value={metrics.averageOrderValue}
                     icon={TrendingUp}
                     change={6.8}
                     color="bg-indigo-500"
-                    prefix="$"
+                    prefix="Birr"
                 />
+
                 <MetricCard
                     title="Return Rate"
                     value={metrics.returnRate}
@@ -130,6 +262,7 @@ const SupplierDashboard = () => {
                     color="bg-red-500"
                     suffix="%"
                 />
+
                 <MetricCard
                     title="Customer Rating"
                     value={metrics.customerSatisfaction}

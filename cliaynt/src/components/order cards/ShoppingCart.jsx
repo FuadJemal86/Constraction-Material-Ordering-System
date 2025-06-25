@@ -6,6 +6,193 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import api from '../../api';
 
+
+const ImageViewer = ({ item }) => {
+    const [showModal, setShowModal] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [mainImageError, setMainImageError] = useState(false);
+
+    const getProductImages = (item) => {
+        const images = [];
+        if (item.image) images.push(`${api.defaults.baseURL}/images/${item.image}`);
+        if (item.image1) images.push(`${api.defaults.baseURL}/images/${item.image1}`);
+        if (item.image2) images.push(`${api.defaults.baseURL}/images/${item.image2}`);
+        if (item.image3) images.push(`${api.defaults.baseURL}/images/${item.image3}`);
+        return images;
+    };
+
+    const productImages = getProductImages(item);
+
+    // Find first working image for main display
+    const getFirstWorkingImage = () => {
+        if (!productImages || productImages.length === 0) return null;
+        return productImages[0]; // You can add logic to test each image if needed
+    };
+
+    const firstImage = getFirstWorkingImage();
+
+    const handleImageError = () => {
+        setMainImageError(true);
+    };
+
+    const openModal = () => {
+        if (productImages && productImages.length > 0) {
+            setShowModal(true);
+            setCurrentImageIndex(0);
+        }
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+    };
+
+    const nextImage = () => {
+        setCurrentImageIndex((prev) =>
+            prev < productImages.length - 1 ? prev + 1 : 0
+        );
+    };
+
+    const prevImage = () => {
+        setCurrentImageIndex((prev) =>
+            prev > 0 ? prev - 1 : productImages.length - 1
+        );
+    };
+
+    return (
+        <>
+            {/* Main Image Display - Responsive */}
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0 relative group">
+                {firstImage && !mainImageError ? (
+                    <>
+                        <img
+                            src={firstImage.startsWith('http')
+                                ? firstImage
+                                : `http://localhost:3032/image/${firstImage}`}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                            onError={handleImageError}
+                        />
+                        {/* View All Button - appears on hover */}
+                        {productImages.length > 1 && (
+                            <button
+                                onClick={openModal}
+                                className="absolute inset-0 bg-black/50 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
+                            >
+                                <span className="hidden sm:inline">View All ({productImages.length})</span>
+                                <span className="sm:hidden">+{productImages.length}</span>
+                            </button>
+                        )}
+                    </>
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <Wrench size={16} className="sm:size-6" />
+                    </div>
+                )}
+            </div>
+
+            {/* Modal for viewing all images - Responsive */}
+            {showModal && (
+                <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-2 sm:p-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-xs sm:max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
+                        {/* Modal Header */}
+                        <div className="flex justify-between items-center p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700">
+                            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white truncate pr-2">
+                                {item.name} - Images
+                            </h3>
+                            <button
+                                onClick={closeModal}
+                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full flex-shrink-0"
+                            >
+                                <X size={16} className="sm:size-5" />
+                            </button>
+                        </div>
+
+                        {/* Main Image Display */}
+                        <div className="relative">
+                            <div className="aspect-square bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                <img
+                                    src={productImages[currentImageIndex].startsWith('http')
+                                        ? productImages[currentImageIndex]
+                                        : `http://localhost:3032/image/${productImages[currentImageIndex]}`}
+                                    alt={`${item.name} - Image ${currentImageIndex + 1}`}
+                                    className="max-w-full max-h-full object-contain"
+                                    onError={(e) => {
+                                        e.target.style.display = 'none';
+                                        e.target.nextElementSibling.style.display = 'flex';
+                                    }}
+                                />
+                                <div className="w-full h-full hidden items-center justify-center text-gray-400">
+                                    <Wrench size={32} className="sm:size-12" />
+                                </div>
+                            </div>
+
+                            {/* Navigation Arrows */}
+                            {productImages.length > 1 && (
+                                <>
+                                    <button
+                                        onClick={prevImage}
+                                        className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-1.5 sm:p-2 rounded-full hover:bg-black/70 transition-colors"
+                                    >
+                                        <svg width="12" height="12" className="sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <polyline points="15,18 9,12 15,6"></polyline>
+                                        </svg>
+                                    </button>
+                                    <button
+                                        onClick={nextImage}
+                                        className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-1.5 sm:p-2 rounded-full hover:bg-black/70 transition-colors"
+                                    >
+                                        <svg width="12" height="12" className="sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <polyline points="9,18 15,12 9,6"></polyline>
+                                        </svg>
+                                    </button>
+                                </>
+                            )}
+
+                            {/* Image Counter */}
+                            <div className="absolute bottom-2 sm:bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm">
+                                {currentImageIndex + 1} / {productImages.length}
+                            </div>
+                        </div>
+
+                        {/* Thumbnail Navigation - Responsive */}
+                        {productImages.length > 1 && (
+                            <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700">
+                                <div className="flex gap-1 sm:gap-2 overflow-x-auto">
+                                    {productImages.map((img, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setCurrentImageIndex(index)}
+                                            className={`flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden border-2 transition-colors ${index === currentImageIndex
+                                                ? 'border-blue-500'
+                                                : 'border-gray-300 dark:border-gray-600'
+                                                }`}
+                                        >
+                                            <img
+                                                src={img.startsWith('http')
+                                                    ? img
+                                                    : `http://localhost:3032/images/${img}`}
+                                                alt={`Thumbnail ${index + 1}`}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    e.target.nextElementSibling.style.display = 'flex';
+                                                }}
+                                            />
+                                            <div className="w-full h-full hidden items-center justify-center text-gray-400 bg-gray-100 dark:bg-gray-700">
+                                                <Wrench size={8} className="sm:size-3" />
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </>
+    );
+};
+
 function ShoppingCart({ onClose }) {
     // Ethiopia boundary definition
     const ETHIOPIA_BOUNDS = {
@@ -105,6 +292,16 @@ function ShoppingCart({ onClose }) {
 
     const deliveryFee = calculateDeliveryFee();
     const finalTotal = cartTotal; // Delivery fee is paid in cash, not added to total
+
+    // Function to get all available images for a product
+    const getProductImages = (item) => {
+        const images = [];
+        if (item.image) images.push(`http://localhost:3032/images/${item.image}`);
+        if (item.image1) images.push(`http://localhost:3032/images/${item.image1}`);
+        if (item.image2) images.push(`http://localhost:3032/images/${item.image2}`);
+        if (item.image3) images.push(`http://localhost:3032/images/${item.image3}`);
+        return images;
+    };
 
     // Fetch product stock information
     useEffect(() => {
@@ -239,7 +436,7 @@ function ShoppingCart({ onClose }) {
                 return;
             }
 
-            const apiKey = "AIzaSyBThb9ieJOIHzM_616ZKBE31ibU8yIDuIs"; // Replace with your actual API key
+            const apiKey = "AIzaSyBThb9ieJOIHzM_616ZKBE31ibU8yIDuIs";
             const script = document.createElement('script');
             script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
             script.async = true;
@@ -709,49 +906,55 @@ function ShoppingCart({ onClose }) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/60 z-30 flex items-center justify-center md:justify-end">
+        <div className="fixed inset-0 bg-black/60 z-30 flex items-center justify-center p-2 md:p-4">
             <Toaster position="top-center" reverseOrder={false} />
 
-            <div className="bg-white dark:bg-gray-900 w-full max-w-md h-full md:h-auto max-h-full overflow-y-auto shadow-xl md:mr-4 md:my-4 md:rounded-lg">
+            <div className="bg-white dark:bg-gray-900 w-full max-w-4xl h-full md:h-auto md:max-h-[90vh] overflow-y-auto shadow-xl md:rounded-lg">
                 {/* Cart Header */}
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-900">
-                    <h2 className="text-xl font-bold flex items-center">
-                        <ShoppingCartOutlinedIcon className="mr-2" />
+                <div className="p-4 md:p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-900 z-10">
+                    <h2 className="text-xl md:text-2xl font-bold flex items-center">
+                        <ShoppingCartOutlinedIcon className="mr-2 md:mr-3" style={{ fontSize: '1.75rem' }} />
                         Your Cart ({cart.length})
                     </h2>
                     <button
                         onClick={onClose}
-                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+                        className="p-1 md:p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
                     >
-                        <X size={20} />
+                        <X size={20} className="md:w-6 md:h-6" />
                     </button>
                 </div>
 
-                <div className="p-4">
+                <div className="p-4 md:p-6">
                     {/* Delivery Options */}
-                    <div className="mb-4">
-                        <h3 className="font-medium mb-3">Delivery Options</h3>
+                    <div className="mb-6">
+                        <h3 className="font-medium mb-3 md:mb-4 text-lg">Delivery Options</h3>
 
                         {/* Supplier Delivery Info */}
                         {cart.length > 0 && (
-                            <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                                <div className="flex items-center mb-2">
-                                    <Truck size={16} className="text-blue-600 dark:text-blue-400 mr-2" />
-                                    <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                            <div className="mb-4 md:mb-6 p-3 md:p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                <div className="flex items-center mb-2 md:mb-3">
+                                    <Truck size={18} className="text-blue-600 dark:text-blue-400 mr-2 md:mr-3" />
+                                    <span className="font-medium text-blue-800 dark:text-blue-200 text-sm md:text-base">
                                         Supplier Delivery Info
                                     </span>
                                 </div>
                                 {supplierOffersDelivery ? (
-                                    <div className="text-sm text-blue-700 dark:text-blue-300">
-                                        <p>✓ Delivery available</p>
-                                        <p>Price: Birr {deliveryPricePerKm}/km</p>
-                                        <p className="text-xs mt-1 text-blue-600 dark:text-blue-400">
+                                    <div className="text-blue-700 dark:text-blue-300 text-sm">
+                                        <p className="flex items-center mb-1">
+                                            <span className="text-green-600 mr-2">✓</span>
+                                            Delivery available
+                                        </p>
+                                        <p className="mb-1">Price: Birr {deliveryPricePerKm}/km</p>
+                                        <p className="text-xs text-blue-600 dark:text-blue-400">
                                             * Delivery fee paid in cash to driver
                                         </p>
                                     </div>
                                 ) : (
-                                    <div className="text-sm text-blue-700 dark:text-blue-300">
-                                        <p>✗ This supplier does not offer delivery</p>
+                                    <div className="text-blue-700 dark:text-blue-300 text-sm">
+                                        <p className="flex items-center mb-1">
+                                            <span className="text-red-600 mr-2">✗</span>
+                                            This supplier does not offer delivery
+                                        </p>
                                         <p>Pickup only</p>
                                     </div>
                                 )}
@@ -759,7 +962,7 @@ function ShoppingCart({ onClose }) {
                         )}
 
                         {/* Delivery Radio Options */}
-                        <div className="flex flex-col gap-3 mb-4">
+                        <div className="flex flex-col gap-3 md:gap-4 mb-4 md:mb-6">
                             <div className="flex items-center">
                                 <input
                                     id="delivery-pickup"
@@ -768,9 +971,9 @@ function ShoppingCart({ onClose }) {
                                     value="pickup"
                                     checked={order.deliveryOption === "pickup"}
                                     onChange={() => handleDeliveryOptionChange("pickup")}
-                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                                    className="h-4 w-4 md:h-5 md:w-5 text-blue-600 focus:ring-blue-500"
                                 />
-                                <label htmlFor="delivery-pickup" className="ml-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                                <label htmlFor="delivery-pickup" className="ml-2 md:ml-3 text-gray-700 dark:text-gray-300 cursor-pointer text-sm md:text-base">
                                     I'll pick up (Free)
                                 </label>
                             </div>
@@ -783,246 +986,231 @@ function ShoppingCart({ onClose }) {
                                     checked={order.deliveryOption === "delivery"}
                                     onChange={() => handleDeliveryOptionChange("delivery")}
                                     disabled={!supplierOffersDelivery}
-                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 disabled:opacity-50"
+                                    className="h-4 w-4 md:h-5 md:w-5 text-blue-600 focus:ring-blue-500 disabled:opacity-50"
                                 />
-                                <label htmlFor="delivery-delivery" className={`ml-2 text-sm cursor-pointer ${supplierOffersDelivery
-                                    ? 'text-gray-700 dark:text-gray-300'
-                                    : 'text-gray-400 dark:text-gray-600'
-                                    }`}>
-                                    Delivery to my location
-                                    {supplierOffersDelivery ? (
-                                        <span className="text-orange-600 dark:text-orange-400">
-                                            {deliveryDistance ? ` (Birr ${deliveryFee.toFixed(2)} - Cash)` : ' (Price calculated on location)'}
+                                <label htmlFor="delivery-delivery" className="ml-2 md:ml-3 text-gray-700 dark:text-gray-300 cursor-pointer text-sm md:text-base">
+                                    Deliver to me
+                                    {supplierOffersDelivery && deliveryPricePerKm > 0 && (
+                                        <span className="text-xs md:text-sm text-gray-500 ml-1">
+                                            (Birr {deliveryPricePerKm}/km - paid in cash)
                                         </span>
-                                    ) : (
-                                        <span className="text-gray-400"> (Not available)</span>
+                                    )}
+                                    {!supplierOffersDelivery && (
+                                        <span className="text-xs md:text-sm text-red-500 ml-1">(Not available)</span>
                                     )}
                                 </label>
                             </div>
                         </div>
 
-                        {/* Show map and location controls only when delivery is selected and offered */}
+                        {/* Delivery Distance and Fee Display */}
+                        {order.deliveryOption === "delivery" && deliveryDistance && (
+                            <div className="mb-3 md:mb-4 p-2 md:p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                                <div className="flex flex-col md:flex-row md:justify-between md:items-center text-xs md:text-sm gap-1 md:gap-0">
+                                    <span className="text-green-700 dark:text-green-300">
+                                        Distance: {deliveryDistance}km
+                                    </span>
+                                    <span className="text-green-700 dark:text-green-300 font-medium">
+                                        Delivery Fee: Birr {deliveryFee.toFixed(2)} (cash payment)
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Map Container for Delivery */}
                         {order.deliveryOption === "delivery" && supplierOffersDelivery && (
-                            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-gray-50 dark:bg-gray-800">
-                                <div className="flex justify-between items-center mb-3">
-                                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Select Delivery Location
-                                    </h4>
+                            <div className="mb-4 md:mb-6">
+                                <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-3 md:mb-4 gap-2 md:gap-0">
+                                    <h4 className="font-medium text-sm md:text-base">Select Delivery Location</h4>
                                     <button
-                                        type="button"
                                         onClick={handleFindMyLocation}
-                                        className="px-3 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
+                                        className="px-3 py-1.5 md:px-4 md:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 text-xs md:text-sm"
                                         disabled={isLoading}
                                     >
-                                        {isLoading ? 'Finding...' : 'Find My Location'}
+                                        <MapPin size={14} className="md:w-4 md:h-4" />
+                                        {isLoading ? 'Loading...' : 'Find My Location'}
                                     </button>
                                 </div>
 
-                                <div className="relative mb-3">
-                                    <div
-                                        ref={mapRef}
-                                        className="w-full h-48 bg-gray-200 dark:bg-gray-700 rounded-lg"
-                                    ></div>
-
-                                    {/* Map loading overlay */}
-                                    {isLoading && (
-                                        <div className="absolute inset-0 bg-white bg-opacity-80 dark:bg-gray-900 dark:bg-opacity-80 flex items-center justify-center rounded-lg">
-                                            <div className="flex flex-col items-center">
-                                                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
-                                                <p className="text-sm text-gray-600 dark:text-gray-400">Loading map...</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Map instructions */}
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 text-center">
-                                    Click on the map to select your delivery location.
-                                    <span className="block">Green marker = Supplier, Red marker = Your location</span>
-                                </p>
-
-                                {/* Distance and Fee Display */}
-                                {deliveryDistance && (
-                                    <div className="mb-3 p-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-md">
-                                        <div className="flex justify-between items-center text-sm">
-                                            <span className="text-orange-700 dark:text-orange-300">
-                                                Distance: {deliveryDistance}km
-                                            </span>
-                                            <span className="font-medium text-orange-800 dark:text-orange-200">
-                                                Cash Fee: Birr {deliveryFee.toFixed(2)}
-                                            </span>
-                                        </div>
-                                        <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-                                            * This amount will be paid in cash to the driver upon delivery
-                                        </p>
-                                    </div>
-                                )}
+                                {/* Map */}
+                                <div
+                                    ref={mapRef}
+                                    className="w-full h-48 md:h-64 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3 md:mb-4"
+                                />
 
                                 {/* Manual Address Input */}
-                                <div className="mb-3">
-                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <div className="mb-3 md:mb-4">
+                                    <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 md:mb-2">
                                         Or enter your address manually:
                                     </label>
                                     <input
                                         type="text"
-                                        placeholder="Enter your delivery address"
-                                        value={order.address}
+                                        value={locationAddress}
                                         onChange={handleAddressChange}
-                                        className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-md dark:bg-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Enter your delivery address in Ethiopia..."
+                                        className="w-full px-2 py-1.5 md:px-3 md:py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
                                     />
                                 </div>
 
-                                {/* Selected Location Display */}
-                                {userLocation && locationAddress && (
-                                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-3 rounded-md flex items-start">
-                                        <MapPin size={16} className="text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0 mr-2" />
-                                        <div className="flex-1">
-                                            <h5 className="text-sm font-medium text-green-800 dark:text-green-200">
-                                                Selected Location:
-                                            </h5>
-                                            <p className="text-xs text-green-700 dark:text-green-300 mt-1">
-                                                {locationAddress}
+                                {/* Location Info */}
+                                {userLocation && (
+                                    <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 p-2 md:p-3 rounded-lg">
+                                        <p className="flex items-center">
+                                            <MapPin size={14} className="mr-1 md:mr-2" />
+                                            Selected Location: {locationAddress || 'Loading address...'}
+                                        </p>
+                                        {deliveryDistance && (
+                                            <p className="mt-1">
+                                                Distance from supplier: {deliveryDistance}km
                                             </p>
-                                        </div>
+                                        )}
                                     </div>
                                 )}
+
+                                {/* Delivery Instructions */}
+                                <div className="mt-3 md:mt-4 p-2 md:p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                                    <div className="flex items-start">
+                                        <AlertCircle size={14} className="text-yellow-600 dark:text-yellow-400 mr-1 md:mr-2 mt-0.5" />
+                                        <div className="text-xs md:text-sm text-yellow-700 dark:text-yellow-300">
+                                            <p className="font-medium mb-1">Delivery Guidelines:</p>
+                                            <ul className="list-disc list-inside space-y-1 text-xs">
+                                                <li>Delivery available only within Ethiopia</li>
+                                                <li>Delivery fee paid in cash to driver</li>
+                                                <li>Click on map or drag marker to set exact location</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
 
                     {/* Cart Items */}
                     {cart.length === 0 ? (
-                        <div className="text-center py-8">
-                            <ShoppingCartOutlinedIcon style={{ fontSize: '3rem' }} className="text-gray-400 mb-3" />
-                            <h3 className="text-lg font-medium mb-2">Your cart is empty</h3>
-                            <p className="text-gray-500 dark:text-gray-400 mb-4">Start adding items to your cart</p>
-                            <button
-                                onClick={onClose}
-                                className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-2 px-4 rounded-md transition-all"
+                        <div className="text-center py-8 md:py-12">
+                            <ShoppingCartOutlinedIcon style={{ fontSize: '3rem' }} className="text-gray-400 mb-3 md:mb-4" />
+                            <p className="text-gray-500 text-base md:text-lg mb-3 md:mb-4">Your cart is empty</p>
+                            <Link
+                                to="/products"
+                                className="inline-block px-4 py-2 md:px-6 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm md:text-base"
                             >
                                 Continue Shopping
-                            </button>
+                            </Link>
                         </div>
                     ) : (
-                        <form onSubmit={handleSubmit}>
-                            <div className="divide-y divide-gray-100 dark:divide-gray-800 mb-4">
+                        <>
+                            {/* Cart Items List */}
+                            <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
                                 {cart.map((item, index) => {
+                                    const productImages = getProductImages(item);
                                     const stock = getProductStock(item.id);
-                                    const isOutOfStock = stock === 0;
-                                    const exceedsStock = item.quantity > stock;
 
                                     return (
-                                        <div key={`${item.id}-${index}`} className="py-3">
-                                            <div className="flex items-center mb-2">
-                                                <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded flex-shrink-0 flex items-center justify-center">
-                                                    <Wrench className="text-gray-400" size={16} />
-                                                </div>
-                                                <div className="ml-3 flex-grow">
-                                                    <h3 className="font-medium text-sm">{item.name}</h3>
-                                                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                        Stock: {stock} available
-                                                        {exceedsStock && (
-                                                            <span className="text-red-500 ml-2">
-                                                                (Exceeds stock!)
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </div>
+                                        <div key={index} className="flex items-center gap-2 md:gap-4 p-2 md:p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                            {/* Product Image */}
+                                            <ImageViewer item={item} />
+
+
+                                            {/* Product Details */}
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-medium text-gray-900 dark:text-white truncate text-sm md:text-base">
+                                                    {item.name}
+                                                </h3>
+                                                <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
+                                                    Birr {item.price.toFixed(2)} each
+                                                </p>
+                                                <p className="text-xs text-gray-400 dark:text-gray-500">
+                                                    Stock: {stock} available
+                                                </p>
+                                                {item.quantity > stock && (
+                                                    <p className="text-xs text-red-500 mt-0.5">
+                                                        ⚠️ Exceeds available stock
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            {/* Quantity Controls */}
+                                            <div className="flex items-center gap-1 md:gap-2">
                                                 <button
-                                                    type="button"
-                                                    onClick={() => removeItem(item.id)}
-                                                    className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                                    onClick={() => handleQuantityUpdate(index, item.quantity - 1)}
+                                                    disabled={item.quantity <= 1}
+                                                    className="p-0.5 md:p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
-                                                    <X size={16} />
+                                                    <Minus size={14} className="md:w-4 md:h-4" />
+                                                </button>
+                                                <span className="w-6 md:w-8 text-center font-medium text-sm md:text-base">
+                                                    {item.quantity}
+                                                </span>
+                                                <button
+                                                    onClick={() => handleQuantityUpdate(index, item.quantity + 1)}
+                                                    disabled={!canIncreaseQuantity(item)}
+                                                    className="p-0.5 md:p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    title={!canIncreaseQuantity(item) ? `Only ${stock} items available` : ''}
+                                                >
+                                                    <Plus size={14} className="md:w-4 md:h-4" />
                                                 </button>
                                             </div>
 
-                                            <div className="flex items-center justify-between">
-                                                {/* Quantity Controls */}
-                                                <div className="flex items-center space-x-2">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleQuantityUpdate(index, item.quantity - 1)}
-                                                        disabled={item.quantity <= 1}
-                                                        className="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                                                    >
-                                                        <Minus size={14} />
-                                                    </button>
-
-                                                    <input
-                                                        type="number"
-                                                        value={item.quantity}
-                                                        min="1"
-                                                        max={stock}
-                                                        onChange={(e) => {
-                                                            const newQuantity = parseInt(e.target.value) || 1;
-                                                            handleQuantityUpdate(index, newQuantity);
-                                                        }}
-                                                        className={`w-16 px-2 py-1 text-center border rounded-md text-sm dark:bg-gray-900 dark:text-white ${exceedsStock
-                                                            ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                                                            : 'border-gray-200 dark:border-gray-600'
-                                                            } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
-                                                    />
-
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleQuantityUpdate(index, item.quantity + 1)}
-                                                        disabled={!canIncreaseQuantity(item) || isOutOfStock}
-                                                        className="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                                                    >
-                                                        <Plus size={14} />
-                                                    </button>
-                                                </div>
-
-                                                {/* Price */}
-                                                <div className="text-right">
-                                                    <span className="font-medium text-sm">
-                                                        Birr {(item.price * item.quantity).toFixed(2)}
-                                                    </span>
-                                                </div>
+                                            {/* Item Total */}
+                                            <div className="text-right min-w-[70px] md:min-w-[80px]">
+                                                <p className="font-medium text-gray-900 dark:text-white text-sm md:text-base">
+                                                    Birr {(item.price * item.quantity).toFixed(2)}
+                                                </p>
                                             </div>
+
+                                            {/* Remove Button */}
+                                            <button
+                                                onClick={() => removeItem(index)}
+                                                className="p-1 md:p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                                            >
+                                                <X size={14} className="md:w-4 md:h-4" />
+                                            </button>
                                         </div>
                                     );
                                 })}
                             </div>
 
-                            {/* Cart Totals */}
-                            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4 space-y-2">
-                                <div className="flex justify-between text-sm">
-                                    <span>Subtotal</span>
-                                    <span className="font-medium">Birr {cartTotal.toFixed(2)}</span>
+                            {/* Order Summary */}
+                            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 md:pt-6">
+                                <div className="space-y-2 mb-3 md:mb-4">
+                                    <div className="flex justify-between text-gray-600 dark:text-gray-400 text-sm md:text-base">
+                                        <span>Subtotal ({cart.length} items):</span>
+                                        <span>Birr {cartTotal.toFixed(2)}</span>
+                                    </div>
+                                    {order.deliveryOption === 'delivery' && deliveryFee > 0 && (
+                                        <div className="flex justify-between text-gray-600 dark:text-gray-400 text-sm md:text-base">
+                                            <span>Delivery Fee (cash payment):</span>
+                                            <span>Birr {deliveryFee.toFixed(2)}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between text-base md:text-lg font-semibold text-gray-900 dark:text-white border-t border-gray-200 dark:border-gray-700 pt-2">
+                                        <span>Online Payment Total:</span>
+                                        <span>Birr {finalTotal.toFixed(2)}</span>
+                                    </div>
+                                    {order.deliveryOption === 'delivery' && deliveryFee > 0 && (
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                                            + Birr {deliveryFee.toFixed(2)} delivery fee (paid in cash to driver)
+                                        </p>
+                                    )}
                                 </div>
 
-                                <div className="flex justify-between font-bold text-lg border-t border-gray-200 dark:border-gray-700 pt-2">
-                                    <span>Total</span>
-                                    <span>Birr {finalTotal.toFixed(2)}</span>
-                                </div>
-
-                                <div className="space-y-2 pt-4">
+                                {/* Submit Buttons */}
+                                <div className="flex flex-col md:flex-row gap-2 md:gap-4">
                                     <button
-                                        type="submit"
-                                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-3 px-4 rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                        disabled={
-                                            (order.deliveryOption === 'delivery' && !userLocation && !order.address.trim()) ||
-                                            cart.some(item => item.quantity > getProductStock(item.id))
-                                        }
-                                    >
-                                        {order.deliveryOption === 'delivery' && !userLocation && !order.address.trim()
-                                            ? 'Please Select Location'
-                                            : cart.some(item => item.quantity > getProductStock(item.id))
-                                                ? 'Check Stock Availability'
-                                                : 'Place Order'}
-                                    </button>
-                                    <button
-                                        type="button"
                                         onClick={onClose}
-                                        className="w-full border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 py-2 px-4 rounded-md transition-all"
+                                        className="flex-1 px-4 py-2 md:px-6 md:py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-sm md:text-base"
                                     >
                                         Continue Shopping
                                     </button>
+                                    <button
+                                        onClick={handleSubmit}
+                                        disabled={isLoading}
+                                        className="flex-1 px-4 py-2 md:px-6 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
+                                    >
+                                        {isLoading ? 'Processing...' : `Place Order - Birr ${finalTotal.toFixed(2)}`}
+                                    </button>
                                 </div>
                             </div>
-                        </form>
+                        </>
                     )}
                 </div>
             </div>
