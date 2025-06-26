@@ -2,7 +2,7 @@ const prisma = require("../../prismaCliaynt")
 const jwt = require('jsonwebtoken')
 
 const pendingOrder = async (req, res) => {
-    const token = req.cookies['x-auth-token'];
+    const token = req.cookies['s-auth-token'];
 
     if (!token) {
         return res.status(401).json({

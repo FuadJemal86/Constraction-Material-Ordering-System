@@ -47,6 +47,8 @@ const SupplierDashboard = () => {
     const [pendingOrders, setPendingOrders] = useState(0);
     const [returnRate, setReturnRate] = useState(0);
     const [doneOrder, setDoneOrder] = useState(0);
+    const [revenueData, setRevenueData] = useState([]);
+    const [topProductsData, setTopProductsData] = useState([]);
 
     const [metrics, setMetrics] = useState({
         totalOrders: 1847,
@@ -217,28 +219,57 @@ const SupplierDashboard = () => {
     }, [])
 
 
+    // chart Data
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await api.get('/supplier/get-chart-data')
+
+                if (result.data.status) {
+                    setRevenueData(result.data.result)
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        fetchData()
+    }, [])
+
+
+    // pi chart data
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await api.get('/supplier/get-pi-chart-data')
+
+                if (result.data.status) {
+                    setTopProductsData(result.data.topProductsData)
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        fetchData()
+    }, [])
 
 
 
-
-    // Sample data for charts
-    const revenueData = [
-        { month: 'Jan', revenue: 42000, orders: 145, customers: 120 },
-        { month: 'Feb', revenue: 38000, orders: 132, customers: 110 },
-        { month: 'Mar', revenue: 52000, orders: 178, customers: 145 },
-        { month: 'Apr', revenue: 48000, orders: 165, customers: 135 },
-        { month: 'May', revenue: 65000, orders: 210, customers: 180 },
-        { month: 'Jun', revenue: 58000, orders: 195, customers: 165 }
-    ];
-
-    const topProductsData = [
-        { name: 'Electronics', sales: 45, color: '#3B82F6' },
-        { name: 'Clothing', sales: 30, color: '#10B981' },
-        { name: 'Home & Garden', sales: 18, color: '#F59E0B' },
-        { name: 'Sports', sales: 12, color: '#EF4444' },
-        { name: 'Books', sales: 8, color: '#8B5CF6' },
-        { name: 'Others', sales: 7, color: '#6B7280' }
-    ];
+    // const topProductsData = [
+    //     { name: 'Electronics', sales: 45, color: '#3B82F6' },
+    //     { name: 'Clothing', sales: 30, color: '#10B981' },
+    //     { name: 'Home & Garden', sales: 18, color: '#F59E0B' },
+    //     { name: 'Sports', sales: 12, color: '#EF4444' },
+    //     { name: 'Books', sales: 8, color: '#8B5CF6' },
+    //     { name: 'Others', sales: 7, color: '#6B7280' }
+    // ];
 
     const orderStatusData = [
         { day: 'Mon', completed: 28, pending: 8, shipped: 15 },
@@ -325,7 +356,7 @@ const SupplierDashboard = () => {
                 />
 
                 <MetricCard
-                    title="Customer Rating"
+                    title="Completed Rate"
                     value={doneOrder}
                     icon={Star}
                     change={4.1}

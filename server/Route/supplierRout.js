@@ -34,6 +34,8 @@ const { pendingOrder } = require('../controllers/supplier controllers/pendingOrd
 const { totalProseOrderBirr } = require('../controllers/supplier controllers/totalOrderPros')
 const { returnRate } = require('../controllers/supplier controllers/return.rate')
 const { doneOrder } = require('../controllers/supplier controllers/doneOrder')
+const { chartData } = require('../controllers/supplier controllers/chartData')
+const { piChartData } = require('../controllers/supplier controllers/pischartData')
 
 
 
@@ -87,5 +89,7 @@ router.get('/get-pending-order', pendingOrder)
 router.get('/get-total-orderProc', totalProseOrderBirr)
 router.get('/get-return-rate', returnRate)
 router.get('/get-done-order', doneOrder)
+router.get('/get-chart-data', chartData)
+router.get('/get-pi-chart-data', piChartData)
 
 module.exports = router
