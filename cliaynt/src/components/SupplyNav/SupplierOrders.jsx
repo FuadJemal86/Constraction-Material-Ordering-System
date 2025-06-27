@@ -254,6 +254,7 @@ function SupplierOrders() {
                             <thead>
                                 <tr>
                                     <th className="p-3 text-left text-xs font-medium text-gray-500">Customer</th>
+                                    <th className="p-3 text-left text-xs font-medium text-gray-500">Phone</th>
                                     <th className="p-3 text-left text-xs font-medium text-gray-500">Product Name</th>
                                     <th className="p-3 text-left text-xs font-medium text-gray-500">Category</th>
                                     <th className="p-3 text-left text-xs font-medium text-gray-500">Quantity</th>
@@ -265,6 +266,7 @@ function SupplierOrders() {
                                     orderItem.map(c => (
                                         <tr >
                                             <td className="p-3 text-sm">{c.order.customer.name}</td>
+                                            <td className="p-3 text-sm">{c.order.customer.phone}</td>
                                             <td className="p-3 text-sm">{c.product.name}</td>
                                             <td className="p-3 text-sm">{c.product.category.category}</td>
                                             <td className="p-3 text-sm">{c.quantity}</td>

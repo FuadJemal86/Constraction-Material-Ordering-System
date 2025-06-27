@@ -30,7 +30,8 @@ const getOrder = async (req, res) => {
                 include: {
                     customer: {
                         select: {
-                            name: true
+                            name: true,
+                            phone: true
                         }
                     }
                 }

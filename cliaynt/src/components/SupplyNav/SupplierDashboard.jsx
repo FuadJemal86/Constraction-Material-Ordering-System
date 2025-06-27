@@ -262,33 +262,6 @@ const SupplierDashboard = () => {
 
 
 
-    // const topProductsData = [
-    //     { name: 'Electronics', sales: 45, color: '#3B82F6' },
-    //     { name: 'Clothing', sales: 30, color: '#10B981' },
-    //     { name: 'Home & Garden', sales: 18, color: '#F59E0B' },
-    //     { name: 'Sports', sales: 12, color: '#EF4444' },
-    //     { name: 'Books', sales: 8, color: '#8B5CF6' },
-    //     { name: 'Others', sales: 7, color: '#6B7280' }
-    // ];
-
-    const orderStatusData = [
-        { day: 'Mon', completed: 28, pending: 8, shipped: 15 },
-        { day: 'Tue', completed: 32, pending: 12, shipped: 18 },
-        { day: 'Wed', completed: 25, pending: 6, shipped: 14 },
-        { day: 'Thu', completed: 38, pending: 15, shipped: 22 },
-        { day: 'Fri', completed: 42, pending: 9, shipped: 25 },
-        { day: 'Sat', completed: 35, pending: 11, shipped: 20 },
-        { day: 'Sun', completed: 22, pending: 5, shipped: 12 }
-    ];
-
-    const performanceData = [
-        { metric: 'Product Views', current: 12580, previous: 11200 },
-        { metric: 'Add to Cart', current: 3240, previous: 2980 },
-        { metric: 'Purchases', current: 1847, previous: 1620 },
-        { metric: 'Customer Returns', current: 44, previous: 67 }
-    ];
-
-
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             {/* Key Metrics Grid */}
@@ -445,101 +418,7 @@ const SupplierDashboard = () => {
                 </div>
             </div>
 
-            {/* Order Status & Performance */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Weekly Orders */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Weekly Order Status</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={orderStatusData}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-                            <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} />
-                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} />
-                            <Tooltip
-                                contentStyle={{
-                                    backgroundColor: 'white',
-                                    border: '1px solid #E5E7EB',
-                                    borderRadius: '8px',
-                                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                                }}
-                            />
-                            <Bar dataKey="completed" stackId="a" fill="#10B981" radius={[0, 0, 0, 0]} />
-                            <Bar dataKey="shipped" stackId="a" fill="#3B82F6" radius={[0, 0, 0, 0]} />
-                            <Bar dataKey="pending" stackId="a" fill="#F59E0B" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
-                    <div className="flex justify-center gap-6 mt-4">
-                        <div className="flex items-center gap-2 text-sm">
-                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                            <span className="text-gray-700">Completed</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                            <span className="text-gray-700">Shipped</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                            <span className="text-gray-700">Pending</span>
-                        </div>
-                    </div>
-                </div>
 
-                {/* Performance Metrics */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Performance Overview</h3>
-                    <div className="space-y-6">
-                        {performanceData.map((item, index) => {
-                            const change = ((item.current - item.previous) / item.previous * 100).toFixed(1);
-                            const isPositive = change >= 0;
-                            return (
-                                <div key={index} className="flex items-center justify-between">
-                                    <div>
-                                        <p className="font-medium text-gray-900">{item.metric}</p>
-                                        <p className="text-sm text-gray-500">
-                                            Current: {item.current.toLocaleString()} | Previous: {item.previous.toLocaleString()}
-                                        </p>
-                                    </div>
-                                    <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${isPositive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                        }`}>
-                                        <TrendingUp className={`w-4 h-4 ${!isPositive ? 'rotate-180' : ''}`} />
-                                        {Math.abs(change)}%
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    {/* Conversion Funnel */}
-                    <div className="mt-6 pt-6 border-t border-gray-200">
-                        <h4 className="font-medium text-gray-900 mb-4">Conversion Funnel</h4>
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-600">Views to Cart</span>
-                                <span className="font-medium">25.8%</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div className="bg-blue-500 h-2 rounded-full" style={{ width: '25.8%' }}></div>
-                            </div>
-
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-600">Cart to Purchase</span>
-                                <span className="font-medium">57.0%</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div className="bg-green-500 h-2 rounded-full" style={{ width: '57%' }}></div>
-                            </div>
-
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-600">Overall Conversion</span>
-                                <span className="font-medium">14.7%</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div className="bg-purple-500 h-2 rounded-full" style={{ width: '14.7%' }}></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 };

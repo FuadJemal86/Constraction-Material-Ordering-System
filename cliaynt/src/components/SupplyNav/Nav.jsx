@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import {
     Menu, X, ChevronLeft, ChevronRight, Eye, Package, Box,
     CreditCard, MessageCircle, MoreVertical, Bell, Search, User, PlayCircle, StopCircle, Globe, Trash2,
-    Settings
+    Settings, CheckCircle, AlertCircle, TrendingUp
 } from "lucide-react";
 import api from '../../api';
 import useSocket from '../chatHook/useSocket';
@@ -20,6 +20,10 @@ function Nav() {
     const [supplierId, setSupplierId] = useState(null);
     const location = useLocation();
 
+    // Profile completion state
+    const [profileCompletion, setProfileCompletion] = useState(60);
+    const [showProfileProgress, setShowProfileProgress] = useState(true);
+
     // Enhanced message state management similar to Header.jsx
     const [unreadMessageCount, setUnreadMessageCount] = useState(0);
     const [messageNotifications, setMessageNotifications] = useState([]);
@@ -29,6 +33,26 @@ function Nav() {
 
     // Initialize socket for supplier with enhanced functionality
     const socket = useSocket(supplierId, 'supplier');
+
+    // Calculate profile completion percentage
+    const calculateProfileCompletion = useCallback(() => {
+        let completion = 60; // Base completion for signup
+
+        if (isVerifiy === true) {
+            completion = 100; // Full completion when verified
+        } else if (isVerifiy === false) {
+            completion = 60; // Partial completion when not verified
+        }
+
+        setProfileCompletion(completion);
+
+        // Hide progress bar when 100% complete
+        if (completion === 100) {
+            setTimeout(() => setShowProfileProgress(false), 3000);
+        } else {
+            setShowProfileProgress(true);
+        }
+    }, [isVerifiy]);
 
     // Enhanced helper function to calculate unread count
     const calculateUnreadCount = useCallback((notificationsList) => {
@@ -296,6 +320,11 @@ function Nav() {
         fetchProfile()
     }, [supplierId])
 
+    // Calculate profile completion when verification status changes
+    useEffect(() => {
+        calculateProfileCompletion();
+    }, [calculateProfileCompletion]);
+
     // Enhanced socket event listeners for both notifications and messages
     useEffect(() => {
         if (socket.socket && socket.isConnected) {
@@ -422,8 +451,13 @@ function Nav() {
 
     const handleNavigate = () => {
         navigate('/chat')
-
     }
+
+    const handleProfileProgressClick = () => {
+        if (profileCompletion < 100) {
+            navigate('/supplier-verification');
+        }
+    };
 
     return (
         <div className="flex flex-col h-screen lg:flex-row min-h-screen bg-gray-50">
@@ -466,6 +500,46 @@ function Nav() {
                         <ChevronLeft size={20} className={`transform transition-transform ${collapsed ? 'rotate-180' : ''}`} />
                     </button>
                 </div>
+
+                {/* Profile Completion Progress - Only show when not collapsed and visible */}
+                {!collapsed && showProfileProgress && profileCompletion < 100 && (
+                    <div className="px-4 pb-4">
+                        <div
+                            className="bg-gray-800 rounded-lg p-3 cursor-pointer hover:bg-gray-700 transition-colors"
+                            onClick={handleProfileProgressClick}
+                        >
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                    <TrendingUp size={16} className="text-blue-400" />
+                                    <span className="text-sm font-semibold">Profile Setup</span>
+                                </div>
+                                <span className="text-sm font-bold text-blue-400">{profileCompletion}%</span>
+                            </div>
+
+                            <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
+                                <div
+                                    className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-500 ease-out"
+                                    style={{ width: `${profileCompletion}%` }}
+                                ></div>
+                            </div>
+
+                            <div className="text-xs text-gray-400">
+                                {profileCompletion === 60 ? 'Complete verification to unlock all features' : 'Almost there!'}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Congratulations message for 100% completion */}
+                {!collapsed && profileCompletion === 100 && showProfileProgress && (
+                    <div className="px-4 pb-4">
+                        <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-3 text-center">
+                            <CheckCircle size={24} className="text-white mx-auto mb-2" />
+                            <div className="text-sm font-semibold text-white">Profile Complete!</div>
+                            <div className="text-xs text-green-100">You're all set to go</div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Navigation */}
                 <nav className="mt-6">
@@ -572,30 +646,49 @@ function Nav() {
                             </div>
                         </div>
                         <div className="flex items-center space-x-3">
+                            {/* Profile Completion Progress in Header (Mobile) */}
+                            {showProfileProgress && profileCompletion < 100 && (
+                                <div className="flex items-center space-x-2 lg:hidden">
+                                    <button
+                                        onClick={handleProfileProgressClick}
+                                        className="flex items-center space-x-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100 transition-colors"
+                                    >
+                                        <TrendingUp size={14} />
+                                        <span className="text-sm font-medium">{profileCompletion}%</span>
+                                    </button>
+                                </div>
+                            )}
+
                             {/* Status indicator */}
                             <div className="px-2 py-1 rounded-full flex items-center space-x-1">
                                 <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}></span>
                                 <span className="text-sm font-medium">{isOnline ? 'Online' : 'Offline'}</span>
                             </div>
 
+                            {/* Verification Status / Button */}
                             {!isVerifiy ? (
-                                <Link to={'/supplier-verification'} className="px-2 py-1 bg-red-100 text-red-800 hover:text-gray-900 rounded-full hover:bg-gray-100">
-                                    Unverified
+                                <Link
+                                    to={'/supplier-verification'}
+                                    className="flex items-center space-x-1 px-3 py-1 bg-red-100 text-red-800 hover:bg-red-200 rounded-full transition-colors"
+                                >
+                                    <AlertCircle size={14} />
+                                    <span className="text-sm font-medium">Verify Account</span>
                                 </Link>
                             ) : (
-                                <Link className="px-2 py-1 bg-green-100 text-green-800 rounded-full hover:bg-gray-100">
-                                    Verified
-                                </Link>
+                                <div className="flex items-center space-x-1 px-3 py-1 bg-green-100 text-green-800 rounded-full">
+                                    <CheckCircle size={14} />
+                                    <span className="text-sm font-medium">Verified</span>
+                                </div>
                             )}
 
-                            {/* FIXED: Enhanced Notification Bell Icon with Proper Count Badge */}
+                            {/* Enhanced Notification Bell Icon with Proper Count Badge */}
                             <div className="relative group">
                                 <button
                                     className="p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100 transition-colors relative"
                                     onClick={() => markAllNotificationsAsRead()}
                                 >
                                     <MessageCircle size={18} onClick={handleNavigate} />
-                                    {/* FIXED: Show notification count badge only when there are unread notifications */}
+                                    {/* Show notification count badge only when there are unread notifications */}
                                     {unreadNotificationCount > 0 && (
                                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full animate-pulse min-w-[20px] text-center shadow-lg">
                                             {unreadNotificationCount > 99 ? '99+' : unreadNotificationCount}
