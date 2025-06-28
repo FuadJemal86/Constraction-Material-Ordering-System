@@ -19,7 +19,8 @@ const getCustomerOrder = async (req, res) => {
             select: {
                 supplier: {
                     select: {
-                        companyName: true
+                        companyName: true,
+                        phone: true
                     }
                 },
                 supplierId: true,

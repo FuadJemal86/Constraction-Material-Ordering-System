@@ -5,15 +5,22 @@
 
 const prisma = require("../../prismaCliaynt");
 
-const updateCustomerApprove =  async (req, res) => {
+const updateCustomerApprove = async (req, res) => {
     const { supplierId } = req.params;
     const { isApproved } = req.body;
 
     try {
         const updatedSupplier = await prisma.supplier.update({
             where: { id: parseInt(supplierId) }, // Ensure ID is an integer
-            data: { isApproved }, // Update the status
+            data: { isApproved },
         });
+
+        if (isApproved === true) {
+            const review = await prisma.supplierVerifiy.update({
+                where: { supplierId: parseInt(supplierId) },
+                data: { isReviw: false }
+            })
+        }
 
         res.json({ status: true, message: "Supplier status updated successfully", result: updatedSupplier });
     } catch (error) {
@@ -22,4 +29,4 @@ const updateCustomerApprove =  async (req, res) => {
     }
 }
 
-module.exports = {updateCustomerApprove}
+module.exports = { updateCustomerApprove }

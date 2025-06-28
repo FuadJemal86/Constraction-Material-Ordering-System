@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import api from '../../api'
+import customerValidation from '../../hookes/customerValidation'
 
 function ViewDetails() {
+    customerValidation()
     const { id } = useParams()
     const [orderItem, setOrderItem] = useState([])
 

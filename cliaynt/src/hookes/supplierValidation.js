@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api";
 
-const customerValidation = () => {
+const supplierValidation = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -10,14 +10,14 @@ const customerValidation = () => {
 
 
             try {
-                const result = await api.post('/customer/validate');
+                const result = await api.post('/supplier/validate');
 
                 if (!result.data.valid) {
                     throw new Error('Invalid token');
                 }
             } catch (err) {
                 console.log(err)
-                navigate('/customer-sign-in');
+                navigate('/sign-in');
             }
         };
 
@@ -25,4 +25,4 @@ const customerValidation = () => {
     }, [navigate]);
 };
 
-export default customerValidation;
+export default supplierValidation;

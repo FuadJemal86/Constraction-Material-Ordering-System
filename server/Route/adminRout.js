@@ -42,6 +42,9 @@ const { totalOrder } = require('../controllers/admin controllers/totalOrder');
 const { totalBirr } = require('../controllers/admin controllers/totalBirr');
 const { getRecentCustomer } = require('../controllers/admin controllers/recentCustomer');
 const { totalServiceBirr } = require('../controllers/admin controllers/totalService');
+const { getCustomerStats } = require('../controllers/admin controllers/customerGrowth');
+const { getSystemPerformance } = require('../controllers/admin controllers/getSystemPerformance');
+const { supplierGrowth } = require('../controllers/admin controllers/supplierGrowth');
 const router = express.Router();
 
 
@@ -79,6 +82,9 @@ router.get('/total-order', totalOrder)
 router.get('/total-birr', totalBirr)
 router.get('/recent-customer', getRecentCustomer)
 router.get('/total-service-birr', totalServiceBirr)
+router.get('/customer-growth', getCustomerStats)
+router.get('/get-system-performance', getSystemPerformance)
+router.get('/get-supplier-growth', supplierGrowth)
 
 
 router.put('/delete-supplier/:id', deleteSupplier)

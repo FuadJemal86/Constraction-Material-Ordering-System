@@ -1,9 +1,23 @@
 const prisma = require("../../prismaCliaynt");
+const jwt = require('jsonwebtoken')
 
 
 const chartData = async (req, res) => {
+
+    const token = req.cookies['s-auth-token'];
+
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            message: 'No token provided. Please login first.'
+        });
+    }
+    let decoded
     try {
+        decoded = jwt.verify(token, process.env.SUPPLIER_KEY);
+
         const orders = await prisma.order.findMany({
+            where: { supplierId: Number(decoded.id) },
             select: {
                 totalPrice: true,
                 customerId: true,

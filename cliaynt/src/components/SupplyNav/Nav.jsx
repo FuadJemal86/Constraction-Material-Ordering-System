@@ -9,8 +9,10 @@ import {
 } from "lucide-react";
 import api from '../../api';
 import useSocket from '../chatHook/useSocket';
+import supplierValidation from '../../hookes/supplierValidation';
 
 function Nav() {
+    supplierValidation()
     const navigate = useNavigate()
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -459,6 +461,27 @@ function Nav() {
         }
     };
 
+
+    const [isReviw, setReviw] = useState(null)
+
+    useEffect(() => {
+        const chekIsReviw = async () => {
+            try {
+                const result = await api.get('/supplier/chek-reviw')
+
+                if (result.data.status) {
+                    setReviw(result.data.reviw)
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+        chekIsReviw()
+
+    }, [])
+
     return (
         <div className="flex flex-col h-screen lg:flex-row min-h-screen bg-gray-50">
             {/* Mobile overlay */}
@@ -502,33 +525,67 @@ function Nav() {
                 </div>
 
                 {/* Profile Completion Progress - Only show when not collapsed and visible */}
-                {!collapsed && showProfileProgress && profileCompletion < 100 && (
-                    <div className="px-4 pb-4">
-                        <div
-                            className="bg-gray-800 rounded-lg p-3 cursor-pointer hover:bg-gray-700 transition-colors"
-                            onClick={handleProfileProgressClick}
-                        >
-                            <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                    <TrendingUp size={16} className="text-blue-400" />
-                                    <span className="text-sm font-semibold">Profile Setup</span>
+
+                {
+                    !isReviw ? (
+                        <div>
+                            {!collapsed && !isReviw && showProfileProgress && profileCompletion < 100 && (
+                                <div className="px-4 pb-4">
+                                    <div
+                                        className="bg-gray-800 rounded-lg p-3 cursor-pointer hover:bg-gray-700 transition-colors"
+                                        onClick={handleProfileProgressClick}
+                                    >
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <TrendingUp size={16} className="text-blue-400" />
+                                                <span className="text-sm font-semibold">Profile Setup</span>
+                                            </div>
+                                            <span className="text-sm font-bold text-blue-400">{profileCompletion}%</span>
+                                        </div>
+
+                                        <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
+                                            <div
+                                                className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-500 ease-out"
+                                                style={{ width: `${profileCompletion}%` }}
+                                            ></div>
+                                        </div>
+
+                                        <div className="text-xs text-gray-400">
+                                            {profileCompletion === 60 ? 'Complete verification to unlock all features' : 'Almost there!'}
+                                        </div>
+                                    </div>
                                 </div>
-                                <span className="text-sm font-bold text-blue-400">{profileCompletion}%</span>
-                            </div>
+                            )}
+                        </div>
 
-                            <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
-                                <div
-                                    className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-500 ease-out"
-                                    style={{ width: `${profileCompletion}%` }}
-                                ></div>
-                            </div>
+                    ) : (
+                        <div className="px-4 pb-4">
+                            <div
+                                className="bg-gray-800 rounded-lg p-3 cursor-pointer hover:bg-gray-700 transition-colors"
+                            >
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <TrendingUp size={16} className="text-blue-400" />
+                                        <span className="text-sm font-semibold">Profile under review</span>
+                                    </div>
+                                    <span className="text-sm font-bold text-blue-400">{profileCompletion}%</span>
+                                </div>
 
-                            <div className="text-xs text-gray-400">
-                                {profileCompletion === 60 ? 'Complete verification to unlock all features' : 'Almost there!'}
+                                <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
+                                    <div
+                                        className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-500 ease-out"
+                                        style={{ width: `${profileCompletion}%` }}
+                                    ></div>
+                                </div>
+
+                                <div className="text-xs text-gray-400">
+                                    {profileCompletion === 60 ? 'Profile under review. Features will unlock within 24 hours.' : 'Almost there!'}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
+
+                    )
+                }
 
                 {/* Congratulations message for 100% completion */}
                 {!collapsed && profileCompletion === 100 && showProfileProgress && (
@@ -668,7 +725,6 @@ function Nav() {
                             {/* Verification Status / Button */}
                             {!isVerifiy ? (
                                 <Link
-                                    to={'/supplier-verification'}
                                     className="flex items-center space-x-1 px-3 py-1 bg-red-100 text-red-800 hover:bg-red-200 rounded-full transition-colors"
                                 >
                                     <AlertCircle size={14} />

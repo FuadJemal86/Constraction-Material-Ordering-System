@@ -18,6 +18,7 @@ const adminLogin = async (req, res) => {
         }
 
         const isPasswordValid = await bcrypt.compare(password, admin.password);
+        const role = admin.role
 
         if (!isPasswordValid) {
             return res.status(401).json({ loginStatus: false, message: 'Wrong Email or Password' });
@@ -36,7 +37,7 @@ const adminLogin = async (req, res) => {
             sameSite: "lax",
         });
 
-        res.status(200).json({ loginStatus: true, message: "Login successful" });
+        res.status(200).json({ loginStatus: true, message: "Login successful", role });
     } catch (err) {
         console.error("Login error:", err.message);
         res.status(500).json({ loginStatus: false, error: err.message });

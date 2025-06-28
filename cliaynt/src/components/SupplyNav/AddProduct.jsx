@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../api';
 import toast, { Toaster } from 'react-hot-toast';
+import supplierValidation from '../../hookes/supplierValidation';
 
 function AddProduct() {
+    supplierValidation()
     const [category, setCategory] = useState([]);
     const [hasDelivery, setHasDelivery] = useState(false);
     const [accounts, setAccounts] = useState([]);

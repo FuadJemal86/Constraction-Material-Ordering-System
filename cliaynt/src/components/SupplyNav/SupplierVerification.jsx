@@ -1,8 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, Upload, X, CheckCircle, FileText } from "lucide-react";
 import api from '../../api';
+import supplierValidation from '../../hookes/supplierValidation';
+import { useNavigate } from 'react-router-dom';
 
 function SupplierVerification() {
+    supplierValidation()
+    const navigate = useNavigate()
     const [photo, setPhoto] = useState(null);
     const [isReviw, setReviw] = useState(null)
     const [license, setLicense] = useState(null);
@@ -175,6 +179,7 @@ function SupplierVerification() {
 
             if (result.data.status) {
                 console.log(result.data.message)
+                navigate('/supplier-page')
             } else {
                 console.log(result.data.message)
             }

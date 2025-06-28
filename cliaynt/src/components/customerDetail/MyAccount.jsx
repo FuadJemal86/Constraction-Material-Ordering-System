@@ -5,9 +5,11 @@ import api from '../../api';
 import toast from 'react-hot-toast';
 import { User, Camera } from 'lucide-react';
 import PaymentHistory from './PaymentHistory';
+import customerValidation from '../../hookes/customerValidation';
 
 
 function MyAccount() {
+    customerValidation()
     const [activeTab, setActiveTab] = useState('profile');
     const [editMode, setEditMode] = useState(false);
     const [imageSrc, setImageSrc] = useState(null);

@@ -36,6 +36,7 @@ const { returnRate } = require('../controllers/supplier controllers/return.rate'
 const { doneOrder } = require('../controllers/supplier controllers/doneOrder')
 const { chartData } = require('../controllers/supplier controllers/chartData')
 const { piChartData } = require('../controllers/supplier controllers/pischartData')
+const { validation } = require('../controllers/supplier controllers/validation')
 
 
 
@@ -80,7 +81,6 @@ router.get('/get-notifications', getNotifaction)
 
 // dashboard data
 
-
 router.get('/get-total-birr', totalRevenue)
 router.get('/get-total-order', totalOrder)
 router.get('/get-total-product', totalProduct)
@@ -91,5 +91,10 @@ router.get('/get-return-rate', returnRate)
 router.get('/get-done-order', doneOrder)
 router.get('/get-chart-data', chartData)
 router.get('/get-pi-chart-data', piChartData)
+
+
+// validation
+
+router.post('/validate', validation)
 
 module.exports = router

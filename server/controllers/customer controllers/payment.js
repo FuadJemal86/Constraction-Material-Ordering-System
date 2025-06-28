@@ -55,7 +55,19 @@ const customerPayment = [
             });
 
             if (existingPayment) {
-                return res.status(400).json({ status: false, message: "Payment already made for this order" });
+                const newPayment = await prisma.payment.update({
+                    where: { transactionId: transactionId },
+                    data: {
+                        amount,
+                        bankId: parseInt(bankId),
+                        status: "PENDING",
+                        transactionId,
+                        service: parseFloat(service),
+                        image: req.file ? req.file.filename : null,
+                        bankTransactionId
+                    }
+                })
+                return res.status(200).json({ status: true, message: 'payment updated' })
             }
 
             const newPayment = await prisma.payment.create({

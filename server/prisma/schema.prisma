@@ -7,21 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model supperAdmin {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique(map: "supper_admin")
-  password  String
-  image     String?
-  createdAt DateTime @default(now())
-}
-
 model admin {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique(map: "Admin_email_key")
   password  String
   image     String?
+  role      roles    @default(ADMIN)
   createdAt DateTime @default(now())
 }
 
@@ -245,4 +237,9 @@ enum order_status {
   SHIPPED
   DELIVERED
   CANCELLED
+}
+
+enum roles {
+  ADMIN
+  SUPPERADMIN
 }

@@ -24,6 +24,7 @@ const { getProductStock } = require('../controllers/customer controllers/get.sto
 const { getNotifaction } = require('../controllers/customer controllers/customerGetNoti')
 const { notificationRed } = require('../controllers/customer controllers/notifactionRed')
 const { markAsAllRed } = require('../controllers/customer controllers/markAsRead')
+const { validation } = require('../controllers/customer controllers/validation')
 
 
 
@@ -66,6 +67,10 @@ router.get('/get-transaction/:transactionId', getTransactionPayment)
 router.get('/profile', getProfile)
 router.get('/get-products-stock', getProductStock)
 
+
+// validation 
+
+router.post('/validate', validation)
 
 
 

@@ -18,7 +18,8 @@ const getCustomerPaymentStatus = async (req, res) => {
                 transactionId: true,
                 supplier: {
                     select: {
-                        companyName:true
+                        companyName: true,
+                        phone: true
                     }
                 }
             }
