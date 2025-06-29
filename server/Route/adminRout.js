@@ -45,6 +45,8 @@ const { totalServiceBirr } = require('../controllers/admin controllers/totalServ
 const { getCustomerStats } = require('../controllers/admin controllers/customerGrowth');
 const { getSystemPerformance } = require('../controllers/admin controllers/getSystemPerformance');
 const { supplierGrowth } = require('../controllers/admin controllers/supplierGrowth');
+const { validation } = require('../controllers/admin controllers/validation');
+const { logout } = require('../controllers/admin controllers/logOut');
 const router = express.Router();
 
 
@@ -105,6 +107,14 @@ router.put('/update-payed-status/:id', updatePayedStatus)
 router.delete('/delete-category/:id', deleteCategory)
 router.delete('/delete-order/:id', orderdelete)
 router.delete('/delete-bank-account/:id', deleteAccount)
+
+// validation
+
+router.post('/validate', validation)
+
+// logout
+
+router.post('/logout', logout)
 
 
 module.exports = router;
