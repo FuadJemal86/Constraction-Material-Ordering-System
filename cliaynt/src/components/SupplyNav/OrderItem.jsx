@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import api from '../../api';
 import { Link } from 'react-router-dom';
+import { BlinkBlur, FourSquare } from 'react-loading-indicators'
+
 
 function OrderItem() {
 
     const [orderItem, setOrderItem] = useState([])
+    const [loading, setLoading] = useState(true)
 
 
     useEffect(() => {
@@ -19,11 +22,23 @@ function OrderItem() {
                 }
             } catch (err) {
                 console.log(err)
+            } finally {
+                setLoading(false)
             }
         }
 
         feachOrderItem()
     }, [])
+
+    if (loading) {
+        return (
+            <div className='relative w-full h-full'>
+                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
+                    <BlinkBlur color="#385d38" size="medium" text="" textColor="" />
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div>

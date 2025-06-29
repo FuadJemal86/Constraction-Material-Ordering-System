@@ -5,10 +5,12 @@ import toast, { Toaster } from 'react-hot-toast';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { Printer, FileSpreadsheet } from "lucide-react";
+import { BlinkBlur, FourSquare } from 'react-loading-indicators'
+
 
 
 function Payment() {
-
+    const [loading, setLoading] = useState(true)
     const [paymentStatus, setPaymentStatus] = useState([])
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -36,6 +38,8 @@ function Payment() {
             }
         } catch (err) {
             console.log(err)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -86,6 +90,16 @@ function Payment() {
         const data = new Blob([excelBuffer], { type: "application/octet-stream" });
         saveAs(data, "Customers.xlsx");
     };
+
+    if (loading) {
+        return (
+            <div className='relative w-full h-full'>
+                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
+                    <BlinkBlur color="#385d38" size="medium" text="" textColor="" />
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="p-4 mt-16 bg-white rounded-lg shadow ">

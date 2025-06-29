@@ -4,11 +4,12 @@ import toast, { Toaster } from 'react-hot-toast';
 import { Eye, Printer, FileSpreadsheet } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { BlinkBlur, FourSquare } from 'react-loading-indicators'
 
 
 function SupplierOrders() {
     // Status badge colors
-
+    const [loading, setLoading] = useState(true)
     const [order, setOrder] = useState([])
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -48,6 +49,8 @@ function SupplierOrders() {
             }
         } catch (err) {
             console.log(err)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -69,12 +72,14 @@ function SupplierOrders() {
         } catch (err) {
             console.log(err);
             toast.error(err.response.data.message);
+        } finally {
+            setLoading(false)
         }
     };
 
     const handleOrderItem = async (id) => {
 
-
+        setLoading(true)
         if (!isModalOpen) {
             setIsModalOpen(true)
         } else {
@@ -128,6 +133,16 @@ function SupplierOrders() {
         const data = new Blob([excelBuffer], { type: "application/octet-stream" });
         saveAs(data, "Customers.xlsx");
     };
+
+    if (loading) {
+        return (
+            <div className='relative w-full h-full'>
+                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
+                    <BlinkBlur color="#385d38" size="medium" text="" textColor="" />
+                </div>
+            </div>
+        )
+    }
 
 
 

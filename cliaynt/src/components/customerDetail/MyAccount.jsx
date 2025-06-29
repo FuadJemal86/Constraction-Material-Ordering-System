@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { User, Camera } from 'lucide-react';
 import PaymentHistory from './PaymentHistory';
 import customerValidation from '../../hookes/customerValidation';
+import { BlinkBlur, FourSquare } from 'react-loading-indicators'
 
 
 function MyAccount() {
@@ -14,6 +15,7 @@ function MyAccount() {
     const [editMode, setEditMode] = useState(false);
     const [imageSrc, setImageSrc] = useState(null);
     const [imageFile, setImageFile] = useState(null);
+    const [loading, setLoading] = useState(true);
 
 
     // Example user data
@@ -30,6 +32,8 @@ function MyAccount() {
                 }
             } catch (err) {
                 console.log(err)
+            } finally {
+                setLoading(false)
             }
         }
         feachData()
@@ -76,6 +80,16 @@ function MyAccount() {
             image: file
         });
     };
+
+    if (loading) {
+        return (
+            <div className=''>
+                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
+                    <BlinkBlur color="#385d38" size="medium" text="" textColor="" />
+                </div>
+            </div>
+        )
+    }
 
 
     return (

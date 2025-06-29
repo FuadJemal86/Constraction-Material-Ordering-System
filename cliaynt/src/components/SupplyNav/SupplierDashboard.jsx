@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { Package, ShoppingCart, TrendingUp, DollarSign, Truck, Star, AlertCircle, Users } from 'lucide-react';
-
 import api from '../../api';
+import { BlinkBlur, FourSquare } from 'react-loading-indicators'
+
 
 const MetricCard = ({ title, value, icon: Icon, change, color, prefix = '', suffix = '' }) => {
     // Helper function to safely render values
@@ -40,6 +41,7 @@ const MetricCard = ({ title, value, icon: Icon, change, color, prefix = '', suff
 };
 
 const SupplierDashboard = () => {
+    const [loading, setLoading] = useState(true)
     const [totalRevenue, setTotalRevenue] = useState(0);
     const [totalProducts, setTotalProducts] = useState(0);
     const [totalOrders, setTotalOrders] = useState(0);
@@ -82,6 +84,8 @@ const SupplierDashboard = () => {
                 }
             } catch (err) {
                 console.log(err)
+            } finally {
+                setLoading(false)
             }
         }
 
@@ -259,6 +263,18 @@ const SupplierDashboard = () => {
 
         fetchData()
     }, [])
+
+    if (loading) {
+        return (
+            <div className='relative w-full h-full'>
+                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
+                    <BlinkBlur color="#385d38" size="medium" text="" textColor="" />
+                </div>
+            </div>
+        )
+    }
+
+
 
 
 

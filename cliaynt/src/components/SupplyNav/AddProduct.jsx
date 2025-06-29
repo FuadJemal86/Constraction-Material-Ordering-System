@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import api from '../../api';
 import toast, { Toaster } from 'react-hot-toast';
 import supplierValidation from '../../hookes/supplierValidation';
+import { BlinkBlur, FourSquare } from 'react-loading-indicators'
+
 
 function AddProduct() {
     supplierValidation()
+    const [loading, setLoading] = useState(true);
     const [category, setCategory] = useState([]);
     const [hasDelivery, setHasDelivery] = useState(false);
     const [accounts, setAccounts] = useState([]);
@@ -44,6 +47,16 @@ function AddProduct() {
         { value: "pair", label: "Pair" },
         { value: "custom", label: "Custom..." }
     ];
+
+    if (loading) {
+        return (
+            <div className='relative w-full h-full'>
+                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
+                    <BlinkBlur color="#385d38" size="medium" text="" textColor="" />
+                </div>
+            </div>
+        )
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -135,6 +148,8 @@ function AddProduct() {
             } catch (err) {
                 console.log(err);
                 toast.error(err.response?.data?.message || 'Failed to load categories');
+            } finally {
+                setLoading(false)
             }
         };
 

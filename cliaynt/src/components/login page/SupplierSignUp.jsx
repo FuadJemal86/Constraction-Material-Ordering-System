@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import logo from '../../images/jejan.svg';
-import banner from '../../images/login banner.jpg';
+import banner from '../../images/left.png';
 import api from '../../api';
 import { Toaster, toast } from 'react-hot-toast';
 import { Notyf } from 'notyf';

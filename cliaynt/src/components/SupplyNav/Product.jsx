@@ -6,10 +6,12 @@ import { saveAs } from 'file-saver';
 import { Printer, FileSpreadsheet, Trash2 } from "lucide-react";
 import toast, { Toaster } from 'react-hot-toast';
 import Swal from 'sweetalert2';
+import { BlinkBlur, FourSquare } from 'react-loading-indicators'
+
 
 
 function Product({ orders = [] }) {
-
+    const [loading, setLoading] = useState(true)
     const [product, setProduct] = useState([])
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -43,6 +45,8 @@ function Product({ orders = [] }) {
             }
         } catch (err) {
             console.log(err)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -114,6 +118,16 @@ function Product({ orders = [] }) {
             const errorMessage = err.response?.data?.message || 'This product already order by customer';
             toast.error(errorMessage);
         }
+    }
+
+    if (loading) {
+        return (
+            <div className='relative w-full h-full'>
+                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
+                    <BlinkBlur color="#385d38" size="medium" text="" textColor="" />
+                </div>
+            </div>
+        )
     }
 
     return (

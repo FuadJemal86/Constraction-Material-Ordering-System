@@ -5,10 +5,13 @@ import api from '../../api';
 import Cookies from 'js-cookie';
 import toast, { Toaster } from 'react-hot-toast';
 import supplierValidation from '../../hookes/supplierValidation';
+import { BlinkBlur, FourSquare } from 'react-loading-indicators'
+
 
 
 function SupplierSetting() {
     supplierValidation()
+    const [loading, setLoading] = useState(true)
     const [isEditing, setIsEditing] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
@@ -81,6 +84,8 @@ function SupplierSetting() {
             }
         } catch (err) {
             console.log(err)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -119,6 +124,16 @@ function SupplierSetting() {
             console.error('Logout failed:', err);
         }
     };
+
+    if (loading) {
+        return (
+            <div className=''>
+                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
+                    <BlinkBlur color="#385d38" size="medium" text="" textColor="" />
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>

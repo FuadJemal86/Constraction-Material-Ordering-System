@@ -3,9 +3,11 @@ import api from '../../api'
 import { Printer, FileSpreadsheet, Eye } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { BlinkBlur, FourSquare } from 'react-loading-indicators'
+
 
 function DonePayment() {
-
+    const [loading, setLoading] = useState(true)
     const [donePayment, setDonePayment] = useState([])
     const [orderItem, setOrderItem] = useState([])
     const [page, setPage] = useState(1);
@@ -37,6 +39,8 @@ function DonePayment() {
                 }
             } catch (err) {
                 console.log(err)
+            } finally {
+                setLoading(false)
             }
 
         }
@@ -98,6 +102,17 @@ function DonePayment() {
         const data = new Blob([excelBuffer], { type: "application/octet-stream" });
         saveAs(data, "Customers.xlsx");
     }
+
+    if (loading) {
+        return (
+            <div className='relative w-full h-full'>
+                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
+                    <BlinkBlur color="#385d38" size="medium" text="" textColor="" />
+                </div>
+            </div>
+        )
+    }
+
 
     return (
         <div>
