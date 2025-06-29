@@ -25,6 +25,7 @@ const { getNotifaction } = require('../controllers/customer controllers/customer
 const { notificationRed } = require('../controllers/customer controllers/notifactionRed')
 const { markAsAllRed } = require('../controllers/customer controllers/markAsRead')
 const { validation } = require('../controllers/customer controllers/validation')
+const { logout } = require('../controllers/customer controllers/logOut')
 
 
 
@@ -71,6 +72,12 @@ router.get('/get-products-stock', getProductStock)
 // validation 
 
 router.post('/validate', validation)
+
+// logout
+
+router.post('/logout', logout)
+
+
 
 
 

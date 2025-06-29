@@ -112,7 +112,7 @@ function SupplierSetting() {
 
     const handleLogout = async () => {
         try {
-            Cookies.remove('s-auth-token');
+            const result = await api.post('/supplier/logout')
 
             window.location.href = '/sign-in';
         } catch (err) {

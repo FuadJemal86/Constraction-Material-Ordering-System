@@ -27,6 +27,16 @@ function Setting() {
         }
     }
 
+    const handleLogout = async () => {
+        try {
+            const result = await api.post('/customer/logout')
+
+            window.location.href = '/customer-sign-in';
+        } catch (err) {
+            console.error('Logout failed:', err);
+        }
+    };
+
     return (
         <div>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
@@ -49,7 +59,7 @@ function Setting() {
                                         type="text"
                                         name="name"
                                         placeholder='new password'
-                                        onChange={e => setPassword({...newPassword , password: e.target.value})}
+                                        onChange={e => setPassword({ ...newPassword, password: e.target.value })}
                                         className="w-1/2 p-2 border border-gray-300 dark:border-gray-700 rounded-md dark:bg-gray-700"
                                     />
                                 </div>
@@ -75,9 +85,8 @@ function Setting() {
                     </div>
 
                     <div>
-                        <h3 className="text-lg font-medium mb-4 text-red-600 dark:text-red-400">Danger Zone</h3>
-                        <button className="px-4 py-2 bg-white text-red-600 border border-red-600 rounded-md hover:bg-red-50 transition-colors">
-                            Delete Account
+                        <button onClick={handleLogout} className="px-4 py-2 bg-white text-red-600 border border-red-600 rounded-md hover:bg-red-50 transition-colors">
+                            LogOut
                         </button>
                     </div>
                 </div>

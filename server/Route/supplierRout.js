@@ -37,6 +37,7 @@ const { doneOrder } = require('../controllers/supplier controllers/doneOrder')
 const { chartData } = require('../controllers/supplier controllers/chartData')
 const { piChartData } = require('../controllers/supplier controllers/pischartData')
 const { validation } = require('../controllers/supplier controllers/validation')
+const { logout } = require('../controllers/supplier controllers/logOut')
 
 
 
@@ -94,7 +95,10 @@ router.get('/get-pi-chart-data', piChartData)
 
 
 // validation
-
 router.post('/validate', validation)
+
+// log out
+
+router.post('/logout', logout)
 
 module.exports = router
