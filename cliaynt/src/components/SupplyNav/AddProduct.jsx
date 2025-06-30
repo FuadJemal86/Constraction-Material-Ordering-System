@@ -17,7 +17,11 @@ function AddProduct() {
         bankName: '',
         account: ''
     });
-
+    const [previewImage, setPreviewImage] = useState(null);
+    const [previewImage1, setPreviewImage1] = useState(null);
+    const [previewImage2, setPreviewImage2] = useState(null);
+    const [previewImage3, setPreviewImage3] = useState(null);
+    const [customUnit, setCustomUnit] = useState(false);
     const [product, setProduct] = useState({
         name: "",
         categoryId: "",
@@ -48,15 +52,7 @@ function AddProduct() {
         { value: "custom", label: "Custom..." }
     ];
 
-    if (loading) {
-        return (
-            <div className='relative w-full h-full'>
-                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
-                    <BlinkBlur color="#385d38" size="medium" text="" textColor="" />
-                </div>
-            </div>
-        )
-    }
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -138,6 +134,24 @@ function AddProduct() {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                const result = await api.get('/supplier/get-account')
+                if (result.data.status) {
+                    setSupplierAccount(result.data.result)
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+                toast.error(err.response.data.message)
+            }
+        }
+
+        fetchData()
+    }, [])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
                 const result = await api.get('/customer/get-category');
 
                 if (result.data.status) {
@@ -156,6 +170,16 @@ function AddProduct() {
         fetchData();
     }, []);
 
+    if (loading) {
+        return (
+            <div className='relative w-full h-full'>
+                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
+                    <BlinkBlur color="#385d38" size="medium" text="" textColor="" />
+                </div>
+            </div>
+        )
+    }
+
     const handleDeliveryToggle = (value) => {
         setHasDelivery(value);
         setProduct({ ...product, offersDelivery: value });
@@ -165,11 +189,7 @@ function AddProduct() {
     };
 
     // Preview image states
-    const [previewImage, setPreviewImage] = useState(null);
-    const [previewImage1, setPreviewImage1] = useState(null);
-    const [previewImage2, setPreviewImage2] = useState(null);
-    const [previewImage3, setPreviewImage3] = useState(null);
-    const [customUnit, setCustomUnit] = useState(false);
+
 
     const handleImageChange = (e, imageField) => {
         const file = e.target.files[0];
@@ -278,23 +298,11 @@ function AddProduct() {
         }
     };
 
-    const feachData = async () => {
-        try {
-            const result = await api.get('/supplier/get-account')
-            if (result.data.status) {
-                setSupplierAccount(result.data.result)
-            } else {
-                console.log(result.data.message)
-            }
-        } catch (err) {
-            console.log(err)
-            toast.error(err.response.data.message)
-        }
-    }
 
-    useEffect(() => {
-        feachData()
-    }, [])
+
+
+
+
 
     return (
         <div className="mt-9 flex justify-center items-center p-4">

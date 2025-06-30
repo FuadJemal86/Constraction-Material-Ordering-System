@@ -10,6 +10,7 @@ const getSupplier = async (req, res) => {
             select: {
                 id: true,
                 companyName: true,
+                phone: true,
                 isApproved: true,
                 address: true,
                 isVerify: true,

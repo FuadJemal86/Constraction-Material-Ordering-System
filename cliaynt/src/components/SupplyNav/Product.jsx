@@ -115,7 +115,7 @@ function Product({ orders = [] }) {
                 })
         } catch (err) {
             console.log(err);
-            const errorMessage = err.response?.data?.message || 'This product already order by customer';
+            const errorMessage = err.response?.data?.message || 'This product already processed by customer';
             toast.error(errorMessage);
         }
     }

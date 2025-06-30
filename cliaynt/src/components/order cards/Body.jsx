@@ -166,7 +166,7 @@ function Body() {
                                 )}
                             </div>
                             <div className="text-sm text-gray-600 dark:text-gray-400">
-                                {selectedSupplier.address}
+                                {selectedSupplier.address},{selectedSupplier.phone}
                             </div>
                         </div>
                     </div>
