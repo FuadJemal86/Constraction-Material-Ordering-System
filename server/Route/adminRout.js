@@ -47,6 +47,8 @@ const { getSystemPerformance } = require('../controllers/admin controllers/getSy
 const { supplierGrowth } = require('../controllers/admin controllers/supplierGrowth');
 const { validation } = require('../controllers/admin controllers/validation');
 const { logout } = require('../controllers/admin controllers/logOut');
+const { deleteSuppliers } = require('../controllers/admin controllers/deleteSupplier');
+const { deleteCustomers } = require('../controllers/admin controllers/deleteCustomer');
 const router = express.Router();
 
 
@@ -107,6 +109,8 @@ router.put('/update-payed-status/:id', updatePayedStatus)
 router.delete('/delete-category/:id', deleteCategory)
 router.delete('/delete-order/:id', orderdelete)
 router.delete('/delete-bank-account/:id', deleteAccount)
+router.delete('/hard-delete-supplier/:id', deleteSuppliers)
+router.delete('/hard-delete-customer/:id', deleteCustomers)
 
 // validation
 

@@ -63,14 +63,14 @@ function Body() {
     return (
         <div className="w-full overflow-x-hidden">
             {/* Hero Section - Full Width Banner */}
-            <section className="relative w-full h-[70vh] min-h-[500px] bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 dark:from-gray-900 dark:via-gray-800 dark:to-black rounded-bl-[40px] rounded-br-[40px] bg-white">
+            <section className="relative w-full h-[80vh] min-h-[500px] bg-gradient-to-r from-yellow-400 to-pink-400 dark:from-gray-900 dark:via-gray-800 dark:to-black rounded-bl-[40px] rounded-br-[40px] bg-white">
                 <div className="absolute inset-0 bg-black bg-opacity-40 dark:bg-opacity-60 rounded-bl-[40px] rounded-br-[40px]"></div>
                 <div className="absolute inset-0 dark:bg-gradient-to-br dark:from-purple-900/30 dark:via-blue-900/20 dark:to-gray-900/40"></div>
                 <div className="relative z-10 flex items-center justify-center h-full px-4">
                     <div className="text-center text-white max-w-4xl">
                         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
                             Welcome to
-                            <span className="block bg-gradient-to-r from-yellow-400 to-pink-400 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
+                            <span className="block bg-gradient-to-r text-white from-yellow-400 to-pink-400 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
                                 Jejan Marketplace
                             </span>
                         </h1>

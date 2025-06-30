@@ -10,6 +10,7 @@ const getOnlineSupplier = async (req, res) => {
                 isVerify: true
             },
             select: {
+                id: true,
                 companyName: true,
                 phone: true,
                 licenseNumber: true,
