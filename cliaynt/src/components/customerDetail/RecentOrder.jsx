@@ -85,10 +85,10 @@ function RecentOrder() {
                         </table>
                     ) : (
                         <div className="p-6 text-center">
-                            <p className="text-gray-500 dark:text-gray-400">You haven't placed any orders yet.</p>
-                            <button className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors">
+                            <p className="text-gray-500 dark:text-gray-400 mb-3">You haven't placed any orders yet.</p>
+                            <Link to={'/products'} className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors">
                                 Browse Products
-                            </button>
+                            </Link>
                         </div>
                     )}
                 </div>
