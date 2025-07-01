@@ -38,11 +38,16 @@ const { chartData } = require('../controllers/supplier controllers/chartData')
 const { piChartData } = require('../controllers/supplier controllers/pischartData')
 const { validation } = require('../controllers/supplier controllers/validation')
 const { logout } = require('../controllers/supplier controllers/logOut')
+const { authSupplier, supplier } = require('../middleware/auth')
 
 
+// middleware
 
 
 const router = express.Router()
+
+router.use(authSupplier, supplier);
+
 
 router.post('/sign-up', supplierUp)
 router.post('/login', supplierLogin)

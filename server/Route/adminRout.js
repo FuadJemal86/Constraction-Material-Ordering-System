@@ -49,8 +49,14 @@ const { validation } = require('../controllers/admin controllers/validation');
 const { logout } = require('../controllers/admin controllers/logOut');
 const { deleteSuppliers } = require('../controllers/admin controllers/deleteSupplier');
 const { deleteCustomers } = require('../controllers/admin controllers/deleteCustomer');
+const { authAdmin, admin } = require('../middleware/auth');
 const router = express.Router();
 
+
+
+// middleware
+
+router.use(authAdmin, admin);
 
 router.post('/login', adminLogin);
 router.post('/add-bank-account', addCompanyAccount)

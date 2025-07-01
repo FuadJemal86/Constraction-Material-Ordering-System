@@ -26,11 +26,17 @@ const { notificationRed } = require('../controllers/customer controllers/notifac
 const { markAsAllRed } = require('../controllers/customer controllers/markAsRead')
 const { validation } = require('../controllers/customer controllers/validation')
 const { logout } = require('../controllers/customer controllers/logOut')
+const { authCustomer, customer } = require('../middleware/auth')
 
 
+
+// middleware
 
 
 const router = express.Router()
+
+router.use(authCustomer, customer);
+
 
 router.post('/sign-up', custoemrSignUp)
 
