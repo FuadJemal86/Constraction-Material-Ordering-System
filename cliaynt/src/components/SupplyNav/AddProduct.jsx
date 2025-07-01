@@ -132,22 +132,22 @@ function AddProduct() {
     };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const result = await api.get('/supplier/get-account')
-                if (result.data.status) {
-                    setSupplierAccount(result.data.result)
-                } else {
-                    console.log(result.data.message)
-                }
-            } catch (err) {
-                console.log(err)
-                toast.error(err.response.data.message)
-            }
-        }
-
         fetchData()
     }, [])
+
+    const fetchData = async () => {
+        try {
+            const result = await api.get('/supplier/get-account')
+            if (result.data.status) {
+                setSupplierAccount(result.data.result)
+            } else {
+                console.log(result.data.message)
+            }
+        } catch (err) {
+            console.log(err)
+            toast.error(err.response.data.message)
+        }
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -271,7 +271,7 @@ function AddProduct() {
             const result = await api.post('/supplier/add-account', newAccount)
 
             if (result.data.status) {
-                feachData()
+                fetchData()
                 setAccounts([...accounts, { ...newAccount }]);
                 setNewAccount({ bankName: '', account: '' });
                 setShowAccountForm(false);
@@ -288,7 +288,7 @@ function AddProduct() {
         try {
             const result = await api.delete(`/supplier/delete-account/${id}`)
             if (result.data.status) {
-                feachData()
+                fetchData()
             } else {
                 toast.error(result.data.message)
             }

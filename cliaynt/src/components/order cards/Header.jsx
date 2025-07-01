@@ -509,15 +509,7 @@ function Header() {
                         </nav>
                     </div>
 
-                    {/* Desktop Search */}
-                    <div className="relative max-w-sm hidden md:block">
-                        <input
-                            type="text"
-                            placeholder="Search"
-                            className="w-full outline-none border border-gray-200 dark:border-gray-800 p-2 pl-10 rounded-3xl dark:bg-gray-900"
-                        />
-                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                    </div>
+
 
                     {/* Header Icons */}
                     <div className='flex gap-2 md:gap-5 items-center'>
