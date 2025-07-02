@@ -241,17 +241,17 @@ const Chat = ({ userId: propUserId, userType: propUserType }) => {
         messagesBg: darkMode ? 'bg-gray-900' : 'bg-gray-50'
     };
 
-    // Message Bubble Component - WhatsApp-style positioning
     const MessageBubble = ({ message }) => {
-        const isOwnMessage = message.senderId === parseInt(userId);
+        const isOwnMessage = message.senderType?.toLowerCase() === userType?.toLowerCase();
+
 
         return (
             <div className={`flex mb-3 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
                 <div
                     className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl relative select-none cursor-pointer transition-all duration-200 ${holdingMessage === message.id ? 'scale-95 opacity-80' : ''
                         } ${isOwnMessage
-                            ? 'bg-blue-500 text-white rounded-br-none'
-                            : `${darkMode ? 'bg-gray-700 text-gray-100' : 'bg-gray-200 text-gray-800'} rounded-bl-none`
+                            ? 'bg-blue-500 text-white rounded-br-sm'
+                            : `${darkMode ? 'bg-gray-700 text-gray-100' : 'bg-gray-200 text-gray-800'} rounded-bl-sm`
                         }`}
                     onMouseDown={(e) => handleMouseDown(message, e)}
                     onMouseUp={handleMouseUp}
@@ -267,10 +267,10 @@ const Chat = ({ userId: propUserId, userType: propUserType }) => {
                         WebkitTouchCallout: 'none'
                     }}
                 >
-                    {/* Sender name inside bubble for received messages */}
+                    {/* Show sender name for customer messages (left side) */}
                     {!isOwnMessage && (
                         <p className={`text-xs font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                            {message.senderName}
+                            {message.senderName || 'Customer'}
                         </p>
                     )}
 
@@ -304,6 +304,7 @@ const Chat = ({ userId: propUserId, userType: propUserType }) => {
             </div>
         );
     };
+
 
     // Delete Modal Component
     const DeleteModal = () => (
