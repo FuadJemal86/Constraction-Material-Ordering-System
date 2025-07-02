@@ -13,11 +13,12 @@ const { authSupper, supperAdmin } = require('../middleware/auth')
 
 const router = express.Router()
 
+router.post('/login', Login)
+
 router.use(authSupper, supperAdmin);
 
 
 router.put('/edit-admin/:id', updateAdmin)
-router.post('/login', Login)
 router.get('/get-admins', getAllAdmins)
 router.post('/add-supper-admin', addSupperAdminAccount)
 router.post('/add-admin-account', addAccount)

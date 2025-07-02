@@ -46,11 +46,13 @@ const { authSupplier, supplier } = require('../middleware/auth')
 
 const router = express.Router()
 
+router.post('/sign-up', supplierUp)
+router.post('/login', supplierLogin)
+
 router.use(authSupplier, supplier);
 
 
-router.post('/sign-up', supplierUp)
-router.post('/login', supplierLogin)
+
 router.post('/supplier-verifing', uplodeSupplierVerification)
 router.post('/add-product', addProduct)
 router.post('/add-account', addAcount)
