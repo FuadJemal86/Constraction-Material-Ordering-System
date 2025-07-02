@@ -3,6 +3,7 @@ const prisma = require("../../prismaCliaynt")
 const totalServiceBirr = async (req, res) => {
     try {
         const totalBirr = await prisma.payment.aggregate({
+            where: { status: 'COMPLETED' },
             _sum: { service: true }
 
         })

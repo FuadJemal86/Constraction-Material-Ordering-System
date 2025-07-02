@@ -3,6 +3,7 @@ const prisma = require("../../prismaCliaynt");
 const getAllCategory = async (req, res) => {
     try {
         const categories = await prisma.category.findMany({
+            take: 5,
             select: {
                 id: true,
                 category: true

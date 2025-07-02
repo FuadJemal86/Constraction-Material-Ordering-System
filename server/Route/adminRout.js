@@ -84,7 +84,6 @@ router.get('/get-account', adminGetAccount)
 router.get('/admin-profile', getAdminProfileImage)
 
 // Dashboard info
-
 router.get('/get-total-supplier', getTotalSupplier)
 router.get('/get-total-customer', getTotalCustomer)
 router.get('/get-all-category', getAllCategory)

@@ -86,7 +86,7 @@ function Header() {
                         <Link to="/products" className="border border-gray-300 rounded-full px-3 py-1.5 lg:px-5 lg:py-2 text-gray-700 font-medium hover:bg-gray-100 transition-colors text-sm lg:text-base dark:text-white dark:hover:bg-gray-500">
                             Shop Now
                         </Link>
-                        <Link to="/sign-up" className="border bg-orange-300 rounded-full px-3 py-1.5 lg:px-5 lg:py-2 text- font-medium hover:bg-orange-400 hover:border-orange-500 transition-colors text-sm lg:text-base">
+                        <Link to="/sign-up" className=" bg-blue-600 rounded-full text-white px-3 py-1.5 lg:px-5 lg:py-2 text- font-medium hover:bg-blue-700  transition-colors text-sm lg:text-base">
                             Supplier
                         </Link>
                     </div>

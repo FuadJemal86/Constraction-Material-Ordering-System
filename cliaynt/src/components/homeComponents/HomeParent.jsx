@@ -15,7 +15,7 @@ function HomeParent() {
         return (
             <div className=''>
                 <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
-                    <BlinkBlur color="#385d38" size="medium" text="" textColor="" />
+                    <BlinkBlur color="#3134cc" size="medium" text="" textColor="" />
                 </div>
             </div>
         )

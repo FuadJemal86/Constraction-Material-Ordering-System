@@ -100,28 +100,28 @@ function MyAccount() {
             <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200 dark:border-gray-700">
                 <button
                     onClick={() => setActiveTab('profile')}
-                    className={`px-4 py-2 font-medium rounded-t-lg transition-colors ${activeTab === 'profile' ? 'bg-yellow-500 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                    className={`px-4 py-2 font-medium rounded-t-lg transition-colors ${activeTab === 'profile' ? 'bg-blue-600 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                         }`}
                 >
                     Profile
                 </button>
                 <button
                     onClick={() => setActiveTab('orders')}
-                    className={`px-4 py-2 font-medium rounded-t-lg transition-colors ${activeTab === 'orders' ? 'bg-yellow-500 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                    className={`px-4 py-2 font-medium rounded-t-lg transition-colors ${activeTab === 'orders' ? 'bg-blue-600 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                         }`}
                 >
                     Orders
                 </button>
                 <button
                     onClick={() => setActiveTab('payments')}
-                    className={`px-4 py-2 font-medium rounded-t-lg transition-colors ${activeTab === 'payments' ? 'bg-yellow-500 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                    className={`px-4 py-2 font-medium rounded-t-lg transition-colors ${activeTab === 'payments' ? 'bg-blue-600 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                         }`}
                 >
                     Payment History
                 </button>
                 <button
                     onClick={() => setActiveTab('settings')}
-                    className={`px-4 py-2 font-medium rounded-t-lg transition-colors ${activeTab === 'settings' ? 'bg-yellow-500 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                    className={`px-4 py-2 font-medium rounded-t-lg transition-colors ${activeTab === 'settings' ? 'bg-blue-600 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                         }`}
                 >
                     Settings
@@ -135,7 +135,7 @@ function MyAccount() {
                         <h2 className="text-xl font-semibold">Personal Information</h2>
                         <button
                             onClick={() => setEditMode(!editMode)}
-                            className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                         >
                             {editMode ? 'Cancel' : 'Edit Profile'}
                         </button>

@@ -218,15 +218,17 @@ function SupplierSignUp() {
             return toast.error('Please fill all fields!');
         }
 
-        const tinRegex = /^\d{10}$/;
+        const tinRegex = /^\d{9,10}$/;
         if (!tinRegex.test(tinNumber)) {
-            return toast.error('Invalid TIN Number. It must be 10 digits.');
+            return toast.error('Invalid TIN Number. It must be 9 or 10 digits.');
         }
 
-        const licenseRegex = /^[A-Z]{2,3}\/\d{3,6}\/\d{4}$/;
+        const licenseRegex = /^[A-Z]{2}\/[A-Z]{4}\/\d{1,2}\/\d{5,7}\/\d{5,8}\/20\d{2}$/;
         if (!licenseRegex.test(licenseNumber)) {
-            return toast.error('Invalid License Number format.');
+            return toast.error('Invalid Business License Number format.');
         }
+
+
 
         if (!agree) {
             return toast.error("You must agree to the terms and conditions.");
