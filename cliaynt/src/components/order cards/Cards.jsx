@@ -74,7 +74,7 @@ function Cards() {
 
                                     <div className="relative overflow-hidden">
                                         <img
-                                            src={`http://localhost:3032/images/${product.image}`}
+                                            src={`${api.defaults.baseURL}/images/${product.image}`}
                                             alt={product.name}
                                             className="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-300"
                                         />

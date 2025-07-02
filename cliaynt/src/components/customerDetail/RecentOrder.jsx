@@ -73,7 +73,7 @@ function RecentOrder() {
                                                 {order.status}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">birr {order.totalPrice}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">Birr {order.totalPrice}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right">
                                             <Link to={`/order-items/${order.id}`} className="text-yellow-500 hover:text-yellow-600 font-medium" >
                                                 View Details

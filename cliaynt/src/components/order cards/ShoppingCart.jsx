@@ -67,7 +67,7 @@ const ImageViewer = ({ item }) => {
                         <img
                             src={firstImage.startsWith('http')
                                 ? firstImage
-                                : `http://localhost:3032/image/${firstImage}`}
+                                : `${api.defaults.baseURL}/images/${firstImage}`}
                             alt={item.name}
                             className="w-full h-full object-cover"
                             onError={handleImageError}
@@ -113,7 +113,7 @@ const ImageViewer = ({ item }) => {
                                 <img
                                     src={productImages[currentImageIndex].startsWith('http')
                                         ? productImages[currentImageIndex]
-                                        : `http://localhost:3032/image/${productImages[currentImageIndex]}`}
+                                        : `${api.defaults.baseURL}/images/${productImages[currentImageIndex]}`}
                                     alt={`${item.name} - Image ${currentImageIndex + 1}`}
                                     className="max-w-full max-h-full object-contain"
                                     onError={(e) => {
@@ -170,7 +170,7 @@ const ImageViewer = ({ item }) => {
                                             <img
                                                 src={img.startsWith('http')
                                                     ? img
-                                                    : `http://localhost:3032/images/${img}`}
+                                                    : `${api.defaults.baseURL}/images/${img}`}
                                                 alt={`Thumbnail ${index + 1}`}
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => {
@@ -296,10 +296,10 @@ function ShoppingCart({ onClose }) {
     // Function to get all available images for a product
     const getProductImages = (item) => {
         const images = [];
-        if (item.image) images.push(`http://localhost:3032/images/${item.image}`);
-        if (item.image1) images.push(`http://localhost:3032/images/${item.image1}`);
-        if (item.image2) images.push(`http://localhost:3032/images/${item.image2}`);
-        if (item.image3) images.push(`http://localhost:3032/images/${item.image3}`);
+        if (item.image) images.push(`${api.defaults.baseURL}/images/${item.image}`);
+        if (item.image1) images.push(`${api.defaults.baseURL}/images/${item.image1}`);
+        if (item.image2) images.push(`${api.defaults.baseURL}/images/${item.image2}`);
+        if (item.image3) images.push(`${api.defaults.baseURL}/images/${item.image3}`);
         return images;
     };
 
@@ -786,6 +786,9 @@ function ShoppingCart({ onClose }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        setIsLoading(true)
+
+
         // Validation
         if (order.deliveryOption === 'delivery') {
             if (!supplierOffersDelivery) {
@@ -902,6 +905,8 @@ function ShoppingCart({ onClose }) {
                 const errorMessage = err.response?.data?.message || 'An error occurred while placing the order';
                 toast.error(errorMessage);
             }
+        } finally {
+            setIsLoading(false)
         }
     };
 

@@ -121,7 +121,7 @@ function HeaderProfile() {
                             isProfile && (
                                 profilePicture?.image?.length > 0 ? (
                                     <button className="h-8 w-8  border border-gray-500  rounded-full overflow-hidden">
-                                        <img src={`http://localhost:3032/images/${profilePicture?.image}`} alt="Profile picture" className="w-full h-full object-cover p-[2px] rounded-full" />
+                                        <img src={`${api.defaults.baseURL}/images/${profilePicture?.image}`} alt="Profile picture" className="w-full h-full object-cover p-[2px] rounded-full" />
                                     </button>
 
                                 ) : (

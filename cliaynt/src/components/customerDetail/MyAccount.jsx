@@ -147,7 +147,7 @@ function MyAccount() {
                             <div className="h-32 w-32 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center border-4 border-gray-100 dark:border-gray-600">
                                 {userData.image && !imageSrc ? (
                                     <img
-                                        src={`http://localhost:3032/images/${userData.image}`}
+                                        src={`${api.defaults.baseURL}/images/${userData.image}`}
                                         alt="Profile"
                                         className="h-full w-full object-cover"
                                     />

@@ -6,6 +6,7 @@ import {
     Moon, Sun, Check, CheckCheck, Reply, Edit3
 } from 'lucide-react';
 import useSocket from './chatHook/useSocket';
+import api from '../api';
 
 
 const Chat = ({ userId: propUserId, userType: propUserType }) => {
@@ -411,7 +412,7 @@ const Chat = ({ userId: propUserId, userType: propUserType }) => {
                                         ) : (
                                             <img
                                                 className='w-full h-full object-cover'
-                                                src={`http://localhost:3032/images/${conv.image}`}
+                                                src={`${api.defaults.baseURL}/images/${conv.image}`}
                                                 alt={conv.name}
                                             />
                                         )

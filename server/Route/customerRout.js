@@ -35,39 +35,29 @@ const { authCustomer, customer } = require('../middleware/auth')
 
 const router = express.Router()
 
+// Public Routes
+router.get('/get-products/:id', getProduct)
+router.get('/get-supplier', getSupplier)
+router.get('/get-category', customerGetCategory)
+router.get('/nearby-suppliers', customerNearbt)
+
+router.post('/login', customerLogin)
+router.post('/sign-up', custoemrSignUp)
+
+// Protected Routes
+
 router.use(authCustomer, customer);
 
 
-router.post('/sign-up', custoemrSignUp)
-
 router.get('/my-account', getCustomerAccount)
 router.get('/get-order', getCustomerOrder)
-
-router.post('/login', customerLogin)
-
 router.get('/verify-token', verifyCustomerToken)
-router.get('/get-category', customerGetCategory)
-router.get('/get-supplier', getSupplier)
 router.get('/get-notifications', getNotifaction)
-
-
-router.post('/place-order', customerPlaceOrder)
-
 router.get('/get-transitionId', customerGetTransaction)
-
-router.post('/make-payment/:transactionId', customerPayment)
-
 router.get('/get-payment-status', getCustomerPayment)
-router.get('/nearby-suppliers', customerNearbt)
 router.get('/get-products/:id', getProduct)
 router.get('/get-pending-payment/:id', getPendingOrder)
 router.get('/get-account', getAccount)
-
-router.put('/update-customer-account', editCustomerProfile)
-router.put('/password-change', updatePassword)
-router.put('/notifications/:id/read', notificationRed)
-router.put('/notifications/mark-all-read', markAsAllRed)
-
 router.get('/get-order-item/:id', getCustomerOrderItem)
 router.get('/get-payment', getCustomerPaymentStatus)
 router.get('/get-transaction/:transactionId', getTransactionPayment)
@@ -75,13 +65,17 @@ router.get('/profile', getProfile)
 router.get('/get-products-stock', getProductStock)
 
 
-// validation 
-
+router.post('/place-order', customerPlaceOrder)
+router.post('/make-payment/:transactionId', customerPayment)
 router.post('/validate', validation)
-
-// logout
-
 router.post('/logout', logout)
+
+
+router.put('/update-customer-account', editCustomerProfile)
+router.put('/password-change', updatePassword)
+router.put('/notifications/:id/read', notificationRed)
+router.put('/notifications/mark-all-read', markAsAllRed)
+
 
 
 

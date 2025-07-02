@@ -168,7 +168,7 @@ function SupplierSetting() {
                                 {
                                     profile.image?.length > 0 ? (
                                         <img
-                                            src={`http://localhost:3032/images/${profile.image}`}
+                                            src={`${api.defaults.baseURL}/images/${profile.image}`}
                                             alt="Profile"
                                             className="h-8 w-8 rounded-full"
                                         />
@@ -246,7 +246,7 @@ function SupplierSetting() {
                                             {
                                                 profile.image?.length > 0 ? (
                                                     <img
-                                                        src={`http://localhost:3032/images/${profile?.image}`}
+                                                        src={`${api.defaults.baseURL}/images/${profile?.image}`}
                                                         alt="Admin"
                                                         className="w-32 h-32 rounded-full object-cover shadow-md border-4 border-white dark:border-gray-700"
                                                     />
