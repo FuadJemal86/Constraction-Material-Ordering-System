@@ -9,6 +9,7 @@ const adminRout = require('./Route/adminRout');
 const customerRout = require('./Route/customerRout');
 const supplierRout = require('./Route/supplierRout');
 const prisma = require('./prismaCliaynt');
+const { changePassword } = require('./controllers/changePassword');
 
 const app = express();
 const server = http.createServer(app);
@@ -35,6 +36,7 @@ app.use('/supper-admin', supperAdmin);
 app.use('/supplier', supplierRout);
 app.use('/customer', customerRout);
 app.use('/admin', adminRout);
+app.use('/change-password', changePassword)
 
 // Store connected users
 const connectedUsers = new Map();

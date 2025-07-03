@@ -57,6 +57,12 @@ model message {
   suppliermrRed Boolean              @default(false)
 }
 
+model forgotPassword {
+  id    Int    @id @default(autoincrement())
+  email String
+  otp   String
+}
+
 model address {
   id      Int    @id @default(autoincrement())
   address String

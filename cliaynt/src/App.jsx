@@ -26,6 +26,7 @@ import SupplierSetting from './components/SupplyNav/Settings';
 import Chat from './components/Chat';
 import AboutUs from './components/homeComponents/AboutUs';
 import SupplierDashboard from './components/SupplyNav/SupplierDashboard';
+import ForgotPassword from './components/login page/forgotPassword';
 
 
 
@@ -49,6 +50,7 @@ function App() {
                 </Route>
                 <Route path='/my-account' element={<MyAccount />} />
                 <Route path='/chat' element={<Chat />} />
+                <Route path='/forgot-password' element={<ForgotPassword />} />
 
 
                 <Route path='/supplier-verification' element={<SupplierVerification />} />

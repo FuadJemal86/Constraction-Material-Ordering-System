@@ -27,6 +27,7 @@ const { markAsAllRed } = require('../controllers/customer controllers/markAsRead
 const { validation } = require('../controllers/customer controllers/validation')
 const { logout } = require('../controllers/customer controllers/logOut')
 const { authCustomer, customer } = require('../middleware/auth')
+const { checkEmail } = require('../controllers/customer controllers/forgotPassword')
 
 
 
@@ -43,6 +44,7 @@ router.get('/nearby-suppliers', customerNearbt)
 
 router.post('/login', customerLogin)
 router.post('/sign-up', custoemrSignUp)
+router.post('/check-email', checkEmail)
 
 // Protected Routes
 

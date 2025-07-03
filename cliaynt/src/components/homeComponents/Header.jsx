@@ -64,17 +64,17 @@ function Header() {
                     {/* Desktop Navigation */}
                     <ul className="hidden md:flex items-center space-x-4 lg:space-x-8 ">
                         <li>
-                            <Link to="/" className="text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
+                            <Link to="/" className="text-gray-700 dark:text-white hover:text-yellow-500 font-medium transition-colors text-sm lg:text-base">
                                 Home
                             </Link>
                         </li>
                         <li>
-                            <Link to={'/about-us'} className="text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
+                            <Link to={'/about-us'} className="text-gray-700 dark:text-white hover:text-yellow-500 font-medium transition-colors text-sm lg:text-base">
                                 About Us
                             </Link>
                         </li>
                         <li>
-                            <Link to="https://officaltechreach.vercel.app/" className="text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors text-sm lg:text-base">
+                            <Link to="https://officaltechreach.vercel.app/" className="text-gray-700 dark:text-white hover:text-yellow-500 font-medium transition-colors text-sm lg:text-base">
                                 Contact Us
                             </Link>
                         </li>

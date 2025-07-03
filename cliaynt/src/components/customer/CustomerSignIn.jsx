@@ -94,7 +94,7 @@ function CustomerSignIn() {
 
                         {/* Forgot Password link */}
                         <div className="flex justify-end">
-                            <a href="#" className="text-xs text-blue-600 hover:text-blue-800">Forgot password?</a>
+                            <a href="/forgot-password" className="text-xs text-blue-600 hover:text-blue-800">Forgot password?</a>
                         </div>
 
                         {/* Submit Button */}

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, ShoppingBag, Truck, Shield, Star, Tag, Gift, CreditCard } from 'lucide-react';
 
 function Body() {
+    const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState('suppliers');
     const [scrollY, setScrollY] = useState(0);
 
@@ -62,7 +64,7 @@ function Body() {
     ];
 
     const handleNavigation = () => {
-        console.log('Navigating to products...');
+        navigate('/products')
     }
 
     return (
@@ -79,7 +81,7 @@ function Body() {
                             opacity: Math.max(0, 1 - scrollY / 800)
                         }}
                     >
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight animate-fade-in-up delay-300">
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight animate-fade-in-up delay-300 bg-gradient-to-r from-yellow-400 to-pink-400 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
                             Welcome to
                             <span className="block bg-gradient-to-r text-white from-yellow-400 to-pink-400 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
                                 Jejan Marketplace

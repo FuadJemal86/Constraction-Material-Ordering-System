@@ -58,6 +58,7 @@ function Footer() {
             <div>
                 <div>
                     <p className='text-center py-4 text-slate-400 text-sm md:text-base'>© 2025 Jejan E-Commerce. All rights reserved.</p>
+                    <Link className='text-center py-4 text-slate-400 text-sm md:text-base'>developed by Tech Reach</Link>
                 </div>
             </div>
         </div>
