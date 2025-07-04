@@ -17,7 +17,7 @@ const server = http.createServer(app);
 // Socket.IO setup
 const io = socketIo(server, {
     cors: {
-        origin: ['http://localhost:5174', 'http://localhost:5173'],
+        origin: ['https://jejan.selamdca.org/', 'http://localhost:5174', 'http://localhost:5173'],
         methods: ['GET', 'POST'],
         credentials: true
     }
@@ -26,7 +26,7 @@ const io = socketIo(server, {
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: ['http://localhost:5174', 'http://localhost:5173'],
+    origin: ['https://jejan.selamdca.org/', 'http://localhost:5174', 'http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'UPDATE'],
     credentials: true
 }));
