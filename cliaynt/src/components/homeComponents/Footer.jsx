@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaFacebook, FaInstagram, FaGithub, FaLinkedin, FaArrowUp, FaHeart, FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
 // Mock logo component since we can't import the actual SVG
 const Logo = () => (
@@ -9,6 +10,8 @@ const Logo = () => (
 );
 
 function Footer() {
+    const navigator = useNavigate()
+
     const [showScrollTop, setShowScrollTop] = useState(false);
     const [currentYear] = useState(new Date().getFullYear());
 
@@ -34,20 +37,16 @@ function Footer() {
     };
 
     const socialLinks = [
-        { icon: FaFacebook, color: 'hover:text-blue-600', label: 'Facebook' },
+        { icon: FaFacebook, color: 'hover:text-blue-600', label: 'Facebook', to: 'https://web.facebook.com/profile.php?id=61578119967494' },
         { icon: FaInstagram, color: 'hover:text-pink-500', label: 'Instagram' },
-        { icon: FaGithub, color: 'hover:text-gray-800 dark:hover:text-white', label: 'GitHub' },
+        { icon: FaGithub, color: 'hover:text-gray-800 dark:hover:text-white', label: 'GitHub', to: 'https://github.com/FuadJemal86' },
         { icon: FaLinkedin, color: 'hover:text-blue-700', label: 'LinkedIn' }
     ];
 
     return (
         <footer className="relative bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-950 dark:to-gray-900 text-gray-700 dark:text-gray-300 transition-all duration-300">
-            {/* Decorative top border */}
-            <div className="h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
 
-            {/* Main footer content */}
             <div className="max-w-7xl mx-auto px-6 py-12">
-                {/* Top section */}
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-12">
                     {/* Brand section */}
                     <div className="lg:col-span-2 space-y-6">
@@ -65,15 +64,15 @@ function Footer() {
                         <div className="space-y-3">
                             <div className="flex items-center gap-3 text-sm">
                                 <FaEnvelope className="text-blue-500" />
-                                <span>support@jejan.com</span>
+                                <span>officaltechreach@gmail.com</span>
                             </div>
                             <div className="flex items-center gap-3 text-sm">
                                 <FaPhone className="text-green-500" />
-                                <span>+1 (555) 123-4567</span>
+                                <span>+251 9029 20301</span>
                             </div>
                             <div className="flex items-center gap-3 text-sm">
                                 <FaMapMarkerAlt className="text-red-500" />
-                                <span>123 Commerce Street, City, State 12345</span>
+                                <span>Ethiopia , Hawassa</span>
                             </div>
                         </div>
                     </div>
@@ -88,10 +87,8 @@ function Footer() {
                                 {[
                                     { label: 'Contact Us', action: handleNaviget },
                                     { label: 'About Us', action: handleNavigetAbout },
-                                    { label: 'Help Center', action: () => { } },
-                                    { label: 'Blog Posts', action: () => { } },
-                                    { label: 'Privacy Policy', action: () => { } },
-                                    { label: 'Terms of Service', action: () => { } }
+                                    { label: 'supplier', action: () => navigator('/sign-up') },
+                                    { label: 'shoppe', action: () => navigator('/products') },
                                 ].map((item, index) => (
                                     <li key={index}>
                                         <button
@@ -134,8 +131,9 @@ function Footer() {
                         <div className="flex gap-4">
                             {socialLinks.map((social, index) => (
                                 <a
+
                                     key={index}
-                                    href="#"
+                                    href={social.to}
                                     className={`p-3 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110 text-gray-600 dark:text-gray-400 ${social.color}`}
                                     aria-label={social.label}
                                 >
@@ -178,12 +176,6 @@ function Footer() {
                         </div>
                     </div>
                 </div>
-            </div>
-
-            {/* Animated background elements */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute -top-4 -right-4 w-24 h-24 bg-blue-500 rounded-full opacity-5 animate-pulse"></div>
-                <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-purple-500 rounded-full opacity-5 animate-pulse delay-1000"></div>
             </div>
         </footer>
     );

@@ -494,7 +494,7 @@ function Header() {
 
                     <div className="flex items-center">
                         <Link to="/" className="flex items-center">
-                            <img className='w-40 h-14 m-1' src={logo} alt="Logo" />
+                            <img className='md:w-32 md:h-14 m-1 w-28 h-12' src={logo} alt="Logo" />
                         </Link>
                     </div>
 
