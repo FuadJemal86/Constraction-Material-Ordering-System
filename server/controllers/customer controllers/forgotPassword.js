@@ -1,4 +1,3 @@
-const { default: api } = require("../../../cliaynt/src/api");
 const prisma = require("../../prismaCliaynt");
 const nodemailer = require("nodemailer");
 
