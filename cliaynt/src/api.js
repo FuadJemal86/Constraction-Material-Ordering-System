@@ -1,8 +1,10 @@
 
 import axios, { CanceledError } from "axios";
 
+const isDevelopment = process.env.NODE_ENV === "development";
+
 const api = axios.create({
-    baseURL: `http://localhost:3032`,
+    baseURL: isDevelopment ? `http://localhost:3032` : 'https://jejan.selamdca.org/',
     withCredentials: true,
 });
 
