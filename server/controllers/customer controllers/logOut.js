@@ -1,11 +1,15 @@
 const logout = (req, res) => {
-    res.clearCookie('x-auth-token', {
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.clearCookie("x-auth-token", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
     });
-    res.sendStatus(200);
-}
+
+    res.status(200).json({ message: "Logged out successfully" });
+};
+
 
 
 module.exports = { logout }
