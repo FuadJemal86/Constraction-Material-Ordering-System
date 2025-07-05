@@ -1,10 +1,10 @@
 const logout = (req, res) => {
-    const isProduction = process.env.NODE_ENV === "production";
 
     res.clearCookie("x-auth-token", {
         httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? "none" : "lax",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        path: "/"
     });
 
     res.status(200).json({ message: "Logged out successfully" });

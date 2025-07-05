@@ -70,7 +70,7 @@ router.get('/get-products-stock', getProductStock)
 router.post('/place-order', customerPlaceOrder)
 router.post('/make-payment/:transactionId', customerPayment)
 router.post('/validate', validation)
-router.post('/logout', logout)
+router.post('/logout', logout, { withCredentials: true })
 
 
 router.put('/update-customer-account', editCustomerProfile)
