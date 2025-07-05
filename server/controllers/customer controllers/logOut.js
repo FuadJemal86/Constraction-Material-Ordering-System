@@ -5,7 +5,7 @@ const logout = (req, res) => {
         httpOnly: true,
         secure: isProduction,
         sameSite: isProduction ? "none" : "lax",
-        path: "/", // this must match how it was set
+        path: "/customer", // this must match how it was set
     });
 
     res.status(200).json({ message: "Logged out successfully" });
