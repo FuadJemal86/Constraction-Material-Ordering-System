@@ -46,7 +46,7 @@ function AboutUs() {
             <Header />
             <div className='w-full overflow-x-hidden'>
                 {/* Hero Section */}
-                <section className="relative w-full h-[60vh] min-h-[400px] bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 dark:from-gray-900 dark:via-gray-800 dark:to-black rounded-bl-[40px] rounded-br-[40px]">
+                <section className="relative w-full h-[60vh] min-h-[400px] bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 dark:from-gray-900 dark:via-gray-800 dark:to-black rounded-bl-[40px] rounded-br-[40px] bg-white">
                     <div className="absolute inset-0 bg-black bg-opacity-40 dark:bg-opacity-60"></div>
                     <div className="absolute inset-0 dark:bg-gradient-to-br dark:from-purple-900/30 dark:via-blue-900/20 dark:to-gray-900/40"></div>
                     <div className="relative z-10 flex items-center justify-center h-full px-4">
