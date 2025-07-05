@@ -25,8 +25,8 @@ const Login = async (req, res) => {
 
         const isProduction = process.env.NODE_ENV === "production";
         const token = jwt.sign({
-            customer: true, email: customer.email, id: customer.id
-        }, process.env.CUSTOMER_KEY, { expiresIn: "30d" })
+            supperAdmin: true, email: supperAdmin.email, id: supperAdmin.id
+        }, process.env.SUPPER_ADMIN_KEY, { expiresIn: "30d" })
 
         res.cookie("supper-token", token, {
             httpOnly: true,

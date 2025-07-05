@@ -20,8 +20,8 @@ const supplierLogin = async (req, res) => {
 
         const isProduction = process.env.NODE_ENV === "production";
         const token = jwt.sign({
-            customer: true, email: customer.email, id: customer.id
-        }, process.env.CUSTOMER_KEY, { expiresIn: "30d" })
+            supplier: true, email: supplier.email, id: supplier.id
+        }, process.env.SUPPLIER_KEY, { expiresIn: "30d" })
 
 
         res.cookie("s-auth-token", token, {
