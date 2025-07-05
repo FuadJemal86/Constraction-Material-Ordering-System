@@ -38,8 +38,6 @@ const supplierLogin = async (req, res) => {
             userType: 'supplier'
         });
 
-
-        res.status(200).json({ loginStatus: true, message: "Login successful" });
     } catch (err) {
         console.log(err)
         return res.status(500).json({ status: false, error: 'server error!' })
