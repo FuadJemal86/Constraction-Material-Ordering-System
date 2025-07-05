@@ -66,7 +66,7 @@ const useSocket = (userId, userType) => {
 
         setConnectionStatus('connecting');
 
-        const newSocket = io('http://localhost:3032', {
+        const newSocket = io('https://jejan.selamdca.org/', {
             transports: ['websocket'],
             withCredentials: true,
             timeout: 10000,
