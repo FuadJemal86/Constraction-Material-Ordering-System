@@ -18,13 +18,16 @@ const customerLogin = async (req, res) => {
             return res.status(400).json({ loginStatus: false, message: 'Wrong Password or Email' })
         }
 
+        const isProduction = process.env.NODE_ENV === "production";
+
         const token = jwt.sign({
             customer: true, email: customer.email, id: customer.id
         }, process.env.CUSTOMER_KEY, { expiresIn: "30d" })
 
         res.cookie("x-auth-token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
             maxAge: 24 * 60 * 60 * 1000,
             sameSite: "lax",
         });
