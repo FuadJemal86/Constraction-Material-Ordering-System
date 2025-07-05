@@ -1,7 +1,8 @@
-const isProduction = process.env.NODE_ENV === "production";
 
 
 const logout = (req, res) => {
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.clearCookie('a-auth-token', {
         httpOnly: true,
         secure: isProduction,
