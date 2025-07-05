@@ -13,7 +13,7 @@ const { changePassword } = require('./controllers/changePassword');
 
 const app = express();
 const server = http.createServer(app);
-
+const PORT = process.env.PORT || 4000;
 // Socket.IO setup
 const io = socketIo(server, {
     cors: {
@@ -37,7 +37,9 @@ app.use('/supplier', supplierRout);
 app.use('/customer', customerRout);
 app.use('/admin', adminRout);
 app.use('/change-password', changePassword)
-
+app.get("/", (req, res) => {
+    res.send("Welcome to the jejan System API!");
+});
 // Store connected users
 const connectedUsers = new Map();
 
@@ -372,8 +374,8 @@ process.on('SIGTERM', async () => {
     server.close();
 });
 
-server.listen(3032, () => {
-    console.log('Server is listening on port 3032 with Socket.IO');
+server.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
 
 module.exports = { app, io };
