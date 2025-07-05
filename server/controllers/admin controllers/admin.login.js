@@ -24,17 +24,16 @@ const adminLogin = async (req, res) => {
             return res.status(401).json({ loginStatus: false, message: 'Wrong Email or Password' });
         }
 
-        const token = jwt.sign(
-            { admin: true, email: admin.email, id: admin.id },
-            process.env.ADMIN_PASSWORD,
-            { expiresIn: '30d' }
-        );
+        const isProduction = process.env.NODE_ENV === "production";
+        const token = jwt.sign({
+            customer: true, email: customer.email, id: customer.id
+        }, process.env.CUSTOMER_KEY, { expiresIn: "30d" })
 
         res.cookie("a-auth-token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            maxAge: 24 * 60 * 60 * 1000,
-            sameSite: "lax",
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
+            maxAge: 24 * 60 * 60 * 1000, // 24 hours
         });
 
         res.status(200).json({ loginStatus: true, message: "Login successful", role });

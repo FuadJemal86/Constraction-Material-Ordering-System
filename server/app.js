@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 4000;
 // Socket.IO setup
 const io = socketIo(server, {
     cors: {
-        origin: ['https://jejan.selamdca.org/', 'http://localhost:5174', 'http://localhost:5173'],
+        origin: ['https://constraction-material-ordering-syst.vercel.app', 'http://localhost:5174', 'http://localhost:5173'],
         methods: ['GET', 'POST'],
         credentials: true
     }
@@ -26,7 +26,7 @@ const io = socketIo(server, {
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: ['https://jejan.selamdca.org/', 'http://localhost:5174', 'http://localhost:5173'],
+    origin: ['https://constraction-material-ordering-syst.vercel.app', 'http://localhost:5174', 'http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'UPDATE'],
     credentials: true
 }));
@@ -41,6 +41,16 @@ app.get("/", (req, res) => {
     res.send("Welcome to the jejan System API!");
 });
 // Store connected users
+
+prisma
+    .$connect()
+    .then(() => {
+        console.log("✅ Connected to database via Prisma!");
+    })
+    .catch((err) => {
+        console.error("❌ Database connection failed:", err.message);
+    });
+
 const connectedUsers = new Map();
 
 // Socket.IO connection handling

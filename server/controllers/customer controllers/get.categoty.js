@@ -3,12 +3,12 @@ const prisma = require("../../prismaCliaynt")
 //get  category
 
 
-const customerGetCategory  = async (req, res) => {
+const customerGetCategory = async (req, res) => {
     try {
         const category = await prisma.category.findMany()
 
         if (!category) {
-            return res.status(401).json({ status: false, message: "category not found" })
+            return res.status(400).json({ status: false, message: "category not found" })
         }
 
         return res.status(200).json({ status: true, category })
@@ -19,4 +19,4 @@ const customerGetCategory  = async (req, res) => {
 }
 
 
-module.exports = {customerGetCategory}
+module.exports = { customerGetCategory }
