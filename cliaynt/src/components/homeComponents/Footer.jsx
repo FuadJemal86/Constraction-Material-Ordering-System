@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { FaFacebook, FaInstagram, FaGithub, FaLinkedin, FaArrowUp, FaHeart, FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import logo from '../../images/jejan.svg';
+
 
 // Mock logo component since we can't import the actual SVG
 const Logo = () => (
-    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-        Jejan
+    <div className="flex items-center">
+        <Link to="/" className="flex items-center">
+            <img className='md:w-32 md:h-14 m-1 w-28 h-12' src={logo} alt="" srcset="" />
+        </Link>
     </div>
 );
 
@@ -31,11 +35,6 @@ function Footer() {
         window.open('https://officaltechreach.vercel.app/', '_blank');
     };
 
-    const handleNavigetAbout = () => {
-        // navigatore('/about-us')
-        console.log('Navigate to about us');
-    };
-
     const socialLinks = [
         { icon: FaFacebook, color: 'hover:text-blue-600', label: 'Facebook', to: 'https://web.facebook.com/profile.php?id=61578119967494' },
         { icon: FaInstagram, color: 'hover:text-pink-500', label: 'Instagram' },
@@ -53,7 +52,7 @@ function Footer() {
                         <div className="flex items-center gap-3">
                             <Logo />
                             <div className="h-8 w-0.5 bg-gradient-to-b from-blue-500 to-purple-500"></div>
-                            <span className="text-lg font-semibold">E-Commerce</span>
+                            <span className="text-lg font-semibold">MarketPlace</span>
                         </div>
                         <p className="text-gray-600 dark:text-gray-400 max-w-md leading-relaxed">
                             Your trusted partner for premium products and exceptional shopping experience.
@@ -72,7 +71,7 @@ function Footer() {
                             </div>
                             <div className="flex items-center gap-3 text-sm">
                                 <FaMapMarkerAlt className="text-red-500" />
-                                <span>Ethiopia , Hawassa</span>
+                                <span>Ethiopia, Jimma</span>
                             </div>
                         </div>
                     </div>
@@ -86,7 +85,7 @@ function Footer() {
                             <ul className="space-y-3">
                                 {[
                                     { label: 'Contact Us', action: handleNaviget },
-                                    { label: 'About Us', action: handleNavigetAbout },
+                                    { label: 'About Us', action: () => navigator('/about-us') },
                                     { label: 'supplier', action: () => navigator('/sign-up') },
                                     { label: 'shoppe', action: () => navigator('/products') },
                                 ].map((item, index) => (

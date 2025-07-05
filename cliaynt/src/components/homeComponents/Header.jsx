@@ -121,7 +121,7 @@ function Header() {
                     </li>
                     <li>
                         <Link
-                            to="/about"
+                            to="/about-us"
                             className="block text-gray-700 dark:text-white hover:text-fuchsia-500 font-medium transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
