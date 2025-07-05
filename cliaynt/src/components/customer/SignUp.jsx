@@ -2,10 +2,11 @@ import React, { useState } from 'react'
 import logo from '../../images/jejan.svg';
 import banner from '../../images/left.png';
 import { Toaster, toast } from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../../api';
 
 function SignUp() {
+    const navigate = useNavigate()
     const [customer, setCustomer] = useState({
         name: '',
         email: '',
@@ -34,6 +35,8 @@ function SignUp() {
 
             if (result.data.status) {
                 toast.success(result.data.message);
+                navigate('/customer-sign-in')
+
             } else {
                 toast.error(result.data.message);
             }
