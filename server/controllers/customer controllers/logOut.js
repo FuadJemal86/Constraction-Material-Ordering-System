@@ -5,10 +5,9 @@ const logout = (req, res) => {
         httpOnly: true,
         secure: isProduction,
         sameSite: isProduction ? "none" : "lax",
-        maxAge: 24 * 60 * 60 * 1000,
     });
-    res.sendStatus(200);
-}
 
+    res.status(200).json({ message: "Logout successful" });
+};
 
-module.exports = { logout }
+module.exports = { logout };
