@@ -1,7 +1,7 @@
 const express = require('express')
 const { getCustomerAccount } = require('../controllers/customer controllers/supplier.getProfile')
 const { getCustomerOrder } = require('../controllers/customer controllers/supplier.getOrder')
-const { custoemrSignUp } = require('../controllers/customer controllers/signUp')
+const { customerSignUp } = require('../controllers/customer controllers/signUp')
 const { customerLogin } = require('../controllers/customer controllers/login')
 const { verifyCustomerToken } = require('../controllers/customer controllers/validate.token')
 const { customerGetCategory } = require('../controllers/customer controllers/get.categoty')
@@ -43,7 +43,7 @@ router.get('/get-category', customerGetCategory)
 router.get('/nearby-suppliers', customerNearbt)
 
 router.post('/login', customerLogin)
-router.post('/sign-up', custoemrSignUp)
+router.post('/sign-up', customerSignUp)
 router.post('/check-email', checkEmail)
 
 // Protected Routes

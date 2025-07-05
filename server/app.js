@@ -46,10 +46,10 @@ app.get("/", (req, res) => {
 prisma
     .$connect()
     .then(() => {
-        console.log("✅ Connected to database via Prisma!");
+        console.log("Connected to database via Prisma!");
     })
     .catch((err) => {
-        console.error("❌ Database connection failed:", err.message);
+        console.error("Database connection failed:", err.message);
     });
 
 const connectedUsers = new Map();

@@ -23,7 +23,7 @@ const upload = multer({
 
 
 
-const custoemrSignUp = (upload.single('image'), async (req, res) => {
+const customerSignUp = (upload.single('image'), async (req, res) => {
     try {
 
         const { name, email, password, phone, image } = req.body
@@ -42,7 +42,7 @@ const custoemrSignUp = (upload.single('image'), async (req, res) => {
             data: { name, email, password: hashPassword, phone, image: req.file ? req.file.filename : null }
         })
 
-        return res.status(200).json({ status: true, message: 'customer registed' })
+        return res.status(200).json({ status: true, message: 'customer register' })
 
     } catch (err) {
         console.log(err)
@@ -51,4 +51,4 @@ const custoemrSignUp = (upload.single('image'), async (req, res) => {
 })
 
 
-module.exports = { custoemrSignUp }
+module.exports = { customerSignUp }
