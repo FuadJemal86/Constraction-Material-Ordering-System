@@ -31,10 +31,10 @@ function AboutUs() {
     ];
 
     const stats = [
-        { number: '50', label: 'Active Suppliers' },
-        { number: '200', label: 'Happy Customers' },
-        { number: '33+', label: 'Successful Orders' },
-        { number: '40.9%', label: 'Platform Uptime' }
+        { number: '5', label: 'Active Suppliers' },
+        { number: '2', label: 'Happy Customers' },
+        { number: '3', label: 'Successful Orders' },
+        { number: '4.9%', label: 'Platform Uptime' }
     ];
 
     const handleNavigation = () => {
