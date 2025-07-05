@@ -841,24 +841,28 @@ function Header() {
                 {cartOpen && <ShoppingCart onClose={() => setCartOpen(false)} />}
             </header>
 
-            {/* Banner Section */}
             <section className="relative w-full h-[80vh] min-h-[500px] bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800  dark:from-gray-900 dark:via-gray-800 dark:to-black rounded-bl-[40px] rounded-br-[40px] bg-white">
-                <div className="absolute inset-0 bg-black bg-opacity-40 dark:bg-opacity-60"></div>
+                <div className="absolute inset-0 bg-black bg-opacity-40 dark:bg-opacity-60 rounded-bl-[40px] rounded-br-[40px]"></div>
                 <div className="absolute inset-0 dark:bg-gradient-to-br dark:from-purple-900/30 dark:via-blue-900/20 dark:to-gray-900/40"></div>
                 <div className="relative z-10 flex items-center justify-center h-full px-4">
-                    <div className="text-center text-white max-w-4xl">
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                    <div
+                        className="text-center text-white max-w-4xl transform transition-all duration-1000 ease-out"
+                        style={{
+                            transform: `translateY(${scrollY * 0.1}px)`,
+                            opacity: Math.max(0, 1 - scrollY / 800)
+                        }}
+                    >
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight animate-fade-in-up delay-300 bg-gradient-to-r from-yellow-400 to-pink-400 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
                             Connect with
-                            <span className="block bg-gradient-to-r from-yellow-400 to-pink-400 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
-                                Trusted Suppliers
+                            <span className="block bg-gradient-to-r text-white from-yellow-400 to-pink-400 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
+                                Trusted Supplier
                             </span>
                         </h1>
-                        <p className="text-lg md:text-xl mb-8 text-gray-200 dark:text-gray-300 max-w-2xl mx-auto">
+                        <p className="text-lg md:text-xl mb-8 text-gray-200 dark:text-gray-300 max-w-2xl mx-auto animate-fade-in-up delay-500">
                             Bridge the gap between customers and suppliers. Find quality products,
                             build lasting partnerships, and grow your business together.
                         </p>
                     </div>
-
                 </div>
 
                 {/* Animated background elements */}

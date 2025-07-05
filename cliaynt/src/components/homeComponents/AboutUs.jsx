@@ -45,28 +45,36 @@ function AboutUs() {
         <div>
             <Header />
             <div className='w-full overflow-x-hidden'>
-                {/* Hero Section */}
+
                 <section className="relative w-full h-[80vh] min-h-[500px] bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800  dark:from-gray-900 dark:via-gray-800 dark:to-black rounded-bl-[40px] rounded-br-[40px] bg-white">
-                    <div className="absolute inset-0 bg-black bg-opacity-40 dark:bg-opacity-60"></div>
+                    <div className="absolute inset-0 bg-black bg-opacity-40 dark:bg-opacity-60 rounded-bl-[40px] rounded-br-[40px]"></div>
                     <div className="absolute inset-0 dark:bg-gradient-to-br dark:from-purple-900/30 dark:via-blue-900/20 dark:to-gray-900/40"></div>
                     <div className="relative z-10 flex items-center justify-center h-full px-4">
-                        <div className="text-center text-white max-w-4xl">
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                        <div
+                            className="text-center text-white max-w-4xl transform transition-all duration-1000 ease-out"
+                            style={{
+                                transform: `translateY(${scrollY * 0.1}px)`,
+                                opacity: Math.max(0, 1 - scrollY / 800)
+                            }}
+                        >
+                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight animate-fade-in-up delay-300 bg-gradient-to-r from-yellow-400 to-pink-400 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
                                 About
-                                <span className="block bg-gradient-to-r from-yellow-400 to-pink-400 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
-                                    Jejan Marketplace
+                                <span className="block bg-gradient-to-r text-white from-yellow-400 to-pink-400 dark:from-cyan-400 dark:to-purple-400 bg-clip-text text-transparent">
+                                    Jejan MarketPlace
                                 </span>
                             </h1>
-                            <p className="text-lg md:text-xl text-gray-200 dark:text-gray-300 max-w-2xl mx-auto">
+                            <p className="text-lg md:text-xl mb-8 text-gray-200 dark:text-gray-300 max-w-2xl mx-auto animate-fade-in-up delay-500">
                                 Connecting customers with trusted suppliers to build lasting business relationships and drive mutual success.
                             </p>
                         </div>
                     </div>
 
                     {/* Animated background elements */}
-                    <div className="absolute top-10 left-10 w-16 h-16 bg-yellow-400 dark:bg-cyan-400 rounded-full opacity-20 dark:opacity-30 animate-pulse"></div>
-                    <div className="absolute top-32 right-20 w-12 h-12 bg-pink-400 dark:bg-purple-400 rounded-full opacity-20 dark:opacity-30 animate-bounce"></div>
-                    <div className="absolute bottom-20 left-1/4 w-10 h-10 bg-green-400 dark:bg-blue-400 rounded-full opacity-20 dark:opacity-30 animate-pulse"></div>
+                    <div className="absolute top-10 left-10 w-20 h-20 bg-yellow-400 dark:bg-cyan-400 rounded-full opacity-20 dark:opacity-30 animate-pulse"></div>
+                    <div className="absolute top-32 right-20 w-16 h-16 bg-pink-400 dark:bg-purple-400 rounded-full opacity-20 dark:opacity-30 animate-bounce"></div>
+                    <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-green-400 dark:bg-blue-400 rounded-full opacity-20 dark:opacity-30 animate-pulse"></div>
+                    <div className="absolute top-1/2 right-1/3 w-8 h-8 bg-blue-400 dark:bg-pink-400 rounded-full opacity-10 dark:opacity-20 animate-ping"></div>
+                    <div className="absolute bottom-32 right-10 w-14 h-14 bg-purple-400 dark:bg-yellow-400 rounded-full opacity-15 dark:opacity-25 animate-pulse"></div>
                 </section>
 
                 {/* Our Story Section */}
