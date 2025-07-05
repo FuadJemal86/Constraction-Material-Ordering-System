@@ -737,7 +737,7 @@ function Header() {
                                     </li>
                                     <li className="border-b border-gray-200 dark:border-gray-700">
                                         <Link
-                                            to="/about"
+                                            to="/about-us"
                                             className="block py-3 text-lg font-medium hover:text-yellow-500 transition-colors"
                                             onClick={() => setMobileMenuOpen(false)}
                                         >
