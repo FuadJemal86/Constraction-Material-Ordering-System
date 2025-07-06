@@ -9,7 +9,8 @@ import {
     Settings,
     Clock,
     CheckCircle,
-    Package
+    Package,
+    LogOut
 } from "lucide-react";
 
 function HeaderProfile() {
@@ -112,6 +113,15 @@ function HeaderProfile() {
 
     }, [])
 
+    const handleLogout = async () => {
+        try {
+            const result = await api.post('/customer/logout')
+            window.location.reload()
+        } catch (err) {
+            console.error('Logout failed:', err);
+        }
+    };
+
     return (
         <div>
             {
@@ -168,11 +178,11 @@ function HeaderProfile() {
                                         <span className="font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white">recent order</span> {orderStatus.filter(c => c.status === 'PENDING').length}
                                     </Link>
                                 </div>
-                                <Link to={'/my-account'} className='flex items-center justify-between mb-2 hover:bg-slate-400 py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900'>
+                                <Link onClick={handleLogout} className='flex items-center justify-between mb-2 hover:bg-slate-400 py-1 px-1 w-full rounded-md hover:text-white transition-colors dark:hover:bg-slate-900'>
                                     <span className='p-1'>
-                                        <Settings />
+                                        <LogOut />
                                     </span>
-                                    <span className='font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white'>setting</span>
+                                    <span className='font-semibold text-sm text-gray-500 dark:text-white px-1 py-2 w-full hover:text-white'>Logout</span>
                                 </Link>
                             </div>
                         </div>
