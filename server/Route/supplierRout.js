@@ -51,6 +51,9 @@ router.post('/sign-up', supplierUp)
 router.post('/login', supplierLogin)
 router.post('/check-email', checkEmail)
 
+router.post('/logout', logout)
+
+
 router.use(authSupplier, supplier);
 
 
@@ -105,9 +108,5 @@ router.get('/get-pi-chart-data', piChartData)
 
 // validation
 router.post('/validate', validation)
-
-// log out
-
-router.post('/logout', logout)
 
 module.exports = router

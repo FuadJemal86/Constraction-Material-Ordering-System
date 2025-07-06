@@ -47,6 +47,9 @@ router.post('/login', customerLogin)
 router.post('/sign-up', customerSignUp)
 router.post('/check-email', checkEmail)
 
+router.post('/logout', logout)
+
+
 // Protected Routes
 
 router.use(authCustomer, customer);
@@ -80,7 +83,6 @@ router.put('/notifications/mark-all-read', markAsAllRed)
 
 
 
-router.post('/logout', logout)
 
 
 
