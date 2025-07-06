@@ -473,8 +473,8 @@ function Header() {
 
     if (loading) {
         return (
-            <div className='relative w-full h-full'>
-                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
+            <div className='w-full h-full'>
+                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-50">
                     <BlinkBlur color="#385d38" size="medium" text="" textColor="" />
                 </div>
             </div>
