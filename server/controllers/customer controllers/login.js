@@ -9,13 +9,13 @@ const customerLogin = async (req, res) => {
         const customer = await prisma.customer.findUnique({ where: { email } })
 
         if (!customer) {
-            return res.status(409).json({ loginStatus: false, message: 'Wrong email or password!' })
+            return res.status(400).json({ loginStatus: false, message: 'Wrong email or password!' })
         }
 
         const isPasswordCorrect = await bcrypt.compare(password, customer.password)
 
         if (!isPasswordCorrect) {
-            return res.status(409).json({ loginStatus: false, message: 'Wrong Password or Email' })
+            return res.status(400).json({ loginStatus: false, message: 'Wrong Password or Email' })
         }
 
         const isProduction = process.env.NODE_ENV === "production";

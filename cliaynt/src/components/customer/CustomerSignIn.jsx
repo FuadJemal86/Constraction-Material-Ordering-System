@@ -35,16 +35,15 @@ function CustomerSignIn() {
                 toast.error(result.data.message);
             }
         } catch (err) {
-            const errorData = err.response?.data;
-
-            if (typeof errorData === 'string') {
-                toast.error(errorData);
-            } else if (errorData?.message) {
-                toast.error(errorData.message);
+            if (err.response && err.response.status === 400) {
+                toast.error('Wrong email or password!');
+            } else if (err.message) {
+                toast.error(err.message);
             } else {
                 toast.error('An unexpected error occurred.');
             }
         }
+
 
 
 
