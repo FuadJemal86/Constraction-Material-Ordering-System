@@ -6,6 +6,8 @@ const { addAccount } = require('../controllers/supperAdmin/admin.addAccount')
 const { deleteAdminAccount } = require('../controllers/supperAdmin/delete.admin.account')
 const { updateAdmin } = require('../controllers/supperAdmin/update.admin')
 const { authSupper, supperAdmin } = require('../middleware/auth')
+const { logout } = require('../controllers/supperAdmin/logout')
+const { validation } = require('../controllers/supperAdmin/validation')
 
 
 // middleware
@@ -13,7 +15,7 @@ const { authSupper, supperAdmin } = require('../middleware/auth')
 
 const router = express.Router()
 
-router.post('/login', Login)
+// router.post('/login', Login)
 
 router.use(authSupper, supperAdmin);
 
@@ -23,6 +25,11 @@ router.get('/get-admins', getAllAdmins)
 router.post('/add-supper-admin', addSupperAdminAccount)
 router.post('/add-admin-account', addAccount)
 router.delete('/remove-admins/:id', deleteAdminAccount)
+router.post('/validate', validation)
+
+// logout
+router.post('/logout', logout)
+
 
 
 
