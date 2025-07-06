@@ -11,11 +11,17 @@ import api from '../../api';
 import toast, { Toaster } from 'react-hot-toast';
 import HeaderProfile from './HeaderProfile';
 import useSocket from '../chatHook/useSocket';
+import { BlinkBlur, FourSquare } from 'react-loading-indicators'
+
 
 function Header() {
+
+
     const navigate = useNavigate()
     // Core state management
     const { cart } = useCart();
+    const [loading, setLoading] = useState(true)
+
     const [paymentStatus, setPaymentStatuses] = useState([]);
     const [orderStatus, setOrderStatus] = useState([]);
     const [count, setCount] = useState([]);
@@ -127,6 +133,8 @@ function Header() {
                 }
             } catch (err) {
                 console.log(err);
+            } finally {
+                setLoading(false)
             }
         };
         getUserInfo();
@@ -463,6 +471,15 @@ function Header() {
         fetchStatus();
     }, []);
 
+    if (loading) {
+        return (
+            <div className='relative w-full h-full'>
+                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
+                    <BlinkBlur color="#385d38" size="medium" text="" textColor="" />
+                </div>
+            </div>
+        )
+    }
 
 
     // to navigate in to chat
