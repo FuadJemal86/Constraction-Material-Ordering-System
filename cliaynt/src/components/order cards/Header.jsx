@@ -513,8 +513,9 @@ function Header() {
 
                     {/* Header Icons */}
                     <div className='flex gap-2 md:gap-5 items-center'>
-                        <HeaderProfile />
-
+                        <div>
+                            <HeaderProfile />
+                        </div>
                         {/* Login Button */}
                         {islogin && (
                             <Link
