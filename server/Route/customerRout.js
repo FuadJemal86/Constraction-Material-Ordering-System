@@ -41,7 +41,7 @@ router.get('/get-products/:id', getProduct)
 router.get('/get-supplier', getSupplier)
 router.get('/get-category', customerGetCategory)
 router.get('/nearby-suppliers', customerNearbt)
-router.post('/logout', logout, { withCredentials: true })
+router.post('/logout', logout)
 
 
 router.post('/login', customerLogin)
