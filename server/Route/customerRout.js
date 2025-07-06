@@ -41,6 +41,8 @@ router.get('/get-products/:id', getProduct)
 router.get('/get-supplier', getSupplier)
 router.get('/get-category', customerGetCategory)
 router.get('/nearby-suppliers', customerNearbt)
+router.post('/logout', logout, { withCredentials: true })
+
 
 router.post('/login', customerLogin)
 router.post('/sign-up', customerSignUp)
@@ -70,7 +72,6 @@ router.get('/get-products-stock', getProductStock)
 router.post('/place-order', customerPlaceOrder)
 router.post('/make-payment/:transactionId', customerPayment)
 router.post('/validate', validation)
-router.post('/logout', logout, { withCredentials: true })
 
 
 router.put('/update-customer-account', editCustomerProfile)
