@@ -19,7 +19,6 @@ const customerLogin = async (req, res) => {
         }
 
         const isProduction = process.env.NODE_ENV === "production";
-        console.log("CUSTOMER_KEY:", process.env.CUSTOMER_KEY);
         const token = jwt.sign({
             customer: true, email: customer.email, id: customer.id
         }, process.env.CUSTOMER_KEY, { expiresIn: "30d" })
