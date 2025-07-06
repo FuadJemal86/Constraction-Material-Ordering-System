@@ -118,8 +118,7 @@ function SupplierSetting() {
     const handleLogout = async () => {
         try {
             const result = await api.post('/supplier/logout')
-
-            window.location.href = '/sign-in';
+            window.location.reload()
         } catch (err) {
             console.error('Logout failed:', err);
         }

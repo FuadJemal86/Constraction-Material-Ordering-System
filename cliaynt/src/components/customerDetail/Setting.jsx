@@ -30,8 +30,7 @@ function Setting() {
     const handleLogout = async () => {
         try {
             const result = await api.post('/customer/logout')
-
-            window.location.href = '/customer-sign-in';
+            window.location.reload()
         } catch (err) {
             console.error('Logout failed:', err);
         }
