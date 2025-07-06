@@ -380,7 +380,7 @@ function Header() {
                 setMessageNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
                 setUnreadMessageCount(0);
 
-                toast.success('All notifications marked as read');
+                // toast.success('All notifications marked as read');
             }
         } catch (err) {
             console.error('Error marking all notifications as read:', err);
