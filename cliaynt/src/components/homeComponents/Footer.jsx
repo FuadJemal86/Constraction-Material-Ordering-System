@@ -67,7 +67,7 @@ function Footer() {
                             </div>
                             <div className="flex items-center gap-3 text-sm">
                                 <FaPhone className="text-green-500" />
-                                <span>+251 9029 20301</span>
+                                <span>+251 90 292 0301</span>
                             </div>
                             <div className="flex items-center gap-3 text-sm">
                                 <FaMapMarkerAlt className="text-red-500" />
