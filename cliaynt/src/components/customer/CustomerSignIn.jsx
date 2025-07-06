@@ -35,16 +35,15 @@ function CustomerSignIn() {
                 toast.error(result.data.message);
             }
         } catch (err) {
-            console.log("Login Error:", err);
-
             if (err.response && err.response.data && err.response.data.message) {
                 toast.error(err.response.data.message);
             } else if (err.message) {
                 toast.error(err.message);
             } else {
-                toast.error('An error occurred. Please try again.');
+                toast.error('An unexpected error occurred.');
             }
         }
+
 
     };
 
