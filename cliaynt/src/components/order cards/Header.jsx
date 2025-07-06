@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaSearch } from "react-icons/fa";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import { LightMode, DarkMode } from "@mui/icons-material";
@@ -7,7 +6,6 @@ import { Menu, X, User, LogIn, MessageCircle, Bell } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from "../CartContext";
 import logo from '../../images/jejan.svg';
-import bannerImage from '../../images/banner2 page2.jpg';
 import ShoppingCart from './ShoppingCart';
 import api from '../../api';
 import toast, { Toaster } from 'react-hot-toast';
@@ -18,8 +16,6 @@ function Header() {
     const navigate = useNavigate()
     // Core state management
     const { cart } = useCart();
-    const [mobilePaymentsOpen, setMobilePaymentsOpen] = useState(false);
-    const [mobileOrdersOpen, setMobileOrdersOpen] = useState(false);
     const [paymentStatus, setPaymentStatuses] = useState([]);
     const [orderStatus, setOrderStatus] = useState([]);
     const [count, setCount] = useState([]);
