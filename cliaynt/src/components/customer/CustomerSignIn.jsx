@@ -35,19 +35,17 @@ function CustomerSignIn() {
                 toast.error(result.data.message);
             }
         } catch (err) {
-            console.log("Login Error:", err);
-            console.log("Axios error response data:", err.response?.data);
+            const errorData = err.response?.data;
 
-            const backendMessage = err?.response?.data?.message;
-
-            if (backendMessage) {
-                toast.error(backendMessage);
-            } else if (err.message) {
-                toast.error(err.message);
+            if (typeof errorData === 'string') {
+                toast.error(errorData);
+            } else if (errorData?.message) {
+                toast.error(errorData.message);
             } else {
                 toast.error('An unexpected error occurred.');
             }
         }
+
 
 
 
