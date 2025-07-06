@@ -115,6 +115,7 @@ function SupplierSetting() {
         }
     }
 
+
     const handleLogout = async () => {
         try {
             const result = await api.post('/supplier/logout')

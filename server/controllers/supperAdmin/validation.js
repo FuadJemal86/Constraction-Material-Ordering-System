@@ -10,6 +10,7 @@ const validation = async (req, res) => {
         return res.status(401).json({ message: 'Token is required' });
     }
 
+
     try {
         jwt.verify(token, process.env.SUPPER_ADMIN_KEY);
         return res.json({ valid: true });
