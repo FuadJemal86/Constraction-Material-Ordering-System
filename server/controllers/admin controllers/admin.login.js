@@ -13,14 +13,14 @@ const adminLogin = async (req, res) => {
         const admin = await prisma.admin.findUnique({ where: { email } });
 
         if (!admin) {
-            return res.status(401).json({ loginStatus: false, message: 'Wrong Email or Password' });
+            return res.status(400).json({ loginStatus: false, message: 'Wrong Email or Password' });
         }
 
         const isPasswordValid = await bcrypt.compare(password, admin.password);
         const role = admin.role;
 
         if (!isPasswordValid) {
-            return res.status(401).json({ loginStatus: false, message: 'Wrong Email or Password' });
+            return res.status(400).json({ loginStatus: false, message: 'Wrong Email or Password' });
         }
 
         const isProduction = process.env.NODE_ENV === "production";
