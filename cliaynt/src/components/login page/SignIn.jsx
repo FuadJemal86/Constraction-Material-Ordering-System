@@ -35,8 +35,13 @@ function SignIn() {
                 toast.error(result.data.message);
             }
         } catch (err) {
-            console.log(err);
-            return toast.error(err.response?.data?.message || 'An error occurred. Please try again.');
+            if (err.response && err.response.status === 400) {
+                toast.error('Wrong email or password!');
+            } else if (err.message) {
+                toast.error(err.message);
+            } else {
+                toast.error('An unexpected error occurred.');
+            }
         }
     };
 
