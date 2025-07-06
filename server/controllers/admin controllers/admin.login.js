@@ -2,7 +2,6 @@ const prisma = require("../../prismaCliaynt");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-
 const adminLogin = async (req, res) => {
     const { email, password } = req.body;
 
@@ -18,18 +17,36 @@ const adminLogin = async (req, res) => {
         }
 
         const isPasswordValid = await bcrypt.compare(password, admin.password);
-        const role = admin.role
+        const role = admin.role;
 
         if (!isPasswordValid) {
             return res.status(401).json({ loginStatus: false, message: 'Wrong Email or Password' });
         }
 
         const isProduction = process.env.NODE_ENV === "production";
-        const token = jwt.sign({
-            admin: true, email: admin.email, id: admin.id
-        }, process.env.ADMIN_PASSWORD, { expiresIn: "30d" })
 
-        res.cookie("a-auth-token", token, {
+        let token;
+        let cookieName;
+
+        if (role === "SUPPERADMIN") {
+            token = jwt.sign({
+                supperAdmin: true,
+                email: admin.email,
+                id: admin.id
+            }, process.env.SUPPER_ADMIN_KEY, { expiresIn: "30d" });
+
+            cookieName = "supper-token";
+        } else {
+            token = jwt.sign({
+                admin: true,
+                email: admin.email,
+                id: admin.id
+            }, process.env.ADMIN_PASSWORD, { expiresIn: "30d" });
+
+            cookieName = "a-auth-token";
+        }
+
+        res.cookie(cookieName, token, {
             httpOnly: true,
             secure: isProduction,
             sameSite: isProduction ? "none" : "lax",
