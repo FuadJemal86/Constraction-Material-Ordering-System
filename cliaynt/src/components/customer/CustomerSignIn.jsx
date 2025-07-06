@@ -35,9 +35,17 @@ function CustomerSignIn() {
                 toast.error(result.data.message);
             }
         } catch (err) {
-            console.log(err);
-            return toast.error(err.response?.data?.message || 'An error occurred. Please try again.');
+            console.log("Login Error:", err);
+
+            if (err.response && err.response.data && err.response.data.message) {
+                toast.error(err.response.data.message);
+            } else if (err.message) {
+                toast.error(err.message);
+            } else {
+                toast.error('An error occurred. Please try again.');
+            }
         }
+
     };
 
     return (
