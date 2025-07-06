@@ -28,8 +28,6 @@ function CustomerSignIn() {
                 // Store userId and userType in localStorage
                 localStorage.setItem('userId', result.data.userId);
                 localStorage.setItem('userType', result.data.userType);
-
-                toast.success(result.data.message);
                 navigate('/products');
             } else {
                 toast.error(result.data.message);
