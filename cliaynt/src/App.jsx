@@ -28,6 +28,7 @@ import AboutUs from './components/homeComponents/AboutUs';
 import SupplierDashboard from './components/SupplyNav/SupplierDashboard';
 import ForgotPassword from './components/login page/forgotPassword';
 import ContactUs from './components/homeComponents/ContactUS';
+import AllProduct from './components/order cards/AllProduct';
 
 
 
@@ -46,10 +47,14 @@ function App() {
                 <Route path='/setting' element={<SupplierSetting />} />
                 <Route path='/payment-form/:transactionId' element={<PaymentForm />} />
                 <Route path='/payment-transaction/:transactionId' element={<PaymentTransaction />} />
+
+                {/* product cards and nav bar */}
                 <Route path="/products" element={<OrderParent />}>
+                    <Route path='' element={<AllProduct />} />
                     <Route path='/products/supplier-products/:id' element={<Cards />} />
                     <Route path='nearby' element={<Nearby />} />
                 </Route>
+
                 <Route path='/my-account' element={<MyAccount />} />
                 <Route path='/chat' element={<Chat />} />
                 <Route path='/forgot-password' element={<ForgotPassword />} />
