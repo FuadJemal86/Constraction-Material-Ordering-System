@@ -37,21 +37,21 @@ function ContactUs() {
             icon: <Mail className="w-8 h-8 text-blue-500" />,
             title: 'Email Us',
             description: 'Send us an email and we\'ll respond within 24 hours',
-            contact: 'info@jejanmarketplace.com',
-            link: 'mailto:info@jejanmarketplace.com'
+            contact: 'fuad.jemal.mail@gmail.com',
+            link: 'mailto:fuad.jemal.mail@gmail.com'
         },
         {
             icon: <Phone className="w-8 h-8 text-green-500" />,
             title: 'Call Us',
             description: 'Speak directly with our support team',
-            contact: '+251 911 123 456',
+            contact: '+251 902 920 301',
             link: 'tel:+251911123456'
         },
         {
             icon: <MapPin className="w-8 h-8 text-purple-500" />,
             title: 'Visit Us',
-            description: 'Come visit our office in Addis Ababa',
-            contact: 'Addis Ababa, Ethiopia',
+            description: '',
+            contact: 'Jimma, Ethiopia',
             link: '#'
         },
         {

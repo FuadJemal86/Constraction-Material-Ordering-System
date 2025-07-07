@@ -31,6 +31,10 @@ function Footer() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    const handleNaviget = () => {
+        window.open('https://officaltechreach.vercel.app/', '_blank');
+    };
+
     const socialLinks = [
         { icon: FaFacebook, color: 'hover:text-blue-600', label: 'Facebook', to: 'https://web.facebook.com/profile.php?id=61578119967494' },
         { icon: FaInstagram, color: 'hover:text-pink-500', label: 'Instagram' },
