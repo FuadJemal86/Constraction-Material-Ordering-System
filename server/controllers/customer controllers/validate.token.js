@@ -20,10 +20,19 @@ const verifyToken = (req, res, next) => {
     }
 };
 
-const verifyCustomerToken =  [verifyToken, async (req, res) => {
+const verifyCustomerToken = [verifyToken, async (req, res) => {
     try {
         const user = await prisma.customer.findUnique({
-            where: { id: req.customer.id }
+            where: { id: req.customer.id },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+                isActive: true,
+                phone: true,
+                createdAt: true,
+            }
         });
 
         if (!user) {
@@ -37,4 +46,4 @@ const verifyCustomerToken =  [verifyToken, async (req, res) => {
     }
 }]
 
-module.exports = {verifyCustomerToken}
+module.exports = { verifyCustomerToken }
