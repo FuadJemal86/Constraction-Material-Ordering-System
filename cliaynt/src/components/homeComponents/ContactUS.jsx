@@ -61,30 +61,31 @@ function ContactUs() {
             icon: <Mail className="w-8 h-8 text-blue-500" />,
             title: 'Email Us',
             description: 'Send us an email and we\'ll respond within 24 hours',
-            contact: 'info@jejanmarketplace.com',
-            link: 'mailto:info@jejanmarketplace.com'
+            contact: 'fuad.jemal.mail@gmail.com',
+            link: 'mailto:fuad.jemal.mail@gmail.com'
         },
         {
             icon: <Phone className="w-8 h-8 text-green-500" />,
             title: 'Call Us',
             description: 'Speak directly with our support team',
-            contact: '+251 911 123 456',
-            link: 'tel:+251911123456'
+            contact: '+251 902 920 302',
+            link: 'tel:+251902920301'
         },
         {
             icon: <MapPin className="w-8 h-8 text-purple-500" />,
             title: 'Visit Us',
             description: 'Come visit our office in Addis Ababa',
-            contact: 'Addis Ababa, Ethiopia',
+            contact: 'Jimma, Ethiopia',
             link: '#'
         },
         {
             icon: <MessageCircle className="w-8 h-8 text-orange-500" />,
             title: 'Live Chat',
             description: 'Get instant support through our chat system',
-            contact: 'Available 24/7',
-            link: '#'
+            contact: 'Available 6/2',
+            link: 'https://t.me/Blazora_X'
         }
+
     ];
 
     const supportHours = [
@@ -276,7 +277,7 @@ function ContactUs() {
                                 <div className="space-y-4">
                                     <div className="flex items-center">
                                         <Users className="w-6 h-6 text-blue-500 mr-3" />
-                                        <span className="text-gray-700 dark:text-gray-300">24/7 Customer Support</span>
+                                        <span className="text-gray-700 dark:text-gray-300">6/2 Customer Support</span>
                                     </div>
                                     <div className="flex items-center">
                                         <Shield className="w-6 h-6 text-green-500 mr-3" />
