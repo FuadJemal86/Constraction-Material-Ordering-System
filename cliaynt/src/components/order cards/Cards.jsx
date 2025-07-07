@@ -22,7 +22,13 @@ function Cards() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await api.get(`/customer/get-products/${id}?category=${category}`)
+                // Build the URL - include category only if it exists
+                let url = `/customer/get-products/${id}`;
+                if (category) {
+                    url += `?category=${category}`;
+                }
+
+                const result = await api.get(url);
 
                 if (result.data.status) {
                     console.log(result.data.product)

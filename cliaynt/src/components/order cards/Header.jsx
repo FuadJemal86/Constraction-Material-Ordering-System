@@ -517,7 +517,7 @@ function Header() {
                                 <li><Link to="/" className="hover:text-yellow-500 transition-colors">Home</Link></li>
                                 <li><Link className="hover:text-yellow-500 transition-colors">Category</Link></li>
                                 <li><Link to="/about-us" className="hover:text-yellow-500 transition-colors">About Us</Link></li>
-                                <li><Link to="https://officaltechreach.vercel.app/" className="hover:text-yellow-500 transition-colors">Contact</Link></li>
+                                <li><Link to="/contact-us" className="hover:text-yellow-500 transition-colors">Contact</Link></li>
                             </ul>
                         </nav>
                     </div>
