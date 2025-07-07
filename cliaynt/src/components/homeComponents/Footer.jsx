@@ -31,10 +31,6 @@ function Footer() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleNaviget = () => {
-        window.open('https://officaltechreach.vercel.app/', '_blank');
-    };
-
     const socialLinks = [
         { icon: FaFacebook, color: 'hover:text-blue-600', label: 'Facebook', to: 'https://web.facebook.com/profile.php?id=61578119967494' },
         { icon: FaInstagram, color: 'hover:text-pink-500', label: 'Instagram' },
@@ -84,7 +80,7 @@ function Footer() {
                         <nav>
                             <ul className="space-y-3">
                                 {[
-                                    { label: 'Contact Us', action: handleNaviget },
+                                    { label: 'Contact Us', action: () => navigator('/contact-us') },
                                     { label: 'About Us', action: () => navigator('/about-us') },
                                     { label: 'supplier', action: () => navigator('/sign-up') },
                                     { label: 'shoppe', action: () => navigator('/products') },

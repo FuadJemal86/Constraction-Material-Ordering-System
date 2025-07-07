@@ -27,6 +27,7 @@ import Chat from './components/Chat';
 import AboutUs from './components/homeComponents/AboutUs';
 import SupplierDashboard from './components/SupplyNav/SupplierDashboard';
 import ForgotPassword from './components/login page/forgotPassword';
+import ContactUs from './components/homeComponents/ContactUS';
 
 
 
@@ -36,6 +37,7 @@ function App() {
             <Routes>
                 <Route path='/' element={<HomeParent />} />
                 <Route path='/about-us' element={<AboutUs />} />
+                <Route path='/contact-us' element={<ContactUs />} />
                 <Route path='/sign-up' element={<SupplierSignUp />} />
                 <Route path='/sign-in' element={<SignIn />} />
                 <Route path='/order-items/:id' element={<ViewDetails />} />
