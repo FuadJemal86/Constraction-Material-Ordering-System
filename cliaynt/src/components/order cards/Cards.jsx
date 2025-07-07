@@ -23,7 +23,7 @@ function Cards() {
         const fetchData = async () => {
             try {
                 // Build the URL - include category only if it exists
-                let url = `/customer/get-products/${id}`;
+                let url = `/customer/get-products`;
                 if (category) {
                     url += `?category=${category}`;
                 }
@@ -43,7 +43,7 @@ function Cards() {
         }
 
         fetchData()
-    }, [category, id]);
+    }, [category]);
 
 
 
