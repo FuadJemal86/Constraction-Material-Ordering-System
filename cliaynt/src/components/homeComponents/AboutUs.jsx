@@ -4,6 +4,7 @@ import Header from './Header';
 import Footer from './Footer';
 import { Link, useNavigate } from 'react-router-dom';
 import { BlinkBlur, FourSquare } from 'react-loading-indicators'
+import { useState } from 'react';
 
 
 function AboutUs() {
