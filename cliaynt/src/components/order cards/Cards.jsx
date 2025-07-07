@@ -5,12 +5,13 @@ import image1 from '../../images/image1_0.jpg';
 // import { Notyf } from "notyf";
 import api from '../../api';
 import toast from 'react-hot-toast';
+
 import 'notyf/notyf.min.css';
 import { Notyf } from 'notyf';
 
 function Cards() {
     // const notyf = new Notyf();
-    const { id } = useParams();
+    const { id } = useParams(); // supplier ID
     const navigate = useNavigate();
     const [allProducts, setAllProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
@@ -18,7 +19,7 @@ function Cards() {
     const { addToCart } = useCart()
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const category = queryParams.get('category');
+    const category = queryParams.get('category'); // category ID
 
     // First useEffect - Fetch all products
     useEffect(() => {
@@ -42,24 +43,31 @@ function Cards() {
         }
 
         fetchAllProducts();
-    }, []); // Only run once on component mount
+    }, []);
 
-    // Second useEffect - Filter products by category
+    // Second useEffect - Filter by supplier and category
     useEffect(() => {
         if (allProducts.length > 0) {
-            if (category) {
-                // Filter products by category
-                const filtered = allProducts.filter(product =>
-                    product.category && product.category.toLowerCase() === category.toLowerCase()
+            let filtered = allProducts;
+
+            // Filter by supplier ID
+            if (id) {
+                filtered = filtered.filter(product =>
+                    product.supplier_id && product.supplier_id.toString() === id.toString()
                 );
-                setFilteredProducts(filtered);
-                console.log(`Filtered products for category "${category}":`, filtered);
-            } else {
-                // Show all products if no category is specified
-                setFilteredProducts(allProducts);
             }
+
+            // Filter by category ID
+            if (category) {
+                filtered = filtered.filter(product =>
+                    product.category_id && product.category_id.toString() === category.toString()
+                );
+            }
+
+            setFilteredProducts(filtered);
+            console.log(`Filtered products for supplier ${id} and category ${category}:`, filtered);
         }
-    }, [allProducts, category]); // Run when allProducts or category changes
+    }, [allProducts, id, category]);
 
     const handleOrderClick = async (product) => {
         try {
@@ -92,18 +100,6 @@ function Cards() {
     return (
         <div className="container mx-auto px-4 py-8">
             <div>
-                {/* Show category info if filtering */}
-                {category && (
-                    <div className="mb-6">
-                        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-                            {category.charAt(0).toUpperCase() + category.slice(1)} Products
-                        </h2>
-                        <p className="text-gray-600 dark:text-gray-400">
-                            Showing {filteredProducts.length} products in {category} category
-                        </p>
-                    </div>
-                )}
-
                 {filteredProducts.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {filteredProducts.map(product => (
@@ -122,14 +118,6 @@ function Cards() {
 
                                 <div className="p-5">
                                     <h3 className="font-bold text-lg mb-2 text-gray-800 dark:text-white">{product.name}</h3>
-
-                                    {/* Show category if available */}
-                                    {product.category && (
-                                        <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mb-2">
-                                            {product.category}
-                                        </span>
-                                    )}
-
                                     <div className="flex justify-between items-center mb-4">
                                         <p className="text-blue-600 dark:text-blue-400 font-bold text-xl">{`birr ${product.price}`}</p>
                                         {/* Optional rating component */}
@@ -152,16 +140,8 @@ function Cards() {
                         ))}
                     </div>
                 ) : (
-                    <div className='w-full grid grid-cols-1 justify-center items-center text-center py-12'>
-                        <div className="text-gray-500 dark:text-gray-400">
-                            <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
-                            </svg>
-                            <p className="text-lg font-medium">No Products Found</p>
-                            {category && (
-                                <p className="text-sm mt-2">No products available in the "{category}" category</p>
-                            )}
-                        </div>
+                    <div className='w-full grid grid-cols-1 justify-center items-center text-center'>
+                        <span>No Product Found</span>
                     </div>
                 )}
             </div>
