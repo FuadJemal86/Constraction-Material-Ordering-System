@@ -3,8 +3,18 @@ import { Users, Target, Award, Heart, Globe, Shield, ArrowRight } from 'lucide-r
 import Header from './Header';
 import Footer from './Footer';
 import { Link, useNavigate } from 'react-router-dom';
+import { BlinkBlur, FourSquare } from 'react-loading-indicators'
+
 
 function AboutUs() {
+
+    const [loading, setLoading] = useState(true)
+
+
+    setTimeout(() => {
+        setLoading(false)
+    }, 3000);
+
     const navigator = useNavigate()
     const values = [
         {
@@ -36,6 +46,16 @@ function AboutUs() {
         { number: '3', label: 'Successful Orders' },
         { number: '4.9%', label: 'Platform Uptime' }
     ];
+
+    if (loading) {
+        return (
+            <div className=''>
+                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
+                    <BlinkBlur color="#3134cc" size="medium" text="" textColor="" />
+                </div>
+            </div>
+        )
+    }
 
     const handleNavigation = () => {
         navigator('/products')

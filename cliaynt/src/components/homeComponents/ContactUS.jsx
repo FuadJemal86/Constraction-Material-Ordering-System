@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { Mail, Phone, MapPin, MessageCircle, Send, Clock, Users, Shield, ArrowRight } from 'lucide-react';
 import Footer from './Footer';
 import Header from './Header';
+import { BlinkBlur, FourSquare } from 'react-loading-indicators'
 
 function ContactUs() {
+    const [loading, setLoading] = useState(true)
+
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -11,6 +15,11 @@ function ContactUs() {
         subject: '',
         message: ''
     });
+
+
+    setTimeout(() => {
+        setLoading(false)
+    }, 3000);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -55,6 +64,16 @@ function ContactUs() {
             alert('There was an error sending your message. Please try again.');
         }
     };
+
+    if (loading) {
+        return (
+            <div className=''>
+                <div className="absolute inset-0 flex justify-center items-center text-center bg-white/70 z-30">
+                    <BlinkBlur color="#3134cc" size="medium" text="" textColor="" />
+                </div>
+            </div>
+        )
+    }
 
     const contactInfo = [
         {
