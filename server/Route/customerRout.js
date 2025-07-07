@@ -28,6 +28,7 @@ const { validation } = require('../controllers/customer controllers/validation')
 const { logout } = require('../controllers/customer controllers/logOut')
 const { authCustomer, customer } = require('../middleware/auth')
 const { checkEmail } = require('../controllers/customer controllers/forgotPassword')
+const { getAllProduct } = require('../controllers/customer controllers/getAllProduct')
 
 
 
@@ -38,6 +39,7 @@ const router = express.Router()
 
 // Public Routes
 router.get('/get-products/:id', getProduct)
+router.get('/get-products', getAllProduct)
 router.get('/get-supplier', getSupplier)
 router.get('/get-category', customerGetCategory)
 router.get('/nearby-suppliers', customerNearbt)

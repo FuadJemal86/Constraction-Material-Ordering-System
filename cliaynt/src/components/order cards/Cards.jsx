@@ -5,7 +5,6 @@ import image1 from '../../images/image1_0.jpg';
 // import { Notyf } from "notyf";
 import api from '../../api';
 import toast from 'react-hot-toast';
-
 import 'notyf/notyf.min.css';
 import { Notyf } from 'notyf';
 
