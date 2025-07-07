@@ -93,7 +93,7 @@ function ContactUs() {
         {
             icon: <MapPin className="w-8 h-8 text-purple-500" />,
             title: 'Visit Us',
-            description: 'Come visit our office in Addis Ababa',
+            description: '',
             contact: 'Jimma, Ethiopia',
             link: '#'
         },
