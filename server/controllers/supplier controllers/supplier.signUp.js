@@ -32,6 +32,12 @@ const supplierUp = async (req, res) => {
             return res.status(400).json({ status: false, message: 'Account Already Exists' });
         }
 
+        const tinExists = await prisma.supplier.findUnique({ where: { tinNumber } });
+        if (tinExists) {
+            return res.status(409).json({ status: false, message: 'Account with this TIN Number already exists' });
+        }
+
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const supplier = await prisma.supplier.create({

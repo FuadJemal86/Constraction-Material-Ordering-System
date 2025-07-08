@@ -177,8 +177,8 @@ model supplier {
   isVerify      Boolean  @default(true)
   lat           Float
   lng           Float
-  tinNumber     String   @unique(map: "Supplier_tinNumber_key") @db.VarChar(10)
-  licenseNumber String   @unique(map: "Supplier_license_key") @db.VarChar(20)
+  tinNumber     String   @unique(map: "Supplier_tinNumber_key") @db.VarChar(20)
+  licenseNumber String   @unique(map: "Supplier_license_key") @db.VarChar(100)
   isApproved    Boolean  @default(false)
   createdAt     DateTime @default(now())
 
