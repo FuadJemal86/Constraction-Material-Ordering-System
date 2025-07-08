@@ -29,7 +29,7 @@ const supplierUp = async (req, res) => {
         const isExist = await prisma.supplier.findUnique({ where: { email } });
 
         if (isExist) {
-            return res.status(401).json({ status: false, message: 'Account Already Exists' });
+            return res.status(400).json({ status: false, message: 'Account Already Exists' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
