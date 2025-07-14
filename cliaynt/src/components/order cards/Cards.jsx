@@ -84,7 +84,7 @@ function Cards() {
                                     <div className="p-5">
                                         <h3 className="font-bold text-lg mb-2 text-gray-800 dark:text-white">{product.name}</h3>
                                         <div className="flex justify-between items-center mb-4">
-                                            <p className="text-blue-600 dark:text-blue-400 font-bold text-xl">{`birr ${product.price}`}</p>
+                                            <p className="text-blue-600 dark:text-blue-400 font-bold text-xl">{`Birr ${product.price}`}</p>
                                             {/* Optional rating component */}
                                             <div className="flex items-center">
                                                 <span className="text-xs ml-1 text-gray-600 dark:text-gray-400">stock {product.stock}/{product.unit}</span>
