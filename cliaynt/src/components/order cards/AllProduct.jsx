@@ -24,7 +24,6 @@ function AllProduct() {
                 }
             } catch (err) {
                 console.log(err);
-                toast.error(err.response?.data?.message || "An error occurred");
             } finally {
                 setLoading(false);
             }
@@ -43,7 +42,7 @@ function AllProduct() {
                 addToCart(product);
                 toast.success("Item added to cart");
             } else {
-                toast.error(result.data.message);
+                console.log(result.data.message);
             }
         } catch (err) {
             console.error("Token verification failed!", err);
