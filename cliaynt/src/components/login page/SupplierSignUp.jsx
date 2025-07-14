@@ -223,13 +223,6 @@ function SupplierSignUp() {
             return toast.error('Invalid TIN Number. It must be 9 or 10 digits.');
         }
 
-        const licenseRegex = /^[A-Z]{2}\/[A-Z]{4}\/\d{1,2}\/\d{5,7}\/\d{5,8}\/20\d{2}$/;
-        if (!licenseRegex.test(licenseNumber)) {
-            return toast.error('Invalid Business License Number format.');
-        }
-
-
-
         if (!agree) {
             return toast.error("You must agree to the terms and conditions.");
         }
@@ -258,7 +251,17 @@ function SupplierSignUp() {
                 toast.error(result.data.message || 'Signup failed!');
             }
         } catch (err) {
-            const errorMessage = err.response?.data?.message || 'An error occurred. Please try again.';
+            const status = err.response?.status;
+            let errorMessage = 'An error occurred. Please try again.';
+
+            if (status === 400) {
+                errorMessage = 'Account with this email already exists.';
+            } else if (status === 409) {
+                errorMessage = err.response.data.message || 'Duplicate data (TIN or License Number).';
+            } else if (status === 500) {
+                errorMessage = 'Server error. Please try again later.';
+            }
+
             toast.error(errorMessage);
             console.error(err);
         }

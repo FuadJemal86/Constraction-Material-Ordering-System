@@ -16,10 +16,6 @@ const supplierUp = async (req, res) => {
             return res.status(400).json({ status: false, message: 'Invalid TIN Number. It must be 10 digits.' });
         }
 
-        const licenseRegex = /^[A-Z]{2}\/[A-Z]{4}\/\d{1,2}\/\d{5,7}\/\d{5,8}\/20\d{2}$/;
-        if (!licenseRegex.test(licenseNumber)) {
-            return res.status(400).json({ status: false, message: 'Invalid License Number format' });
-        }
 
         const licenseExists = await prisma.supplier.findFirst({ where: { licenseNumber } });
         if (licenseExists) {
